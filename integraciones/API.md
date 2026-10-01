@@ -144,3 +144,20 @@ omitirla; Studio guarda `confirmed_at` separadamente. Repetir el mismo recibo co
 ambas fechas; permite completar una fecha de publicación que antes faltaba. Los trabajos
 incluyen `publications` con estados, plataformas y enlaces, y `published` solo es verdadero
 si existe una publicación confirmada. Estos campos no incluyen tokens de reclamación.
+
+
+### Idea automática y producción en una llamada
+
+`POST /api/v1/ideas`, con autenticación Bearer y `Idempotency-Key` estable:
+
+```json
+{"brand_id":"gcode","kind":"video","auto":true,"style":"auto","allow_paid":true,"produce":true,"allow_paid_voice":true,"aspect":"vertical"}
+```
+
+No requiere `idea`. La selección usa los hechos de la marca y el historial automático.
+Estilos nuevos: `tutorial`, `pregunta`, `lista`, `solucion`, `comparativa`, `marca`;
+se conservan `historia`, `comercial`, `consejo`. `style: "auto"` requiere `auto: true`.
+`produce: false` devuelve solo el borrador. Con producción devuelve además `job`,
+que se consulta mediante las rutas existentes hasta completarse. La voz tiene un
+límite de US$2 y el guion reserva US$0.10. La publicación sigue requiriendo revisión
+y programación. Reintenta una respuesta perdida con la misma clave y el mismo cuerpo.

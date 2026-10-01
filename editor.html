@@ -29,6 +29,7 @@
 <div class="card"><h2>Videos guardados</h2><div id="videos"></div></div>
 </aside></main>
 <script type="module">
+import {styles} from './styles.mjs'
 import { validar, formatos } from './validar.mjs'
 const $=id=>document.getElementById(id); let sb, selected=0,total=0,t=0,playing=false,last=0,dirty=false
 let history=[],future=[],restoring=false,audioPlan=null,activeAudio=null;const music=new Audio();music.loop=true;music.volume=.12;
@@ -43,8 +44,8 @@ function fields(){const e=sb.escenas[selected];$('fields').replaceChildren();for
 async function load(){history=[];future=[];activeAudio?.audio.pause();music.pause();sb=structuredClone(catalogo.get($('project').value));await frame.contentWindow.preparar(sb);selected=0;t=0;playing=false;dirty=false;sync();fields();$('voice').checked=sb.voz===true;$('subtitles').checked=sb.subtitulos===true}
 const list=await(await fetch('/api/lista')).json();
 const catalogo=new Map(await Promise.all(list.guiones.map(async f=>[f,validar(await(await fetch('/storyboards/'+encodeURIComponent(f))).json())])));
-const descripciones={historia:'Personajes y escenas ilustradas para contar un problema, mostrar la solución y cerrar con una demo.',comercial:'Estilo del Reel de n8n: narración, Montserrat gruesa, palabras resaltadas y capturas reales.',consejo:'Una sola idea, un dato visible y un cierre corto. Ideal para piezas breves.'};
-const bases={historia:'piloto-voz-selectiva.json',comercial:'comercial-n8n.json',consejo:'consejo-venta-neta.json'};
+const descripciones={...Object.fromEntries(Object.entries(styles).map(([id,s])=>[id,s.description])),historia:'Personajes y escenas ilustradas para contar un problema, mostrar la solución y cerrar con una demo.',comercial:'Estilo del Reel de n8n: narración, Montserrat gruesa, palabras resaltadas y capturas reales.',consejo:'Una sola idea, un dato visible y un cierre corto. Ideal para piezas breves.'};
+const bases={...Object.fromEntries(Object.entries(styles).filter(([,s])=>s.beats).map(([id])=>[id,'base-'+id+'.json'])),historia:'piloto-voz-selectiva.json',comercial:'comercial-n8n.json',consejo:'consejo-venta-neta.json'};
 for(const [key,label]of Object.entries(formatos))$('format').add(new Option(label,key));
 function proyectos(){const formato=$('format').value;$('project').replaceChildren();for(const [f,guion]of catalogo)if((guion.formato||'historia')===formato)$('project').add(new Option(guion.nombre,f));$('format-description').textContent=descripciones[formato];if(catalogo.has(bases[formato]))$('project').value=bases[formato]}
 $('format').value='comercial';const requested=new URLSearchParams(location.search).get('project');if(requested&&catalogo.has(requested+'.json'))$('format').value=catalogo.get(requested+'.json').formato||'historia';proyectos();if(requested&&catalogo.has(requested+'.json'))$('project').value=requested+'.json';await load();

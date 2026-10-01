@@ -1,0 +1,64 @@
+{
+  "nombre": "base-tutorial",
+  "formato": "tutorial",
+  "voz": true,
+  "subtitulos": true,
+  "perfil_voz": "n8n",
+  "escenas": [
+    {
+      "tipo": "media",
+      "layout": "steps",
+      "step": 1,
+      "steps": 5,
+      "dur": 5,
+      "titulo": "Lo que vas a aprender",
+      "texto": "Edita este mensaje con un hecho comprobado.",
+      "voz": "",
+      "cta": "Solicita tu demo"
+    },
+    {
+      "tipo": "media",
+      "layout": "steps",
+      "step": 2,
+      "steps": 5,
+      "dur": 5,
+      "titulo": "Primer paso",
+      "texto": "Edita este mensaje con un hecho comprobado.",
+      "voz": "",
+      "cta": "Solicita tu demo"
+    },
+    {
+      "tipo": "media",
+      "layout": "steps",
+      "step": 3,
+      "steps": 5,
+      "dur": 5,
+      "titulo": "Segundo paso",
+      "texto": "Edita este mensaje con un hecho comprobado.",
+      "voz": "",
+      "cta": "Solicita tu demo"
+    },
+    {
+      "tipo": "media",
+      "layout": "steps",
+      "step": 4,
+      "steps": 5,
+      "dur": 5,
+      "titulo": "Tercer paso",
+      "texto": "Edita este mensaje con un hecho comprobado.",
+      "voz": "",
+      "cta": "Solicita tu demo"
+    },
+    {
+      "tipo": "media",
+      "layout": "steps",
+      "step": 5,
+      "steps": 5,
+      "dur": 5,
+      "titulo": "Solicita tu demo",
+      "texto": "+1 849 540 6093",
+      "voz": "",
+      "cta": "Solicita tu demo"
+    }
+  ]
+}

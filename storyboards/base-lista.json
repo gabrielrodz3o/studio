@@ -1,0 +1,64 @@
+{
+  "nombre": "base-lista",
+  "formato": "lista",
+  "voz": true,
+  "subtitulos": true,
+  "perfil_voz": "n8n",
+  "escenas": [
+    {
+      "tipo": "media",
+      "layout": "cards",
+      "step": 1,
+      "steps": 5,
+      "dur": 5,
+      "titulo": "Tres puntos para recordar",
+      "texto": "Edita este mensaje con un hecho comprobado.",
+      "voz": "",
+      "cta": "Solicita tu demo"
+    },
+    {
+      "tipo": "media",
+      "layout": "cards",
+      "step": 2,
+      "steps": 5,
+      "dur": 5,
+      "titulo": "Punto uno",
+      "texto": "Edita este mensaje con un hecho comprobado.",
+      "voz": "",
+      "cta": "Solicita tu demo"
+    },
+    {
+      "tipo": "media",
+      "layout": "cards",
+      "step": 3,
+      "steps": 5,
+      "dur": 5,
+      "titulo": "Punto dos",
+      "texto": "Edita este mensaje con un hecho comprobado.",
+      "voz": "",
+      "cta": "Solicita tu demo"
+    },
+    {
+      "tipo": "media",
+      "layout": "cards",
+      "step": 4,
+      "steps": 5,
+      "dur": 5,
+      "titulo": "Punto tres",
+      "texto": "Edita este mensaje con un hecho comprobado.",
+      "voz": "",
+      "cta": "Solicita tu demo"
+    },
+    {
+      "tipo": "media",
+      "layout": "cards",
+      "step": 5,
+      "steps": 5,
+      "dur": 5,
+      "titulo": "Solicita tu demo",
+      "texto": "+1 849 540 6093",
+      "voz": "",
+      "cta": "Solicita tu demo"
+    }
+  ]
+}

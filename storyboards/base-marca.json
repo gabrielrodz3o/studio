@@ -1,0 +1,53 @@
+{
+  "nombre": "base-marca",
+  "formato": "marca",
+  "voz": true,
+  "subtitulos": true,
+  "perfil_voz": "n8n",
+  "escenas": [
+    {
+      "tipo": "media",
+      "layout": "minimal",
+      "step": 1,
+      "steps": 4,
+      "dur": 5,
+      "titulo": "Conoce la marca",
+      "texto": "Edita este mensaje con un hecho comprobado.",
+      "voz": "",
+      "cta": "Solicita tu demo"
+    },
+    {
+      "tipo": "media",
+      "layout": "minimal",
+      "step": 2,
+      "steps": 4,
+      "dur": 5,
+      "titulo": "Qué hacemos",
+      "texto": "Edita este mensaje con un hecho comprobado.",
+      "voz": "",
+      "cta": "Solicita tu demo"
+    },
+    {
+      "tipo": "media",
+      "layout": "minimal",
+      "step": 3,
+      "steps": 4,
+      "dur": 5,
+      "titulo": "Para quién trabajamos",
+      "texto": "Edita este mensaje con un hecho comprobado.",
+      "voz": "",
+      "cta": "Solicita tu demo"
+    },
+    {
+      "tipo": "media",
+      "layout": "minimal",
+      "step": 4,
+      "steps": 4,
+      "dur": 5,
+      "titulo": "Solicita tu demo",
+      "texto": "+1 849 540 6093",
+      "voz": "",
+      "cta": "Solicita tu demo"
+    }
+  ]
+}

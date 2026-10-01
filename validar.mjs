@@ -1,5 +1,6 @@
+import {styles} from './styles.mjs'
 export const tipos = ['media','gancho_local', 'caos_acumulado', 'transicion', 'tablet_comanda', 'pantalla_cocina', 'caja_cuadra', 'inventario_alerta', 'grafica_ventas', 'remate', 'cierre', 'comercial_doble', 'comercial_foco', 'comercial_cierre', 'comercial_n8n']
-export const formatos = { historia: 'Historia ilustrada', comercial: 'Demostración comercial', consejo: 'Consejo rápido' }
+export const formatos = Object.fromEntries(Object.entries(styles).map(([id,s])=>[id,s.name]))
 export function validar(sb) {
   const errores = []
   if(sb?.brand){const b=sb.brand;if(b.logo_resource_id&&!/^[a-f0-9-]{36}$/.test(b.logo_resource_id))errores.push('Logo inválido');if(b.logo_url&&!/^assets\/resource-[a-f0-9-]{36}\.(jpg|jpeg|png|webp)$/.test(b.logo_url))errores.push('Ruta de logo inválida');if(typeof b.name!=='string'||b.name.length>100||!/^#[a-f0-9]{6}$/i.test(b.primary||'')||!/^#[a-f0-9]{6}$/i.test(b.accent||''))errores.push('Identidad visual inválida')}
@@ -29,6 +30,8 @@ export function validar(sb) {
     const fail = s => errores.push(`Escena ${i + 1}: ${s}`)
     if (!e || typeof e !== 'object') { fail('inválida'); continue }
     if(e.tipo==='media'){
+      if(e.layout&&!['steps','question','cards','split','minimal'].includes(e.layout))fail('Diseño editorial inválido')
+      for(const k of ['step','steps'])if(e[k]!=null&&(!Number.isInteger(e[k])||e[k]<1||e[k]>30))fail('Numeración inválida')
       if(typeof e.titulo!=='string'||e.titulo.length>100)fail('Título de recurso inválido')
       if(e.resource_id&&!/^[a-f0-9-]{36}$/.test(e.resource_id))fail('Recurso inválido')
       if(e.media_url&&!/^assets\/resource-[a-f0-9-]{36}\.(jpg|jpeg|png|webp|mp4|mov)$/.test(e.media_url))fail('Ruta de recurso inválida')

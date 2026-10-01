@@ -1,0 +1,53 @@
+{
+  "nombre": "base-solucion",
+  "formato": "solucion",
+  "voz": true,
+  "subtitulos": true,
+  "perfil_voz": "n8n",
+  "escenas": [
+    {
+      "tipo": "media",
+      "layout": "split",
+      "step": 1,
+      "steps": 4,
+      "dur": 5,
+      "titulo": "Una dificultad cotidiana",
+      "texto": "Edita este mensaje con un hecho comprobado.",
+      "voz": "",
+      "cta": "Solicita tu demo"
+    },
+    {
+      "tipo": "media",
+      "layout": "split",
+      "step": 2,
+      "steps": 4,
+      "dur": 5,
+      "titulo": "Qué necesitas resolver",
+      "texto": "Edita este mensaje con un hecho comprobado.",
+      "voz": "",
+      "cta": "Solicita tu demo"
+    },
+    {
+      "tipo": "media",
+      "layout": "split",
+      "step": 3,
+      "steps": 4,
+      "dur": 5,
+      "titulo": "Cómo puede ayudar",
+      "texto": "Edita este mensaje con un hecho comprobado.",
+      "voz": "",
+      "cta": "Solicita tu demo"
+    },
+    {
+      "tipo": "media",
+      "layout": "split",
+      "step": 4,
+      "steps": 4,
+      "dur": 5,
+      "titulo": "Solicita tu demo",
+      "texto": "+1 849 540 6093",
+      "voz": "",
+      "cta": "Solicita tu demo"
+    }
+  ]
+}

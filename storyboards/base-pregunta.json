@@ -1,0 +1,53 @@
+{
+  "nombre": "base-pregunta",
+  "formato": "pregunta",
+  "voz": true,
+  "subtitulos": true,
+  "perfil_voz": "n8n",
+  "escenas": [
+    {
+      "tipo": "media",
+      "layout": "question",
+      "step": 1,
+      "steps": 4,
+      "dur": 5,
+      "titulo": "La pregunta",
+      "texto": "Edita este mensaje con un hecho comprobado.",
+      "voz": "",
+      "cta": "Solicita tu demo"
+    },
+    {
+      "tipo": "media",
+      "layout": "question",
+      "step": 2,
+      "steps": 4,
+      "dur": 5,
+      "titulo": "La respuesta",
+      "texto": "Edita este mensaje con un hecho comprobado.",
+      "voz": "",
+      "cta": "Solicita tu demo"
+    },
+    {
+      "tipo": "media",
+      "layout": "question",
+      "step": 3,
+      "steps": 4,
+      "dur": 5,
+      "titulo": "Cómo funciona",
+      "texto": "Edita este mensaje con un hecho comprobado.",
+      "voz": "",
+      "cta": "Solicita tu demo"
+    },
+    {
+      "tipo": "media",
+      "layout": "question",
+      "step": 4,
+      "steps": 4,
+      "dur": 5,
+      "titulo": "Solicita tu demo",
+      "texto": "+1 849 540 6093",
+      "voz": "",
+      "cta": "Solicita tu demo"
+    }
+  ]
+}

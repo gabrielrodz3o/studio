@@ -185,3 +185,20 @@ publicación real excluyen las publicaciones cuya fecha se desconoce.
 Código versionado en https://github.com/gabrielrodz3o/studio. El repositorio es público;
 los recursos del negocio, credenciales y datos de operación permanecen en los respaldos
 privados, fuera de Git. Consulta README.md antes de instalar desde una copia nueva.
+
+## Crear sin una idea y estilos editoriales
+
+En **Crear → Crear por mí**, elige la marca. Studio selecciona un hecho de su ficha,
+evita los temas automáticos más recientes y rota seis estructuras editoriales.
+Puedes elegir un estilo concreto en lugar de la selección automática.
+Los nueve estilos son historia ilustrada, demostración comercial (n8n), consejo rápido,
+paso a paso, pregunta y respuesta, lista útil, problema y solución, comparativa educativa
+y presentación de marca. Conservan la voz Charon y los subtítulos sincronizados.
+
+El resultado puede ser un borrador editable o una pieza producida para revisión.
+El guion reserva US$0.10; producir un video requiere autorizar además hasta US$2
+para voz. Estos importes son límites, no precios fijos. Una misma solicitud conserva
+su guion y su trabajo al reintentarse. No publica automáticamente ni ejecuta un calendario
+por su cuenta: n8n puede iniciar la misma operación mediante la API privada.
+Las imágenes automáticas usan la identidad de la marca; los nuevos videos admiten
+fotos y clips de la biblioteca además de la composición tipográfica animada.

@@ -24,6 +24,17 @@ const access=await new Access(state,{origin,enabled:process.env.STUDIO_REQUIRE_L
 const marketing=await new Marketing(root).init()
 const versions=new Versions(root)
 const creative=new Creative(root)
+async function createPiece(input,key,actor){
+ if(input.produce!=null&&typeof input.produce!=='boolean')throw problem(422,'produce debe ser booleano')
+ if(input.aspect!=null&&!['vertical','horizontal','square'].includes(input.aspect))throw problem(422,'Formato de salida inválido')
+ if(input.produce&&input.kind==='video'&&input.allow_paid_voice!==true)throw problem(422,'Autoriza la generación de voz para producir el video')
+ const result=await creative.create(input,key,actor)
+ await versions.save(result.kind,result.script,actor)
+ if(!input.produce)return result
+ const request={brand_id:input.brand_id||'comandpos',kind:result.kind,script:result.script,...(result.kind==='video'?{voice:true,subtitles:true,allow_paid_voice:true,aspect:input.aspect||'vertical',max_budget_usd:2}:{})}
+ const {job}=await store.create(request,'idea-render:'+result.id,'creative')
+ return {...result,job}
+}
 const photos=new PhotoJobs(root)
 const lockFile=join(state,'service.lock')
 async function lock(){
@@ -96,7 +107,7 @@ const server=createServer(async(req,res)=>{
       if(req.method==='POST'&&/^\/api\/v1\/photos\/photo_[a-f0-9-]{36}\/retry$/.test(path))return json(202,await photos.retry(path.split('/').at(-2)))
       if(req.method==='POST'&&path==='/api/v1/photos')return json(202,await photos.start(await body(req),req.headers['idempotency-key'],'n8n'))
       if(req.method==='GET'&&/^\/api\/v1\/photos\/photo_[a-f0-9-]{36}$/.test(path))return json(200,await photos.status(path.split('/').at(-1)))
-      if(req.method==='POST'&&path==='/api/v1/ideas'){const result=await creative.create(await body(req),req.headers['idempotency-key'],'n8n');await versions.save(result.kind,result.script,'n8n');return json(200,result)}
+      if(req.method==='POST'&&path==='/api/v1/ideas'){const result=await createPiece(await body(req),req.headers['idempotency-key'],'n8n');return json(200,result)}
       const action=/^\/api\/v1\/jobs\/(job_[a-f0-9-]{36})\/(cancel|retry|delivery|log)$/.exec(path)
       if(action){if(req.method==='POST'&&action[2]==='cancel')return json(200,await store.cancel(action[1]));if(req.method==='POST'&&action[2]==='retry')return json(202,await store.retry(action[1],req.headers['idempotency-key']));if(req.method==='GET'&&action[2]==='log')return json(200,{log:await store.log(action[1])});if(req.method==='GET'&&action[2]==='delivery'){const j=store.get(action[1]);if(j.review.status!=='approved')throw problem(409,'La pieza requiere aprobación');return json(200,j)}}
       if(req.method==='GET'&&path==='/api/v1/health')return json(200,{ok:true,api_version:1,active_jobs:store.active?1:0})
@@ -139,7 +150,7 @@ const server=createServer(async(req,res)=>{
       if(path==='/api/marketing/assets'){const d=await body(req,85000000);return json(201,await marketing.upload(d,Buffer.from(d.base64||'','base64'),actor.username))}
       if(/^\/api\/photos\/photo_[a-f0-9-]{36}\/retry$/.test(path))return json(202,await photos.retry(path.split('/').at(-2)))
       if(path==='/api/photos')return json(202,await photos.start(await body(req),req.headers['idempotency-key'],actor.username))
-      if(path==='/api/ideas'){const input=await body(req),key=req.headers['idempotency-key'];const result=await creative.create(input,key,actor.username);await versions.save(result.kind,result.script,actor.username);await access.audit(actor.username,'idea_created',{id:result.id});return json(200,result)}
+      if(path==='/api/ideas'){const input=await body(req),key=req.headers['idempotency-key'];const result=await createPiece(input,key,actor.username);await access.audit(actor.username,'idea_created',{id:result.id});return json(200,result)}
       if(path==='/api/preview/audio')return json(200,await previewAudio(root,(await body(req)).script))
       const jobAction=/^\/api\/jobs\/(job_[a-f0-9-]{36})\/(cancel|retry|review)$/.exec(path);if(jobAction){let out;if(jobAction[2]==='review'){access.require(req,['admin']);const d=await body(req);out=await store.review(jobAction[1],d.status,actor.username,d.note||'')}else if(jobAction[2]==='cancel')out=await store.cancel(jobAction[1],actor.username);else out=await store.retry(jobAction[1],req.headers['idempotency-key']);await access.audit(actor.username,'job_'+jobAction[2],{id:jobAction[1]});return json(200,out)}
       if(path==='/api/feed/photo'){const data=await body(req,17000000);const task=photoWrite.then(()=>approvePhoto(data,root));photoWrite=task.catch(()=>{});return json(201,await task)}
@@ -168,7 +179,7 @@ const server=createServer(async(req,res)=>{
     }
     if(path==='/api/lista')return json(200,{guiones:(await readdir(join(root,'storyboards'))).filter(f=>!f.startsWith('.')&&f.endsWith('.json')),voces:(await readdir(join(root,'casting'))).filter(f=>/^\d.*\.mp3$/.test(f)),videos:(await readdir(join(root,'salida'))).filter(f=>!f.startsWith('.')&&f.endsWith('.mp4'))})
     const route=decodeURIComponent(path==='/'?'/centro.html':path)
-    if(!/^\/(history\.mjs|marketing.html|marketing-ui.js|editor-tools.js|media-scenes.js|ui\.css|ui\.js|home\.js|account\.html|create\.html|editor\.html|feed-editor\.html|centro\.html|studio\.html|validar\.mjs|n8n-style\.js|formats\.js|feed\/templates\/[^/]+\.json|feed\/photos\/[a-z0-9-]+\.(jpg|png)|assets\/[^/]+|storyboards\/[^/]+\.json|casting\/[^/]+\.mp3|salida\/[^/]+\.(mp4|json))$/.test(route)||basename(route).startsWith('.'))throw problem(404,'No disponible')
+    if(!/^\/(styles\.mjs|create-ui\.js|history\.mjs|marketing.html|marketing-ui.js|editor-tools.js|media-scenes.js|ui\.css|ui\.js|home\.js|account\.html|create\.html|editor\.html|feed-editor\.html|centro\.html|studio\.html|validar\.mjs|n8n-style\.js|formats\.js|feed\/templates\/[^/]+\.json|feed\/photos\/[a-z0-9-]+\.(jpg|png)|assets\/[^/]+|storyboards\/[^/]+\.json|casting\/[^/]+\.mp3|salida\/[^/]+\.(mp4|json))$/.test(route)||basename(route).startsWith('.'))throw problem(404,'No disponible')
     const file=resolve(root,'.'+route);if(!file.startsWith(root+sep))throw problem(403,'Ruta inválida')
     return await sendFile(req,res,file)
   }catch(e){if(!res.headersSent)json(e.status||(e.code==='ENOENT'?404:400),{error:e.message});else res.destroy()}

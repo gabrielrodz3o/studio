@@ -44,3 +44,10 @@ feed/templates/*
 !feed/templates/imagen-insumos.json
 !feed/templates/carrusel-insumos.json
 !feed/templates/historia-insumos.json
+
+!storyboards/base-tutorial.json
+!storyboards/base-pregunta.json
+!storyboards/base-lista.json
+!storyboards/base-solucion.json
+!storyboards/base-comparativa.json
+!storyboards/base-marca.json
