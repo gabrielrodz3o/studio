@@ -48,12 +48,15 @@ export async function duracion(f) {
   return Number(stdout.trim())
 }
 
+export function voiceKey(texto,v,take=0){return createHash('sha256').update(JSON.stringify([texto, v.model, v.voice_name, v.audio_profile, v.sample_context, v.style, v.pace, ...(take?[{take}]:[]), ...(v.model==='google/gemini-3-1-flash-tts'?[v.temperature??.6,v.accent??null]:[])])).digest('hex').slice(0, 16)}
+export async function voiceTakes(texto,v){const out=[];for(let take=0;take<=20;take++){const id=voiceKey(texto,v,take),file=join(CACHE,id+'.wav');if(await existe(file))out.push({take,id,duration:await duracion(file),url:'/voice-cache/'+id+'.wav'})}return out}
+
 // Máximo tres tareas por frase, incluso al reiniciar el proceso. No reenvía POST ambiguos.
 export async function voz(texto, v, { cacheOnly = false, take = 0 } = {}) {
   if(!Number.isInteger(take)||take<0||take>20)throw Error('Toma de voz inválida');
   await mkdir(CACHE, { recursive: true })
   // Conserva la clave anterior para aprovechar los audios ya pagados.
-  const id = createHash('sha256').update(JSON.stringify([texto, v.model, v.voice_name, v.audio_profile, v.sample_context, v.style, v.pace, ...(take?[{take}]:[]), ...(v.model==='google/gemini-3-1-flash-tts'?[v.temperature??.6,v.accent??null]:[])])).digest('hex').slice(0, 16)
+  const id = voiceKey(texto,v,take)
   const limpio = join(CACHE, id + '.wav')
   if (await existe(limpio)) return { archivo: limpio, dur: await duracion(limpio), id }
   if (cacheOnly) throw new Error(`Falta audio en caché: «${texto}». Quita --solo-cache para usar kie.ai.`)
@@ -67,7 +70,7 @@ export async function voz(texto, v, { cacheOnly = false, take = 0 } = {}) {
     for (;;) {
       if (!tarea || tarea.reintentar) {
         const intento = (tarea?.intento ?? 0) + 1
-        if(process.env.STUDIO_JOB_ID)await new Budget(join(WORK,'.studio-state')).reserve('voice:'+id+':'+intento,Number(process.env.STUDIO_VOICE_RESERVE||0.25),'voz',process.env.STUDIO_JOB_ID,Number(process.env.STUDIO_JOB_BUDGET||2))
+        if(process.env.STUDIO_JOB_ID)await new Budget(join(WORK,'.studio-state')).reserve('voice:'+id+':'+intento,Number(process.env.STUDIO_VOICE_RESERVE||0.25),'voz',process.env.STUDIO_JOB_ID,Number(process.env.STUDIO_JOB_BUDGET||2),process.env.STUDIO_BUDGET_GROUP||null)
         // Se escribe antes del POST: si se pierde la respuesta, no se repite a ciegas.
         tarea = { texto, voz: v.voice_name, intento, estado: 'creando', creada: new Date().toISOString() }
         await guardar(registro, tarea)

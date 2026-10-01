@@ -1,3 +1,7 @@
+import {freezeImageRuntime} from './image-runtime.mjs'
+import {Budget} from './budget.mjs'
+import {freezeEvidence} from './evidence.mjs'
+import {storagePreflight} from './storage.mjs'
 import {assertJob} from './contracts.mjs'
 import { mkdir, readFile, writeFile, rename, readdir, stat, copyFile } from 'node:fs/promises'
 import { join } from 'node:path'
@@ -44,10 +48,10 @@ export class JobStore {
     if (!j) throw problem(404, 'Trabajo no encontrado')
     const publications=this.publications(j.id),published=publications.filter(p=>p.status==='published');
     return {
-      id: j.id, status: j.status, brand_id: j.brand_id, kind: j.kind,
+      id: j.id, operation_id:j.operation_id||null, status: j.status, brand_id: j.brand_id, kind: j.kind,
       template_id: j.template_id, name: j.name, source: j.source,
       created_at: j.created_at, updated_at: j.updated_at,
-      resource_ids:j.resource_ids||[],campaign_id:j.campaign_id,concept_id:j.concept_id,creative_id:j.creative_id,parent_job_id:j.parent_job_id,caption:j.caption,checkpoint:j.checkpoint,options: j.options, brief: j.brief, error: j.error || null, stage:j.stage||j.status, progress:j.progress||0, review:j.review||{status:'pending'},
+      resource_ids:j.resource_ids||[],campaign_id:j.campaign_id,concept_id:j.concept_id,evidence_claims:j.evidence_claims||[],creative_id:j.creative_id,parent_job_id:j.parent_job_id,caption:j.caption,checkpoint:j.checkpoint,options: j.options, brief: j.brief, error: j.error || null, stage:j.stage||j.status, progress:j.progress||0, review:j.review||{status:'pending'},
       published: published.length>0, publications, published_at:published.map(p=>p.published_at).filter(Boolean).sort().at(-1)||null, status_url: `/api/v1/jobs/${j.id}`,
       artifact: j.status === 'succeeded' ? {
         ...(j.kind==='video'?{video_url: `/api/v1/jobs/${j.id}/artifacts/video`}:{}),
@@ -58,6 +62,7 @@ export class JobStore {
     }
   }
   get(id) { return this.view(this.jobs.get(id)) }
+  matchesRetry(id,parentId,key) { const j=this.jobs.get(id);return !!j&&j.parent_job_id===parentId&&j.idempotency_key===key }
   list() { return [...this.jobs.values()].sort((a,b) => b.created_at.localeCompare(a.created_at)).map(j => this.view(j)) }
   async create(request, key, source = 'api') {
     return this.exclusive(async () => {
@@ -72,7 +77,7 @@ export class JobStore {
         return { job: this.view(old), reused: true }
       }
       assertJob(request)
-      const allowed = ['campaign_id','concept_id','creative_id','parent_job_id','caption','brand_id','kind','template_id','script','voice','subtitles','allow_paid_voice','brief','max_budget_usd','aspect','preview']
+      const allowed = ['budget_group','campaign_id','concept_id','creative_id','parent_job_id','caption','brand_id','kind','template_id','script','voice','subtitles','allow_paid_voice','brief','max_budget_usd','aspect','preview']
       if (Object.keys(request).some(k => !allowed.includes(k))) throw problem(400, 'La solicitud contiene campos desconocidos')
       let marketing
       try{marketing=JSON.parse(await readFile(join(this.root,'.studio-state/marketing/state.json'),'utf8'))}catch(e){if(e.code!=='ENOENT')throw e}
@@ -95,6 +100,8 @@ export class JobStore {
         catch (e) { if (e.code === 'ENOENT') throw problem(404, 'Plantilla no encontrada'); throw e }
       }
       script = structuredClone(script)
+      if(script.evidence_claims){if(!Array.isArray(script.evidence_claims)||script.evidence_claims.some(c=>!c||typeof c!=='object'))throw problem(422,'Evidencia inválida');script.evidence_claims=freezeEvidence(script,brand)}
+      if(request.kind!=='video'&&script.layout==='brand')for(const page of script.slides||[])page.id||='page-'+randomUUID();
       if(request.kind==='video')for(const scene of script.escenas||[])scene.id||='scene-'+randomUUID()
       if(request.brand_id!=='comandpos'&&(request.kind==='video'?script.escenas?.some(e=>e.tipo!=='media'):script.layout!=='brand'))throw problem(422,'Para esta marca usa escenas de recursos propios; las plantillas de ComandPOS son exclusivas de ese producto')
       if(request.kind!=='video'&&script.layout==='brand'&&script.brand_id!==request.brand_id)throw problem(422,'Marca de imagen incorrecta')
@@ -108,19 +115,26 @@ export class JobStore {
       try { request.kind==='video'?validar(script):validateFeed(script,request.kind) } catch (e) { throw problem(422, e.message) }
       if(request.kind==='video' && (script.escenas.length>12 || script.escenas.reduce((n,e)=>n+e.dur,0)>120 || script.escenas.reduce((n,e)=>n+(e.voz||'').length,0)>1800)) throw problem(422,'Límite por trabajo: 12 escenas, 120 segundos de guion y 1800 caracteres de locución')
       if(request.kind==='video'){script.voz = request.voice ?? script.voz === true; script.subtitulos = request.subtitles ?? script.subtitulos === true}
+      await storagePreflight(this.dir,{seconds:request.kind==='video'?script.escenas.reduce((n,e)=>n+e.dur,0):0});
       const id = 'job_' + randomUUID(), now = new Date().toISOString()
+      const lineage=[];let parent=request.parent_job_id?this.jobs.get(request.parent_job_id):null;
+      if(request.parent_job_id&&!parent)throw problem(422,'Intento anterior no encontrado');
+      const seen=new Set();while(parent){if(seen.has(parent.id)||parent.brand_id!==request.brand_id||parent.kind!==request.kind)throw problem(422,'Linaje incompatible');seen.add(parent.id);lineage.unshift(parent.id);parent=parent.parent_job_id?this.jobs.get(parent.parent_job_id):null}
+      const original=lineage.length?this.jobs.get(lineage[0]):null;
+      const operation=await new Budget(join(this.root,'.studio-state')).bindOperation(id,lineage,original?.options.max_budget_usd||request.max_budget_usd||2);
       const job = {
-        id, status: 'queued', source, idempotency_key: key, fingerprint,
+        id, operation_id:operation.id, status: 'queued', source, idempotency_key: key, fingerprint,
         brand_id: request.brand_id, kind: request.kind, template_id: request.template_id || null,
-        resource_ids:[...new Set([...(script.escenas||[]).map(e=>e.resource_id),script.resource_id,script.music_resource_id,brand?.logo_resource_id].filter(Boolean))],campaign_id:request.campaign_id||script.campaign_id||null,concept_id:request.concept_id||script.concept_id||null,creative_id:request.creative_id||null,parent_job_id:request.parent_job_id||null,caption:request.caption||'',name: script.nombre, brief: request.brief || '', created_at: now, updated_at: now,
+        evidence_claims:script.evidence_claims||[],resource_ids:[...new Set([...(script.escenas||[]).map(e=>e.resource_id),script.resource_id,script.music_resource_id,...(script.slides||[]).map(p=>p.resource_id),brand?.logo_resource_id].filter(Boolean))],campaign_id:request.campaign_id||script.campaign_id||null,concept_id:request.concept_id||script.concept_id||null,creative_id:request.creative_id||null,parent_job_id:request.parent_job_id||null,caption:request.caption||'',name: script.nombre, brief: request.brief || '', created_at: now, updated_at: now,
         review:{status:'pending'},stage:'queued',progress:0,
-        options: { voice: script.voz, subtitles: script.subtitulos, allow_paid_voice: request.allow_paid_voice === true,max_budget_usd:request.max_budget_usd||2,aspect:request.aspect||'vertical',preview:request.preview===true },
+        options: { budget_group:request.budget_group||null,voice: script.voz, subtitles: script.subtitulos, allow_paid_voice: request.allow_paid_voice === true,max_budget_usd:request.max_budget_usd||2,aspect:request.aspect||'vertical',preview:request.preview===true },
       }
       await mkdir(join(this.dir, id, 'artifacts'), { recursive: true, mode: 0o700 })
-      if(request.kind==='video'){await mkdir(join(this.dir,id,'source'),{recursive:true});for(const name of ['studio.html','n8n-style.js','formats.js','media-scenes.js'])await (await import('node:fs/promises')).copyFile(join(this.root,name),join(this.dir,id,'source',name));await mkdir(join(this.dir,id,'source/assets'),{recursive:true});const sources=await Promise.all(['studio.html','n8n-style.js','formats.js','media-scenes.js'].map(n=>readFile(join(this.root,n),'utf8')));const refs=new Set([...sources,JSON.stringify(script)].flatMap(text=>text.match(/assets\/[a-zA-Z0-9_-]+\.(?:png|jpg|webp|ttf|mp3|wav)/g)||[]));refs.add(script.music_file||'assets/fondo-02.mp3');for(const ref of refs)if(!ref.startsWith('assets/resource-'))await copyFile(join(this.root,ref),join(this.dir,id,'source',ref));const runtime={};for(const name of ['render.mjs','voz.mjs','subtitulos.mjs','alinear.py','scene-cache.mjs','releases.mjs','validar.mjs','styles.mjs','budget.mjs','voz-perfil.json','voz-perfil-original.json','package-lock.json']){runtime[name]=createHash('sha256').update(await readFile(join(this.root,name))).digest('hex');await copyFile(join(this.root,name),join(this.dir,id,'source',name))}await atomic(join(this.dir,id,'runtime.json'),runtime)}
+      if(request.kind==='video'){await mkdir(join(this.dir,id,'source'),{recursive:true});for(const name of ['studio.html','n8n-style.js','formats.js','media-scenes.js','visual-runtime.js','design.mjs','captions.mjs'])await (await import('node:fs/promises')).copyFile(join(this.root,name),join(this.dir,id,'source',name));await mkdir(join(this.dir,id,'source/assets'),{recursive:true});const sources=await Promise.all(['studio.html','n8n-style.js','formats.js','media-scenes.js','visual-runtime.js','design.mjs','captions.mjs'].map(n=>readFile(join(this.root,n),'utf8')));const refs=new Set([...sources,JSON.stringify(script)].flatMap(text=>text.match(/assets\/[a-zA-Z0-9_-]+\.(?:png|jpg|webp|ttf|mp3|wav)/g)||[]));refs.add(script.music_file||'assets/fondo-02.mp3');for(const ref of refs)if(!ref.startsWith('assets/resource-'))await copyFile(join(this.root,ref),join(this.dir,id,'source',ref));const runtime={};for(const name of ['render.mjs','voz.mjs','subtitulos.mjs','alinear.py','scene-cache.mjs','releases.mjs','validar.mjs','styles.mjs','budget.mjs','file-lock.mjs','design.mjs','captions.mjs','voz-perfil.json','voz-perfil-original.json','package-lock.json']){runtime[name]=createHash('sha256').update(await readFile(join(this.root,name))).digest('hex');await copyFile(join(this.root,name),join(this.dir,id,'source',name))}await atomic(join(this.dir,id,'runtime.json'),runtime)}
       for(const [from,to]of resourceCopies)await copyFile(from,join(this.dir,id,'source',to))
-      if(request.kind!=='video')await prepareFeed(script,join(this.dir,id),this.root)
+      if(request.kind!=='video'){await prepareFeed(script,join(this.dir,id),this.root);await freezeImageRuntime(this.root,join(this.dir,id))}
       await atomic(join(this.dir, id, 'script.json'), script)
+      if(source==='creative'&&job.creative_id)await new Budget(join(this.root,'.studio-state')).attach('idea:'+job.creative_id,job.id)
       await this.persist(job)
       this.jobs.set(id, job); this.keys.set(key, id); this.schedule()
       return { job: this.view(job), reused: false }
@@ -143,12 +157,13 @@ export class JobStore {
     this.active = null; this.schedule()
   }
   async execute(job, dir) {
-    if(job.kind!=='video'){job.stage='composing';return executeFeed(job,dir)}
+    await storagePreflight(dir,{seconds:120});
+    if(job.kind!=='video'){job.stage='composing';const frozen=await stat(join(dir,'image-source/run.mjs')).then(()=>true,e=>{if(e.code==='ENOENT')return false;throw e});let result;if(frozen){const snapshot=JSON.parse(await readFile(join(dir,'image-runtime.json'),'utf8'));if(createHash('sha256').update(await readFile(join(this.root,'package-lock.json'))).digest('hex')!==snapshot.hashes['package-lock.json'])throw Error('Las dependencias del render de imagen cambiaron; crea una nueva versión para producir con el runtime actual');await run(process.execPath,[join(dir,'image-source/run.mjs'),dir],{timeout:120000,maxBuffer:2000000});result=JSON.parse(await readFile(join(dir,'image-result.json'),'utf8'));const runtime=JSON.parse(await readFile(join(dir,'image-runtime.json'),'utf8'));const manifest=JSON.parse(await readFile(join(dir,'artifacts/manifest.json'),'utf8'));manifest.runtime=runtime;await atomic(join(dir,'artifacts/manifest.json'),manifest);result.runtime=runtime}else result=await executeFeed(job,dir);return result}
     const frozen=await stat(join(dir,'source/render.mjs')).then(()=>true,()=>false);const args = [frozen?join(dir,'source/render.mjs'):'render.mjs', join(dir, 'script.json'), job.options.voice ? '--voz' : '--sin-voz']
     if (!job.options.allow_paid_voice) args.push('--solo-cache')
     let log = ''
     const code = await new Promise((resolve, reject) => {
-      const child = spawn(process.execPath, args, { cwd: this.root, env: { ...process.env,STUDIO_WORK_ROOT:this.root,STUDIO_JOB_ID:job.id,STUDIO_JOB_BUDGET:String(job.options.max_budget_usd||2),STUDIO_SOURCE_DIR:join(dir,'source'),STUDIO_ASPECT:job.options.aspect||'vertical',STUDIO_PREVIEW:job.options.preview?'1':'0', STUDIO_OUTPUT_DIR: join(dir, 'artifacts') },detached:process.platform!=='win32', stdio: ['ignore','pipe','pipe'] })
+      const child = spawn(process.execPath, args, { cwd: this.root, env: { ...process.env,STUDIO_WORK_ROOT:this.root,STUDIO_JOB_ID:job.id,STUDIO_BUDGET_GROUP:job.options.budget_group||'',STUDIO_JOB_BUDGET:String(job.options.max_budget_usd||2),STUDIO_SOURCE_DIR:join(dir,'source'),STUDIO_ASPECT:job.options.aspect||'vertical',STUDIO_PREVIEW:job.options.preview?'1':'0', STUDIO_OUTPUT_DIR: join(dir, 'artifacts') },detached:process.platform!=='win32', stdio: ['ignore','pipe','pipe'] })
       this.children.set(job.id,child);const timer=setTimeout(()=>{job.stage='timeout';try{process.kill(-child.pid,'SIGKILL')}catch{child.kill('SIGKILL')}},30*60000);
       const progressTimer=setInterval(()=>{this.exclusive(async()=>{if(job.status!=='running')return;try{job.checkpoint=JSON.parse(await readFile(join(dir,'artifacts/checkpoint.json'),'utf8'));job.stage=job.checkpoint.stage}catch(e){if(e.code!=='ENOENT')console.warn('Checkpoint:',e.message)}job.updated_at=new Date().toISOString();await this.persist(job)}).catch(e=>console.warn('Progreso:',e.message))},3000);progressTimer.unref();
       const append = b => { const text=b.toString();log = (log + text).slice(-16000); this.liveLogs.set(job.id,log);if(text.includes('voz '))job.stage='voice';const m=/(\d+)%/.exec(text);if(m){job.stage='rendering';job.progress=Math.min(94,15+Math.round(Number(m[1])*.8))}if(text.includes('video mudo listo')){job.stage='mixing';job.progress=95} }
@@ -178,13 +193,13 @@ export class JobStore {
     if (!j) throw problem(404, 'Trabajo no encontrado')
     if (j.status !== 'succeeded') throw problem(409, 'El archivo todavía no está listo')
     if(kind==='cover'&&j.kind==='video')return join(this.dir,id,'artifacts','cover.jpg')
-    if(/^image-[1-4]$/.test(kind)){const p=j.artifact.images?.find(p=>'image-'+p.index===kind);if(!p)throw problem(404,'Página no encontrada');return join(this.dir,id,'artifacts',p.filename)}
+    if(/^image-[1-8]$/.test(kind)){const p=j.artifact.images?.find(p=>'image-'+p.index===kind);if(!p)throw problem(404,'Página no encontrada');return join(this.dir,id,'artifacts',p.filename)}
     if (!['video','manifest'].includes(kind)||(kind==='video'&&j.kind!=='video')) throw problem(404, 'Archivo no encontrado')
     return join(this.dir, id, 'artifacts', kind === 'video' ? j.artifact.filename : j.artifact.manifest_filename)
   }
   async cancel(id,actor='api'){const j=this.jobs.get(id);if(!j)throw problem(404,'Trabajo no encontrado');if(!['queued','running'].includes(j.status))throw problem(409,'Solo puedes cancelar trabajos en cola o ejecución');this.cancelled.add(id);j.cancelled_by=actor;if(j.status==='queued'){j.status='cancelled';j.stage='cancelled';await this.persist(j)}else{const child=this.children.get(id);if(child){try{process.kill(-child.pid,'SIGTERM')}catch{child.kill('SIGTERM')}const t=setTimeout(()=>{try{process.kill(-child.pid,'SIGKILL')}catch{}},3000);t.unref()}}return this.view(j)}
   async review(id,status,actor,note=''){const j=this.jobs.get(id);if(!j)throw problem(404,'Trabajo no encontrado');if(j.status!=='succeeded'||!['approved','rejected'].includes(status)||typeof note!=='string'||note.length>1000)throw problem(422,'Revisión inválida');j.review={status,actor,note,at:new Date().toISOString()};await this.persist(j);return this.view(j)}
-  async retry(id,key){const j=this.jobs.get(id);if(!j||!['failed','interrupted','cancelled'].includes(j.status))throw problem(409,'Solo se reintentan trabajos fallidos, interrumpidos o cancelados');const script=JSON.parse(await readFile(join(this.dir,id,'script.json'),'utf8'));return this.create({brand_id:j.brand_id,kind:j.kind,script,parent_job_id:j.id,...(j.campaign_id?{campaign_id:j.campaign_id}:{}),...(j.concept_id?{concept_id:j.concept_id}:{}),...(j.kind==='video'?{voice:j.options.voice,subtitles:j.options.subtitles,allow_paid_voice:j.options.allow_paid_voice,max_budget_usd:j.options.max_budget_usd,aspect:j.options.aspect,preview:j.options.preview}:{})},key,j.source)}
+  async retry(id,key){const j=this.jobs.get(id);if(!j||!['failed','interrupted','cancelled'].includes(j.status))throw problem(409,'Solo se reintentan trabajos fallidos, interrumpidos o cancelados');const script=JSON.parse(await readFile(join(this.dir,id,'script.json'),'utf8'));return this.create({brand_id:j.brand_id,kind:j.kind,...(j.options.budget_group?{budget_group:j.options.budget_group}:{}),script,parent_job_id:j.id,caption:j.caption||'',brief:j.brief||'',...(j.creative_id?{creative_id:j.creative_id}:{}),...(j.campaign_id?{campaign_id:j.campaign_id}:{}),...(j.concept_id?{concept_id:j.concept_id}:{}),...(j.kind==='video'?{voice:j.options.voice,subtitles:j.options.subtitles,allow_paid_voice:j.options.allow_paid_voice,max_budget_usd:j.options.max_budget_usd,aspect:j.options.aspect,preview:j.options.preview}:{})},key,j.source)}
   async log(id) { if (!this.jobs.has(id)) throw problem(404, 'Trabajo no encontrado'); if(this.liveLogs.has(id))return this.liveLogs.get(id); return readFile(join(this.dir, id, 'render.log'), 'utf8').catch(() => '') }
   async stop() {
     this.stopping = true

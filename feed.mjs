@@ -21,7 +21,7 @@ export async function feedCatalog(root=ROOT){
 export function validateFeed(s,kind){
  if(s?.layout==='brand')return validateBrandFeed(s,kind)
  if(!s||typeof s!=='object'||Array.isArray(s))throw Error('Guion de imagen inválido')
- const keys=['nombre','tipo','tema_id','titular','subtitulo','caption','cta','layout','foto_id','captura','slides']
+ const keys=['template','evidence_claims','claim_ids','nombre','tipo','tema_id','titular','subtitulo','caption','cta','layout','foto_id','captura','slides']
  if(Object.keys(s).some(k=>!keys.includes(k)))throw Error('Campo de imagen desconocido')
  if(!/^[a-z0-9][a-z0-9-]{0,79}$/.test(s.nombre))throw Error('Nombre inválido')
  if(!['imagen','carrusel','historia_social'].includes(kind)||s.tipo!==kind)throw Error('El tipo de pieza no coincide')
@@ -32,8 +32,9 @@ export function validateFeed(s,kind){
  const captures=['cocina','mesas','cuenta','cuentaxcobrar','comtabilidad','reporteBI','recursohumanos_empleados','nomina']
  if(s.captura!=null&&!captures.includes(s.captura))throw Error('Captura no aprobada')
  if(s.layout==='product-scene'&&!s.captura)throw Error('El diseño de producto necesita una captura real')
- if(!Array.isArray(s.slides)||s.slides.length!==(kind==='carrusel'?4:0))throw Error('El carrusel requiere exactamente cuatro páginas')
- for(const slide of s.slides){if(!slide||Object.keys(slide).some(k=>!['titulo','texto'].includes(k))||typeof slide.titulo!=='string'||!slide.titulo.trim()||slide.titulo.length>80||typeof slide.texto!=='string'||!slide.texto.trim()||slide.texto.length>240)throw Error('Página inválida o demasiado extensa')}
+ if(!Array.isArray(s.slides)||(kind==='carrusel'?(s.slides.length<2||s.slides.length>8):s.slides.length!==0))throw Error('El carrusel requiere entre 2 y 8 páginas')
+ if(s.slides.some(p=>p.id!=null&&!/^[a-zA-Z0-9_-]{1,100}$/.test(p.id))||new Set(s.slides.filter(p=>p.id).map(p=>p.id)).size!==s.slides.filter(p=>p.id).length)throw Error('Identificadores de página inválidos o repetidos')
+ for(const slide of s.slides){if(!slide||Object.keys(slide).some(k=>!['id','titulo','texto','claim_ids'].includes(k))||typeof slide.titulo!=='string'||!slide.titulo.trim()||slide.titulo.length>80||typeof slide.texto!=='string'||!slide.texto.trim()||slide.texto.length>240)throw Error('Página inválida o demasiado extensa')}
  if(/demo gratis|demo gratuita|caso real|garantiz|\d+\s*%/i.test([s.titular,s.subtitulo,s.caption,...s.slides.flatMap(x=>[x.titulo,x.texto])].join(' ')))throw Error('Afirmación que requiere evidencia: revisa el texto antes de producir')
  return structuredClone(s)
 }
@@ -82,10 +83,10 @@ export async function executeFeed(job,dir){
  const s=validateFeed(await readJSON(join(dir,'script.json')),job.kind),photo=await readJSON(join(dir,'photo-review.json'))
  const ocr=await inspectPhoto(join(dir,'photo.jpg'))
  const c={texto_en_imagen:s.titular,ctaVisual:s.cta,tipo_contenido:'educativo',story:s.tipo==='historia_social',photo_file:join(dir,'photo.jpg'),product_asset:s.captura,design:{layout:s.layout,subline:s.subtitulo,commercial:!!s.captura}}
- const pages=s.tipo!=='carrusel'?[null]:s.slides.map((p,i)=>({slideIndex:i+1,slideText:p.titulo,slideBody:p.texto}))
+ const pages=s.tipo!=='carrusel'?[null]:s.slides.map((p,i)=>({slideIndex:i+1,slideCount:s.slides.length,slideText:p.titulo,slideBody:p.texto}))
  const images=[]
  for(let i=0;i<pages.length;i++){
-  const content={...c,design:{...c.design,...(i===0&&s.slides[0]?{subline:s.slides[0].texto}:{})},...(i===0?{texto_en_imagen:s.slides[0]?.titulo||s.titular}:{}),...(i===3?{ctaVisual:s.slides[3].titulo}:{}),endBody:s.slides[3]?.texto}
+  const content={...c,design:{...c.design,...(i===0&&s.slides[0]?{subline:s.slides[0].texto}:{})},...(i===0?{texto_en_imagen:s.slides[0]?.titulo||s.titular}:{}),...(i===pages.length-1&&s.tipo==='carrusel'?{ctaVisual:s.slides.at(-1).titulo}:{}),endBody:s.slides.at(-1)?.texto}
   const r=await renderFeed(content,pages[i],sharp,fs,join(dir,'brand'))
   const name=`pagina-${i+1}.jpg`,path=join(dir,'artifacts',name)
   await writeFile(path,r.buffer)

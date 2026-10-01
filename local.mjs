@@ -1,3 +1,9 @@
+import {voiceTakes,perfil as voiceProfile} from './voz.mjs'
+import {voiceReviews,reviewFile,acceptVoiceReview} from './voice-reviews.mjs'
+import {createHandoff} from './handoff.mjs'
+import {Batches,batchQuote} from './batches.mjs'
+import {inspectCache,cleanCache,protectedCacheKeys} from './storage.mjs'
+import {capability} from './capabilities.mjs'
 import {authorizeApi} from './api-scopes.mjs'
 import {campaignContext,proposals,deriveCampaign} from './planning.mjs'
 import { createServer } from 'node:http'
@@ -34,8 +40,8 @@ async function createPiece(input,key,actor){
  const result=await creative.create(input,key,actor)
  await versions.save(result.kind,result.script,actor)
  if(!input.produce)return result
- const request={brand_id:input.brand_id||'comandpos',kind:result.kind,script:result.script,creative_id:result.id,concept_id:result.concept_id,caption:result.caption,...(result.campaign_id?{campaign_id:result.campaign_id}:{}),...(result.kind==='video'?{voice:true,subtitles:true,allow_paid_voice:true,aspect:input.aspect||'vertical',max_budget_usd:2}:{})}
- const {job}=await store.create(request,'idea-render:'+result.id,'creative');await creative.budget.attach('idea:'+result.id,job.id)
+ const request={...(input.budget_group?{budget_group:input.budget_group}:{}),brand_id:input.brand_id||'comandpos',kind:result.kind,script:result.script,creative_id:result.id,concept_id:result.concept_id,caption:result.caption,...(result.campaign_id?{campaign_id:result.campaign_id}:{}),...(result.kind==='video'?{voice:true,subtitles:true,allow_paid_voice:true,aspect:input.aspect||'vertical',max_budget_usd:2}:{})}
+ const {job}=await store.create(request,'idea-render:'+result.id,'creative')
  if(input.piece_id){const piece=marketing.data.pieces.find(p=>p.id===input.piece_id);if(!piece||piece.brand_id!==job.brand_id||piece.campaign_id!==result.campaign_id)throw problem(422,'La pieza no corresponde a esta campaña');await marketing.savePiece({...piece,job_id:job.id,caption:result.caption,creative_id:result.id},actor,store)}
  else if(result.campaign_id&&!marketing.data.pieces.some(p=>p.creative_id===result.id)){await marketing.savePiece({campaign_id:result.campaign_id,concept_id:result.concept_id,creative_id:result.id,title:result.selection?.topic?.slice(0,160)||result.script.nombre,kind:result.kind,channel:'instagram',caption:result.caption,brief:input.idea||result.selection?.idea||'',job_id:job.id},actor,store)}
  return {...result,job}
@@ -61,7 +67,8 @@ if(!token){try{token=(await readFile(tokenFile,'utf8')).trim()}catch(e){if(e.cod
 if(token.length<32)throw Error('STUDIO_API_TOKEN debe tener al menos 32 caracteres')
 let apiClients;try{apiClients=JSON.parse(await readFile(join(state,'api-clients.json'),'utf8'))}catch(e){if(e.code!=='ENOENT')throw e}
 const store=await new JobStore({root,publications:id=>publicationsFor(marketing.data.deliveries,id)}).init()
-const mime={'.css':'text/css; charset=utf-8','.html':'text/html; charset=utf-8','.mjs':'text/javascript','.js':'text/javascript','.json':'application/json','.png':'image/png','.webp':'image/webp','.jpg':'image/jpeg','.ttf':'font/ttf','.mp3':'audio/mpeg','.wav':'audio/wav','.mp4':'video/mp4'}
+const batches=await new Batches(root,{produce:createPiece,budget:creative.budget,store,linkJob:async(pieceId,jobId,actor)=>{const p=marketing.data.pieces.find(p=>p.id===pieceId);if(!p)throw problem(404,'Pieza no encontrada');await marketing.savePiece({...p,job_id:jobId},actor,store)}}).init();
+const mime={'.gz':'application/gzip','.css':'text/css; charset=utf-8','.html':'text/html; charset=utf-8','.mjs':'text/javascript','.js':'text/javascript','.json':'application/json','.png':'image/png','.webp':'image/webp','.jpg':'image/jpeg','.ttf':'font/ttf','.mp3':'audio/mpeg','.wav':'audio/wav','.mp4':'video/mp4'}
 const digest=x=>createHash('sha256').update(x).digest()
 function authenticated(req){return timingSafeEqual(digest(req.headers.authorization||''),digest('Bearer '+token))}
 async function body(req,limit=250000){
@@ -77,7 +84,7 @@ async function catalog(){
     const s=JSON.parse(await readFile(join(root,'storyboards',file),'utf8'))
     templates.push({id:file.slice(0,-5),name:s.nombre,format:s.formato||'historia',kind:'video',brand_id:s.brand_id||'comandpos',voice:s.voz===true,subtitles:s.subtitulos===true,seconds:s.escenas.reduce((n,e)=>n+e.dur,0)})
   }
-  for(const file of (await readdir(join(root,'feed/templates'))).filter(f=>!f.startsWith('.')&&f.endsWith('.json'))){const s=JSON.parse(await readFile(join(root,'feed/templates',file),'utf8'));templates.push({id:file.slice(0,-5),name:s.nombre,kind:s.tipo,brand_id:s.brand_id||'comandpos',format:s.layout,pages:s.tipo==='carrusel'?4:1})}
+  for(const file of (await readdir(join(root,'feed/templates'))).filter(f=>!f.startsWith('.')&&f.endsWith('.json'))){const s=JSON.parse(await readFile(join(root,'feed/templates',file),'utf8'));templates.push({id:file.slice(0,-5),name:s.nombre,kind:s.tipo,brand_id:s.brand_id||'comandpos',format:s.layout,pages:s.tipo==='carrusel'?(s.slides?.length||0):1})}
   return {api_version:1,center:config.nombre,brands:marketing.snapshot().brands,modules:config.modulos,templates}
 }
 async function sendFile(req,res,file){
@@ -117,7 +124,7 @@ const server=createServer(async(req,res)=>{
       if(req.method==='GET'&&/^\/api\/v1\/photos\/photo_[a-f0-9-]{36}$/.test(path))return json(200,await photos.status(path.split('/').at(-1)))
       if(req.method==='POST'&&path==='/api/v1/ideas'){const result=await createPiece(await body(req),req.headers['idempotency-key'],'n8n');return json(200,result)}
       const action=/^\/api\/v1\/jobs\/(job_[a-f0-9-]{36})\/(cancel|retry|delivery|log)$/.exec(path)
-      if(action){if(req.method==='POST'&&action[2]==='cancel')return json(200,await store.cancel(action[1]));if(req.method==='POST'&&action[2]==='retry')return json(202,await store.retry(action[1],req.headers['idempotency-key']));if(req.method==='GET'&&action[2]==='log')return json(200,{log:await store.log(action[1])});if(req.method==='GET'&&action[2]==='delivery'){const j=store.get(action[1]);if(j.review.status!=='approved')throw problem(409,'La pieza requiere aprobación');return json(200,j)}}
+      if(action){if(req.method==='POST'&&action[2]==='cancel')return json(200,await store.cancel(action[1]));if(req.method==='POST'&&action[2]==='retry')return json(202,await marketing.retryJob(action[1],req.headers['idempotency-key'],'n8n',store,url.searchParams.get('piece_id')));if(req.method==='GET'&&action[2]==='log')return json(200,{log:await store.log(action[1])});if(req.method==='GET'&&action[2]==='delivery'){const j=store.get(action[1]);if(j.review.status!=='approved')throw problem(409,'La pieza requiere aprobación');return json(200,j)}}
       if(req.method==='GET'&&path==='/api/v1/health')return json(200,{ok:true,api_version:1,active_jobs:store.active?1:0})
       if(req.method==='GET'&&path==='/api/v1/catalog')return json(200,await catalog())
       if(req.method==='GET'&&path==='/api/v1/jobs')return json(200,{jobs:store.list()})
@@ -125,7 +132,7 @@ const server=createServer(async(req,res)=>{
         const result=await store.create(await body(req),req.headers['idempotency-key'])
         res.setHeader('Location',result.job.status_url);return json(result.reused?200:202,result)
       }
-      const match=/^\/api\/v1\/jobs\/(job_[a-f0-9-]{36})(?:\/artifacts\/(video|cover|manifest|image-[1-4]))?$/.exec(path)
+      const match=/^\/api\/v1\/jobs\/(job_[a-f0-9-]{36})(?:\/artifacts\/(video|cover|manifest|image-[1-8]))?$/.exec(path)
       if(match&&['GET','HEAD'].includes(req.method)){
         if(match[2])return await sendFile(req,res,store.artifactPath(match[1],match[2]))
         return json(200,store.get(match[1]))
@@ -138,18 +145,35 @@ const server=createServer(async(req,res)=>{
     if(path==='/auth/me'&&req.method==='GET')return json(200,actor)
     if(path==='/auth/logout'&&req.method==='POST'){access.sameOrigin(req);res.setHeader('Set-Cookie',access.logout(req));return json(200,{ok:true})}
     if(path==='/auth/account'&&req.method==='POST'){access.sameOrigin(req);return json(200,await access.change(actor,await body(req)))}
+    const handoff=/^\/api\/handoff\/(job_[a-f0-9-]{36})$/.exec(path);if(handoff&&req.method==='GET'){store.get(handoff[1]);res.setHeader('Content-Disposition','attachment; filename="gcode-project.tar.gz"');return await sendFile(req,res,join(store.dir,handoff[1],'handoff.tar.gz'))}
+    if(path==='/api/batches'&&req.method==='GET')return json(200,{batches:batches.list(),quote:batchQuote});
     if(path==='/api/proposals'&&req.method==='GET'){const data=marketing.snapshot(),brand=marketing.brand(url.searchParams.get('brand')||'comandpos'),campaign=campaignContext(data,brand.id,url.searchParams.get('campaign'));return json(200,{proposals:proposals(data,brand,await creative.history(),campaign)})}
     if(path==='/api/release-preview'&&req.method==='GET')return json(200,marketing.releasePreview(url.searchParams.get('piece_id'),store))
     if(path==='/api/marketing'&&req.method==='GET')return json(200,marketing.snapshot())
     const resource=/^\/api\/library\/([a-f0-9-]{36})$/.exec(path)
     if(resource&&['GET','HEAD'].includes(req.method))return await sendFile(req,res,marketing.asset(resource[1]).path)
-    if(path==='/api/operations'&&req.method==='GET'){access.require(req,['admin']);const budget=await creative.budget.summary(),jobs=store.list(),approved=marketing.data.releases.filter(r=>r.status==='approved');return json(200,{jobs:jobs.map(j=>({id:j.id,name:j.name,status:j.status,created_at:j.created_at,updated_at:j.updated_at,parent_job_id:j.parent_job_id,creative_id:j.creative_id,reserved_usd:budget.entries.filter(e=>e.job===j.id).reduce((n,e)=>n+e.reserved,0),confirmed_usd:budget.entries.filter(e=>e.job===j.id&&e.actual_usd!=null).reduce((n,e)=>n+e.actual_usd,0),cost_complete:budget.entries.some(e=>e.job===j.id)&&budget.entries.filter(e=>e.job===j.id).every(e=>e.actual_usd!=null)})),budget,approved_releases:approved.length,approval_minutes:approved.map(r=>{const j=jobs.find(j=>j.id===r.bundle.job_id);return j?(Date.parse(r.at)-Date.parse(j.created_at))/60000:null}).filter(x=>x!=null),pending_comments:marketing.data.comments.filter(c=>!c.resolved).length,uncertain_deliveries:marketing.data.deliveries.filter(d=>d.status==='uncertain').length})}
-    if(path==='/api/budget'&&req.method==='GET'){access.require(req,['admin']);return json(200,await creative.budget.summary())}
+    if(path==='/api/creative/issues'&&req.method==='GET'){access.require(req,['admin','editor']);return json(200,{issues:await creative.issues()})}
+    if(path==='/api/voice-reviews'&&req.method==='GET'){access.require(req,['admin','editor']);return json(200,{reviews:await voiceReviews(root)})}
+    const voiceReviewAudio=/^\/api\/voice-reviews\/([a-f0-9]{24})\/audio$/.exec(path);if(voiceReviewAudio&&req.method==='GET'){access.require(req,['admin','editor']);return sendFile(req,res,reviewFile(root,voiceReviewAudio[1]).replace('.json','.wav'))}
+    if(path==='/api/operations'&&req.method==='GET'){access.require(req,['admin']);const budget=await creative.budget.summary(),jobs=store.list(),approved=marketing.data.releases.filter(r=>r.status==='approved');return json(200,{jobs:jobs.map(j=>({id:j.id,name:j.name,status:j.status,created_at:j.created_at,updated_at:j.updated_at,parent_job_id:j.parent_job_id,creative_id:j.creative_id,reserved_usd:budget.jobs[j.id]?.reserved||0,confirmed_usd:budget.jobs[j.id]?.actual||0,cost_complete:!budget.jobs[j.id]||budget.jobs[j.id].unconfirmed===0})),budget,approved_releases:approved.length,approval_minutes:approved.map(r=>{const j=jobs.find(j=>j.id===r.bundle.job_id);return j?(Date.parse(r.at)-Date.parse(j.created_at))/60000:null}).filter(x=>x!=null),pending_comments:marketing.data.comments.filter(c=>!c.resolved).length,uncertain_deliveries:marketing.data.deliveries.filter(d=>d.status==='uncertain').length})}
+    if(path==='/api/budget'&&req.method==='GET'){access.require(req,['admin']);return json(200,await creative.budget.summary({offset:Number(url.searchParams.get('offset'))||0}))}
+    if(path==='/api/capabilities'&&req.method==='GET')return json(200,capability(Object.fromEntries(url.searchParams),marketing.data.accounts));
+    if(path==='/api/storage'&&req.method==='GET'){access.require(req,['admin']);return json(200,await inspectCache(root,{protectedKeys:await protectedCacheKeys(store)}))}
     if(path==='/api/accounts'&&req.method==='GET'){access.require(req,['admin']);return json(200,access.users.map(u=>({username:u.username,role:u.role})))}
     if(path==='/api/versions'&&req.method==='GET')return json(200,await versions.list(url.searchParams.get('kind'),url.searchParams.get('name')))
     if(path==='/api/version'&&req.method==='GET')return json(200,await versions.get(url.searchParams.get('kind'),url.searchParams.get('name'),url.searchParams.get('id')))
     if(req.method==='POST'){
       access.sameOrigin(req);access.require(req,['admin','editor'])
+      if(path==='/api/creative/correct'){const d=await body(req);const recovery=await creative.correct(d.id,d.revision,d.content,actor.username);const result=await creative.create(recovery.input,recovery.key,actor.username);await versions.save(result.kind,result.script,actor.username);return json(200,{name:result.script.nombre,kind:result.kind})}
+      if(path==='/api/voice-reviews/accept'){const d=await body(req);const out=await acceptVoiceReview(root,d.key,d,actor.username);await access.audit(actor.username,'voice_review_accepted',{key:d.key});return json(200,out)}
+      if(path==='/api/voice/takes'){const d=await body(req);if(typeof d.text!=='string'||!d.text.trim()||d.text.length>500)throw problem(422,'Texto inválido');return json(200,{takes:await voiceTakes(d.text,await voiceProfile(d.profile||'n8n'))})}
+      if(path==='/api/preview/scene'){const d=await body(req);if(!Number.isInteger(d.scene)||d.scene<0||d.scene>=d.script?.escenas?.length)throw problem(422,'Escena inválida');return json(200,await previewAudio(root,d.script,{scene:d.scene,audioOnly:true}))}
+      if(path==='/api/handoff'){const d=await body(req);await createHandoff(store,d.id);return json(200,{url:'/api/handoff/'+d.id})}
+      if(path==='/api/batches/start'){const d=await body(req);if(!Array.isArray(d.piece_ids)||d.piece_ids.length!==4)throw problem(422,'Selecciona cuatro piezas');const pieces=d.piece_ids.map(id=>marketing.data.pieces.find(p=>p.id===id));if(!pieces||pieces.some(p=>!p)||new Set(pieces.map(p=>p.kind)).size!==4||new Set(pieces.map(p=>p.campaign_id)).size!==1||new Set(pieces.map(p=>p.concept_id)).size!==1)throw problem(422,'Selecciona cuatro derivados de una propuesta');return json(202,await batches.start({pieces,allow_paid:d.allow_paid,max_budget_usd:d.max_budget_usd},req.headers['idempotency-key'],actor.username))}
+      if(path==='/api/batches/retry-child'){const d=await body(req);return json(202,await batches.retryChild(d.id,d.piece_id,actor.username))}
+      if(path==='/api/batches/cancel')return json(200,await batches.cancel((await body(req)).id,actor.username));
+      if(path==='/api/batches/resume')return json(202,await batches.resume((await body(req)).id));
+      if(path==='/api/storage/clean'){access.require(req,['admin']);const d=await body(req);return json(200,await store.exclusive(async()=>{if(store.list().some(j=>['running','queued'].includes(j.status)))throw problem(409,'Espera a que termine la producción para limpiar');const result=await cleanCache(root,d.token,{protectedKeys:await protectedCacheKeys(store)});await access.audit(actor.username,'cache_clean',result);return result}))}
       if(path==='/api/marketing/brands'){access.require(req,['admin']);return json(200,await marketing.saveBrand(await body(req),actor.username))}
       if(path==='/api/marketing/derivatives'){const d=await body(req),data=marketing.snapshot(),brand=marketing.brand(d.brand_id),campaign=campaignContext(data,brand.id,d.campaign_id);if(!campaign)throw problem(422,'Selecciona una campaña');const proposal=proposals(data,brand,await creative.history(),campaign).find(p=>p.id===d.proposal_id);if(!proposal)throw problem(422,'Propuesta no encontrada');const pieces=[];for(const draft of deriveCampaign(data,campaign,proposal)){const old=marketing.data.pieces.find(p=>p.campaign_id===campaign.id&&p.concept_id===proposal.id&&p.kind===draft.kind);pieces.push(old||await marketing.savePiece(draft,actor.username,store))}return json(200,{pieces})}
       if(path==='/api/marketing/campaigns')return json(200,await marketing.saveCampaign(await body(req),actor.username))
@@ -157,6 +181,7 @@ const server=createServer(async(req,res)=>{
       if(path==='/api/marketing/comments')return json(200,await marketing.addComment(await body(req),actor.username,store))
       if(path==='/api/marketing/comments/resolve')return json(200,await marketing.resolveComment(await body(req),actor.username))
       if(path==='/api/marketing/cancel-delivery'){access.require(req,['admin']);return json(200,await marketing.cancelDelivery(await body(req),actor.username))}
+      if(path==='/api/marketing/reconcile-delivery'){access.require(req,['admin']);return json(200,await marketing.reconcileDelivery(await body(req),actor.username))}
       if(path==='/api/budget/reconcile'){access.require(req,['admin']);const d=await body(req);return json(200,await creative.budget.reconcile(d.id,d.actual_usd,d.receipt,actor.username))}
       if(path==='/api/marketing/releases'){access.require(req,['admin']);return json(200,await marketing.approveRelease(await body(req),actor.username,store))}
       if(path==='/api/marketing/publications/import'){access.require(req,['admin']);return json(200,await marketing.importPublication(await body(req),actor.username,store))}
@@ -167,7 +192,7 @@ const server=createServer(async(req,res)=>{
       if(path==='/api/photos')return json(202,await photos.start(await body(req),req.headers['idempotency-key'],actor.username))
       if(path==='/api/ideas'){const input=await body(req),key=req.headers['idempotency-key'];const result=await createPiece(input,key,actor.username);await access.audit(actor.username,'idea_created',{id:result.id});return json(200,result)}
       if(path==='/api/preview/audio')return json(200,await previewAudio(root,(await body(req)).script))
-      const jobAction=/^\/api\/jobs\/(job_[a-f0-9-]{36})\/(cancel|retry|review)$/.exec(path);if(jobAction){let out;if(jobAction[2]==='review'){access.require(req,['admin']);const d=await body(req);out=await store.review(jobAction[1],d.status,actor.username,d.note||'')}else if(jobAction[2]==='cancel')out=await store.cancel(jobAction[1],actor.username);else out=await store.retry(jobAction[1],req.headers['idempotency-key']);await access.audit(actor.username,'job_'+jobAction[2],{id:jobAction[1]});return json(200,out)}
+      const jobAction=/^\/api\/jobs\/(job_[a-f0-9-]{36})\/(cancel|retry|review)$/.exec(path);if(jobAction){let out;if(jobAction[2]==='review'){access.require(req,['admin']);const d=await body(req);out=await store.review(jobAction[1],d.status,actor.username,d.note||'')}else if(jobAction[2]==='cancel')out=await store.cancel(jobAction[1],actor.username);else out=await marketing.retryJob(jobAction[1],req.headers['idempotency-key'],actor.username,store,url.searchParams.get('piece_id'));await access.audit(actor.username,'job_'+jobAction[2],{id:jobAction[1]});return json(200,out)}
       if(path==='/api/feed/photo'){const data=await body(req,17000000);const task=photoWrite.then(()=>approvePhoto(data,root));photoWrite=task.catch(()=>{});return json(201,await task)}
       if(path==='/api/feed/render'||path==='/api/feed/save'){const data=await body(req),s=validateFeed(data.script,data.kind);let result;if(path.endsWith('/render'))result=await store.create({brand_id:s.brand_id||'comandpos',kind:s.tipo,script:s},data.idempotency_key,'feed-editor');await versions.save(s.tipo,s,actor.username);await access.audit(actor.username,'save_feed',{name:s.nombre});return json(result?202:200,result||{ok:true})}
       if(!['/api/guardar','/api/render'].includes(path))throw problem(404,'Ruta desconocida')
@@ -185,7 +210,7 @@ const server=createServer(async(req,res)=>{
     if(/^\/api\/photos\/photo_[a-f0-9-]{36}$/.test(path))return json(200,await photos.status(path.split('/').at(-1)))
     if(path==='/api/feed/catalog')return json(200,await feedCatalog(root))
     if(path==='/api/centro')return json(200,{...await catalog(),jobs:store.list()})
-    const localArtifact=/^\/api\/centro\/jobs\/(job_[a-f0-9-]{36})\/artifacts\/(video|cover|manifest|image-[1-4])$/.exec(path)
+    const localArtifact=/^\/api\/centro\/jobs\/(job_[a-f0-9-]{36})\/artifacts\/(video|cover|manifest|image-[1-8])$/.exec(path)
     if(localArtifact)return await sendFile(req,res,store.artifactPath(localArtifact[1],localArtifact[2]))
     if(path==='/api/estado'){
       const j=store.list().find(j=>j.source==='editor')
@@ -195,7 +220,7 @@ const server=createServer(async(req,res)=>{
     if(path==='/api/lista')return json(200,{guiones:(await readdir(join(root,'storyboards'))).filter(f=>!f.startsWith('.')&&f.endsWith('.json')),voces:(await readdir(join(root,'casting'))).filter(f=>/^\d.*\.mp3$/.test(f)),videos:(await readdir(join(root,'salida'))).filter(f=>!f.startsWith('.')&&f.endsWith('.mp4'))})
     const vendor=/^\/vendor\/wavesurfer\/([a-z0-9./-]+\.js)$/.exec(path);if(vendor&&!vendor[1].includes('..'))return await sendFile(req,res,join(root,'node_modules/wavesurfer.js/dist',vendor[1]));
     const route=decodeURIComponent(path==='/'?'/centro.html':path)
-    if(!/^\/(styles\.mjs|create-ui\.js|history\.mjs|marketing.html|marketing-ui.js|editor-tools.js|media-scenes.js|ui\.css|ui\.js|home\.js|account\.html|create\.html|editor\.html|feed-editor\.html|centro\.html|studio\.html|validar\.mjs|n8n-style\.js|formats\.js|feed\/templates\/[^/]+\.json|feed\/photos\/[a-z0-9-]+\.(jpg|png)|assets\/[^/]+|storyboards\/[^/]+\.json|casting\/[^/]+\.mp3|salida\/[^/]+\.(mp4|json))$/.test(route)||basename(route).startsWith('.'))throw problem(404,'No disponible')
+    if(!/^\/(carousel-ui\.js|operations-ui\.js|design\.mjs|captions\.mjs|visual-runtime\.js|version-diff\.mjs|styles\.mjs|create-ui\.js|history\.mjs|marketing.html|marketing-ui.js|editor-tools.js|media-scenes.js|ui\.css|ui\.js|home\.js|account\.html|create\.html|editor\.html|feed-editor\.html|centro\.html|studio\.html|validar\.mjs|n8n-style\.js|formats\.js|feed\/templates\/[^/]+\.json|feed\/photos\/[a-z0-9-]+\.(jpg|png)|assets\/[^/]+|storyboards\/[^/]+\.json|casting\/[^/]+\.mp3|salida\/[^/]+\.(mp4|json))$/.test(route)||basename(route).startsWith('.'))throw problem(404,'No disponible')
     const file=resolve(root,'.'+route);if(!file.startsWith(root+sep))throw problem(403,'Ruta inválida')
     return await sendFile(req,res,file)
   }catch(e){if(!res.headersSent)json(e.status||(e.code==='ENOENT'?404:400),{error:e.message});else res.destroy()}

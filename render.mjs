@@ -1,4 +1,4 @@
-import {sourceFingerprint,sceneKey,checkpoint,cachedScene} from './scene-cache.mjs'
+import {sourceFingerprint,visualContext,sceneKey,checkpoint,cachedScene} from './scene-cache.mjs'
 import {renameSync,existsSync} from 'node:fs'
 import {createHash} from 'node:crypto'
 // GCODE Studio: graba studio.html cuadro a cuadro con Chrome sin pantalla y lo monta con ffmpeg.
@@ -9,7 +9,7 @@ import { execFile } from 'node:child_process'
 import { promisify } from 'node:util'
 const run=promisify(execFile)
 import { spawn } from 'node:child_process'
-import { mkdirSync, rmSync, writeFileSync, readFileSync, mkdtempSync } from 'node:fs'
+import { copyFileSync, mkdirSync, rmSync, writeFileSync, readFileSync, mkdtempSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { validar } from './validar.mjs'
 import { subtitulos } from './subtitulos.mjs'
@@ -35,7 +35,7 @@ const fotos = args.includes('--fotos') ? args[args.indexOf('--fotos') + 1].split
 const musica = args.includes('--musica') ? args[args.indexOf('--musica') + 1] : 'fondo-02.mp3'
 
 const ENTRA = 0.35, SALE = 0.5
-const voces = [];const cacheStats={reused:0,rendered:0};await checkpoint(OUT,'preparing')
+const voces = [];const cacheStats={reused:0,rendered:0,segments:[]};await checkpoint(OUT,'preparing')
 if (conVoz) {
   const v = await perfil(sb.perfil_voz || 'n8n')
   for (const [i, e] of sb.escenas.entries()) {
@@ -51,7 +51,7 @@ if (conVoz) {
     e.voz_inicio ??= ENTRA
     e.dur = Math.max(e.dur, +(e.voz_inicio + a.dur + (original ? .05 : SALE)).toFixed(2))
     e.palabras = sb.subtitulos === true && e.manual_words && e.palabras?.map(w=>w.word).join(' ')===(e.voz||'').trim().split(/\s+/).join(' ') ? e.palabras : sb.subtitulos === true ? (original ? original.palabras.filter(w=>w.start>=trimStart&&w.end<=trimEnd+.05).map(w=>({...w,start:w.start-trimStart,end:w.end-trimStart})) : (await subtitulos(e.voz,untrimmed)).filter(w=>w.start>=trimStart&&w.end<=trimEnd+.05).map(w=>({...w,start:w.start-trimStart,end:w.end-trimStart}))) : []
-    voces.push({ escena: i, ...a })
+    copyFileSync(a.archivo,join(OUT,'voice-stem-'+i+'.wav'));voces.push({ escena: i, ...a })
     console.log(`voz ${i + 1}: ${a.dur.toFixed(2)} s  «${e.voz}»`)
   }
   let t = 0; for (const [i, e] of sb.escenas.entries()) { const x = voces.find((q) => q.escena === i); if (x) x.t = t + (e.voz_inicio ?? ENTRA); t += e.dur }
@@ -84,7 +84,8 @@ const js = async (expr) => { const r = await cdp('Runtime.evaluate', { expressio
 await cdp('Page.enable')
 await cdp('Emulation.setDeviceMetricsOverride', { width: WIDTH, height: HEIGHT, deviceScaleFactor: PREVIEW?(ASPECT==='portrait'?.4:.5):1, mobile: false })
 await cdp('Page.navigate', { url: 'file://' + join(SOURCE, 'studio.html') })
-for (let i = 0; i < 100 && !(await js('typeof window.setOutputFormat==="function"').catch(() => false)); i++) await esperar(100)
+for (let i = 0; i < 100 && !(await js('typeof window.setOutputFormat==="function" && window.studioVisualReady===true').catch(() => false)); i++) await esperar(100)
+if(!(await js('window.studioVisualReady===true')))throw Error('No se cargó el módulo visual de la plantilla');
 await js('Promise.all([document.fonts.load("900 40px Montserrat"),document.fonts.load("600 40px Montserrat")]).then(()=>true)')
 if (!(await js('document.fonts.check("900 40px Montserrat")'))) throw new Error('Montserrat no cargó: el video saldría con otra letra')
 await js(`setOutputFormat(${JSON.stringify(ASPECT)})`);await js(`preparar(${JSON.stringify(sb)})`)
@@ -97,12 +98,14 @@ for(const [i,e]of sb.escenas.entries()){
   const overflow=await js(`(()=>{const stage=document.querySelector('#stage'),box=stage.getBoundingClientRect();return [...stage.querySelectorAll('text')].filter(el=>{let p=el;while(p&&p!==stage){if(Number(getComputedStyle(p).opacity)<.1)return false;p=p.parentElement}const r=el.getBoundingClientRect();return r.width>0&&(r.left<box.left-2||r.right>box.right+2||r.top<box.top-2||r.bottom>box.bottom+2)}).map(el=>el.textContent).slice(0,8)})()`);
   quality.samples.push({scene:i+1,second:sceneStart+offset,overflow});if(overflow.length)quality.warnings.push('Escena '+(i+1)+': texto fuera del cuadro: '+overflow.join(' / '));
  }
+ if(e.palabras?.length){const metrics=await js(`studioCaptionMetrics(${JSON.stringify(e.palabras)},${JSON.stringify(sb)},${e.tipo==='media'?WIDTH:1080},${e.tipo==='media'?HEIGHT:1920},${e.tipo==='media'?'undefined':66})`);if(metrics.fast||metrics.tooShort)quality.warnings.push('Escena '+(i+1)+': revisar lectura de subtítulos ('+metrics.fast+' páginas rápidas, '+metrics.tooShort+' breves)')}
  if(e.voz&&e.voz.split(/\s+/).length/e.dur>3.8)quality.warnings.push('Escena '+(i+1)+': narración rápida; revisar comprensión');
  sceneStart+=e.dur;
 }
 const frame = async (t) => { await js(`seek(${t})`); return Buffer.from((await cdp('Page.captureScreenshot', { format: fotos ? 'png' : 'jpeg', quality: 92 })).data, 'base64') }
 
 if (fotos) {
+  writeFileSync(join(OUT,'quality.json'),JSON.stringify({...quality,checks:['Geometría de texto en cuadros de muestra','Duración de lectura'],audio_checked:false},null,2));
   for (const t of fotos) writeFileSync(join(OUT, `foto-${t}.png`), await frame(t))
   console.log('Fotos listas en', OUT)
 } else {
@@ -111,7 +114,7 @@ if (fotos) {
   const source=await sourceFingerprint(SOURCE),renderer=createHash('sha256').update(readFileSync(fileURLToPath(import.meta.url))).digest('hex');
   const segments=[];let start=0;
   for(const [sceneIndex,scene]of sb.escenas.entries()){
-    const frames=Math.round(scene.dur*FPS),key=sceneKey({scene,brand:sb.brand,evidence:sb.evidencia,source,aspect:ASPECT,fps:FPS,preview:PREVIEW,renderer,context:{index:sceneIndex,count:sb.escenas.length,...(scene.tipo==='comercial_n8n'?{start,total:TOTAL,hook:sb.escenas[0].titulo}:{})}});
+    const frames=Math.round(scene.dur*FPS),key=sceneKey({scene,brand:sb.brand,evidence:sb.evidencia,source,aspect:ASPECT,fps:FPS,preview:PREVIEW,renderer,context:visualContext(sb,scene,sceneIndex,start,TOTAL)});
     let segment=await cachedScene(cacheDir,key,frames);
     await checkpoint(OUT,'rendering',{scene:sceneIndex+1,total:sb.escenas.length,cache:cacheStats});
     if(segment){cacheStats.reused++}else{
@@ -123,7 +126,7 @@ if (fotos) {
       ff.stdin.end();await done;segment=join(cacheDir,key+'.mp4');renameSync(temp,segment);
       writeFileSync(join(cacheDir,key+'.json'),JSON.stringify({frames,at:new Date().toISOString()}));cacheStats.rendered++;
     }
-    segments.push(segment);start+=scene.dur;console.log(Math.round(start/TOTAL*100)+'%');
+    cacheStats.segments.push({key,scene_id:scene.id,start,duration:frames/FPS,frames});segments.push(segment);start+=scene.dur;console.log(Math.round(start/TOTAL*100)+'%');
   }
   const list=join(perfilChrome,'segments.txt');writeFileSync(list,segments.map(file=>"file '"+file.replaceAll("'","'\\''")+"'").join('\n'));
   await run('ffmpeg',['-v','error','-y','-f','concat','-safe','0','-i',list,'-c','copy',mudo],{timeout:120000});

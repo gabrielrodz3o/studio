@@ -9,17 +9,18 @@ export function campaignContext(data, brandId, campaignId) {
   return campaign
 }
 export function proposals(data,brand,history=[],campaign=null) {
-  const claims=(brand.claims||[]).filter(c=>c.verified&&c.source)
+  const claims=(brand.claims||[]).filter(c=>c.verified&&c.source&&c.reviewed_by)
   const facts=claims.length?claims.map(c=>({topic:c.text,claim_id:c.id,source:c.source})):String(brand.facts||'').split(/\n|;|(?<=\.)\s+/).map(topic=>({topic:topic.trim(),source:'Ficha de marca; revisar evidencia'})).filter(c=>c.topic.length>8)
   if(!facts.length)throw Error('Completa los hechos comprobados de la marca')
   const published=data.deliveries.filter(d=>d.brand_id===brand.id&&d.status==='published').sort((a,b)=>String(b.published_at||b.at).localeCompare(String(a.published_at||a.at))).slice(0,30)
   const past=[...history.filter(h=>h.brand_id===brand.id).sort((a,b)=>String(b.at).localeCompare(String(a.at))).slice(0,Math.max(1,facts.length-1)).map(h=>h.topic||h.idea),...published.map(d=>d.caption)]
   const base=automaticBrief(brand,history)
-  return facts.map(f=>{
+  const angles=[{id:'uso',label:'Una situación cotidiana',instruction:'Explica una situación ilustrativa donde se utiliza la función.'},{id:'pregunta',label:'Una duda frecuente',instruction:'Formula una duda y responde únicamente con el hecho disponible.'},{id:'distincion',label:'Qué permite y qué no afirma',instruction:'Aclara el alcance del hecho sin inventar limitaciones ni funciones adicionales.'}];
+  return facts.flatMap(f=>angles.map(angle=>{
     const repetition=Math.max(0,...past.filter(Boolean).map(t=>similarity(f.topic,t))),relevance=similarity(f.topic,(campaign?.objective||'')+' '+(campaign?.offer||''))
-    const idea=`Crea una pieza para ${campaign?.audience||brand.audience} sobre este hecho verificado: ${f.topic}. Objetivo editorial: ${campaign?.objective||'Explicar una función comprobada'}. No inventes resultados, precios ni funciones. Cierra con ${brand.cta}.`
-    return {...f,id:hash({brand:brand.id,campaign:campaign?.id,topic:f.topic}).slice(0,20),style:brand.id==='comandpos'&&/reportes|venta neta/i.test(f.topic)?'comercial':base.style,idea,score:relevance*.5-repetition*2,repetition,reason:(relevance?'Relacionado con el objetivo de campaña. ':'Hecho disponible en la marca. ')+(repetition>.6?'Se parece a contenido reciente: cambia el enfoque.':'Menor repetición en el historial consultado.'),resources:selectResources(brand.id,f.topic,data.assets).map(a=>({id:a.id,name:a.name,type:a.type,score:a.score}))}
-  }).sort((a,b)=>b.score-a.score).slice(0,3)
+    const idea=`Enfoque editorial: ${angle.instruction} Crea una pieza para ${campaign?.audience||brand.audience} sobre este hecho de la ficha de marca (requiere revisión de evidencia): ${f.topic}. Objetivo editorial: ${campaign?.objective||'Explicar una función comprobada'}. No inventes resultados, precios ni funciones. Cierra con ${brand.cta}.`
+    return {...f,angle:angle.id,angle_label:angle.label,id:hash({brand:brand.id,campaign:campaign?.id,topic:f.topic,angle:angle.id}).slice(0,20),style:brand.id==='comandpos'&&/reportes|venta neta/i.test(f.topic)?'comercial':base.style,idea,score:relevance*.5-repetition*2-history.filter(h=>h.brand_id===brand.id&&h.topic===f.topic&&h.angle===angle.id).length,repetition,reason:angle.label+'. '+(relevance?'Relacionado con el objetivo de campaña. ':'Hecho disponible en la marca. ')+(repetition>.6?'Se parece a contenido reciente: cambia el enfoque.':'Menor repetición en el historial consultado.'),resources:selectResources(brand.id,f.topic,data.assets).map(a=>({id:a.id,name:a.name,type:a.type,score:a.score}))}
+  })).filter(p=>!(data.pieces||[]).some(piece=>piece.brand_id===brand.id&&piece.campaign_id===campaign?.id&&piece.concept_id===p.id)).sort((a,b)=>b.score-a.score).slice(0,3)
 }
 
 export function deriveCampaign(data,campaign,proposal) {

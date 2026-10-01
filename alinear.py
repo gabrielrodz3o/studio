@@ -23,8 +23,9 @@ def verify_meaning(text, segments):
 def norm(s):
     return ''.join(c for c in unicodedata.normalize('NFD', s.lower()) if c.isalnum())
 
-def align(text, segments, duration):
-    verify_meaning(text, segments)
+def align(text, segments, duration, review_accepted=False):
+    if not review_accepted:
+        verify_meaning(text, segments)
     expected=text.split()
     target=''.join(norm(w) for w in expected)
     observed=''; times=[]
@@ -55,8 +56,8 @@ def align(text, segments, duration):
         end=max(start,min(duration,end))
         words.append({'word':w,'start':round(start,3),'end':round(end,3)})
         pos+=size
-    return {'words':words,'coincidencia':round(match.ratio(),3),'metodo':'whisper-local-con-texto-del-guion','alignment_version':ALIGNMENT_VERSION,'critical_words_checked':True}
+    return {'words':words,'coincidencia':round(match.ratio(),3),'metodo':'whisper-local-con-texto-del-guion','alignment_version':ALIGNMENT_VERSION,'critical_words_checked':not review_accepted,'human_review':review_accepted}
 
 if __name__=='__main__':
     data=json.load(open(sys.argv[1])); transcription=json.load(open(sys.argv[2]))
-    print(json.dumps(align(data['texto'],transcription['transcription'],data['duracion']),ensure_ascii=False))
+    print(json.dumps(align(data['texto'],transcription['transcription'],data['duracion'],data.get('review_accepted') is True),ensure_ascii=False))

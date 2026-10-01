@@ -8,7 +8,7 @@ export async function sourceFingerprint(root) {
   async function scan(dir,prefix=''){
     for(const file of (await readdir(dir,{withFileTypes:true})).sort((a,b)=>a.name.localeCompare(b.name))){
       const name=prefix+file.name;if(file.isDirectory()){if(name==='assets')await scan(join(dir,file.name),name+'/');continue}
-      if(!prefix&&!['studio.html','n8n-style.js','media-scenes.js','formats.js'].includes(name))continue
+      if(!prefix&&!['studio.html','n8n-style.js','media-scenes.js','formats.js','visual-runtime.js','design.mjs','captions.mjs'].includes(name))continue
       if(prefix&&(file.name.startsWith('resource-')||/\.(wav|mp3)$/.test(name)))continue
       entries.push([name,createHash('sha256').update(await readFile(join(dir,file.name))).digest('hex')])
     }
@@ -17,8 +17,9 @@ export async function sourceFingerprint(root) {
 }
 export function sceneKey({scene,brand,evidence,source,aspect,fps,preview,renderer,context}){
   const {id,...content}=scene
-  return createHash('sha256').update(canonical({schema:1,scene:content,brand,evidence,source,aspect,fps,preview,renderer,context})).digest('hex')
+  return createHash('sha256').update(canonical({schema:2,scene:content,brand,evidence,source,aspect,fps,preview,renderer,context})).digest('hex')
 }
+export function visualContext(story,scene,index,start,total){return {index,count:story.escenas.length,template:story.template||null,design_family:scene.family||story.design_family||null,editorial_topic:scene.tipo==='media'?story.editorial_topic||null:null,...(scene.tipo==='comercial_n8n'?{start,total,hook:story.escenas[0].titulo}:{})}}
 export async function checkpoint(out,stage,detail={}) {
   await mkdir(out,{recursive:true});const file=join(out,'checkpoint.json'),temp=file+'.'+randomUUID()+'.tmp'
   await writeFile(temp,JSON.stringify({stage,at:new Date().toISOString(),...detail}),{mode:0o600});await rename(temp,file)

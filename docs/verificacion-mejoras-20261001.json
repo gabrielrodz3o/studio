@@ -1,0 +1,375 @@
+{
+  "date": "2026-10-01T14:16:40.333885+00:00",
+  "node_tests": {
+    "passed": 77,
+    "failed": 0
+  },
+  "python_tests": {
+    "passed": 6
+  },
+  "editorial_fixtures": {
+    "passed": 20
+  },
+  "integration": {
+    "date": "2026-10-01T14:16:05.360Z",
+    "api": "passed",
+    "browser": "passed",
+    "render": "passed",
+    "handoff": "created; NLE import not exercised",
+    "job": "job_eb54801d-9ce3-4ea6-8a31-89a8f267f337",
+    "artifacts": "/private/tmp/studio-final-improvements"
+  },
+  "matrix": {
+    "at": "2026-10-01T13:59:59.532Z",
+    "audio": "not exercised",
+    "cases": [
+      {
+        "style": "historia",
+        "aspect": "vertical",
+        "frames": 8,
+        "warnings": [],
+        "status": "rendered"
+      },
+      {
+        "style": "historia",
+        "aspect": "horizontal",
+        "frames": 8,
+        "warnings": [],
+        "status": "rendered"
+      },
+      {
+        "style": "historia",
+        "aspect": "square",
+        "frames": 8,
+        "warnings": [],
+        "status": "rendered"
+      },
+      {
+        "style": "historia",
+        "aspect": "portrait",
+        "frames": 8,
+        "warnings": [],
+        "status": "rendered"
+      },
+      {
+        "style": "comercial",
+        "aspect": "vertical",
+        "frames": 4,
+        "warnings": [],
+        "status": "rendered"
+      },
+      {
+        "style": "comercial",
+        "aspect": "horizontal",
+        "frames": 4,
+        "warnings": [],
+        "status": "rendered"
+      },
+      {
+        "style": "comercial",
+        "aspect": "square",
+        "frames": 4,
+        "warnings": [],
+        "status": "rendered"
+      },
+      {
+        "style": "comercial",
+        "aspect": "portrait",
+        "frames": 4,
+        "warnings": [],
+        "status": "rendered"
+      },
+      {
+        "style": "consejo",
+        "aspect": "vertical",
+        "frames": 2,
+        "warnings": [],
+        "status": "rendered"
+      },
+      {
+        "style": "consejo",
+        "aspect": "horizontal",
+        "frames": 2,
+        "warnings": [],
+        "status": "rendered"
+      },
+      {
+        "style": "consejo",
+        "aspect": "square",
+        "frames": 2,
+        "warnings": [],
+        "status": "rendered"
+      },
+      {
+        "style": "consejo",
+        "aspect": "portrait",
+        "frames": 2,
+        "warnings": [],
+        "status": "rendered"
+      },
+      {
+        "style": "tutorial",
+        "aspect": "vertical",
+        "frames": 5,
+        "warnings": [],
+        "status": "rendered"
+      },
+      {
+        "style": "tutorial",
+        "aspect": "horizontal",
+        "frames": 5,
+        "warnings": [],
+        "status": "rendered"
+      },
+      {
+        "style": "tutorial",
+        "aspect": "square",
+        "frames": 5,
+        "warnings": [],
+        "status": "rendered"
+      },
+      {
+        "style": "tutorial",
+        "aspect": "portrait",
+        "frames": 5,
+        "warnings": [],
+        "status": "rendered"
+      },
+      {
+        "style": "pregunta",
+        "aspect": "vertical",
+        "frames": 4,
+        "warnings": [],
+        "status": "rendered"
+      },
+      {
+        "style": "pregunta",
+        "aspect": "horizontal",
+        "frames": 4,
+        "warnings": [],
+        "status": "rendered"
+      },
+      {
+        "style": "pregunta",
+        "aspect": "square",
+        "frames": 4,
+        "warnings": [],
+        "status": "rendered"
+      },
+      {
+        "style": "pregunta",
+        "aspect": "portrait",
+        "frames": 4,
+        "warnings": [],
+        "status": "rendered"
+      },
+      {
+        "style": "lista",
+        "aspect": "vertical",
+        "frames": 5,
+        "warnings": [],
+        "status": "rendered"
+      },
+      {
+        "style": "lista",
+        "aspect": "horizontal",
+        "frames": 5,
+        "warnings": [],
+        "status": "rendered"
+      },
+      {
+        "style": "lista",
+        "aspect": "square",
+        "frames": 5,
+        "warnings": [],
+        "status": "rendered"
+      },
+      {
+        "style": "lista",
+        "aspect": "portrait",
+        "frames": 5,
+        "warnings": [],
+        "status": "rendered"
+      },
+      {
+        "style": "solucion",
+        "aspect": "vertical",
+        "frames": 4,
+        "warnings": [],
+        "status": "rendered"
+      },
+      {
+        "style": "solucion",
+        "aspect": "horizontal",
+        "frames": 4,
+        "warnings": [],
+        "status": "rendered"
+      },
+      {
+        "style": "solucion",
+        "aspect": "square",
+        "frames": 4,
+        "warnings": [],
+        "status": "rendered"
+      },
+      {
+        "style": "solucion",
+        "aspect": "portrait",
+        "frames": 4,
+        "warnings": [],
+        "status": "rendered"
+      },
+      {
+        "style": "comparativa",
+        "aspect": "vertical",
+        "frames": 5,
+        "warnings": [],
+        "status": "rendered"
+      },
+      {
+        "style": "comparativa",
+        "aspect": "horizontal",
+        "frames": 5,
+        "warnings": [],
+        "status": "rendered"
+      },
+      {
+        "style": "comparativa",
+        "aspect": "square",
+        "frames": 5,
+        "warnings": [],
+        "status": "rendered"
+      },
+      {
+        "style": "comparativa",
+        "aspect": "portrait",
+        "frames": 5,
+        "warnings": [],
+        "status": "rendered"
+      },
+      {
+        "style": "marca",
+        "aspect": "vertical",
+        "frames": 4,
+        "warnings": [],
+        "status": "rendered"
+      },
+      {
+        "style": "marca",
+        "aspect": "horizontal",
+        "frames": 4,
+        "warnings": [],
+        "status": "rendered"
+      },
+      {
+        "style": "marca",
+        "aspect": "square",
+        "frames": 4,
+        "warnings": [],
+        "status": "rendered"
+      },
+      {
+        "style": "marca",
+        "aspect": "portrait",
+        "frames": 4,
+        "warnings": [],
+        "status": "rendered"
+      }
+    ]
+  },
+  "deployment": {
+    "host": "gcoderd2",
+    "status": "healthy; final code deployed",
+    "rollback": "gcode-studio:before-20261001T141649Z",
+    "linux_carousel_pages": 6,
+    "linux_operation_budget": "passed",
+    "integration_api": 200,
+    "unauthenticated_editor_api": 401,
+    "connector": "gcoderd1 updated; syntax passed; no tick executed"
+  },
+  "files": {
+    "history.test.mjs": "f00cf290a4746a37d92cdf5ac6eba93a6d793af3ba70eaa6359b9c090940ba16",
+    "releases.mjs": "fea96d507379bbdc2cff62500c636dd8db2208902c86a7c03c82ecf1bada8ec8",
+    "handoff.mjs": "46955ecbfbdc9d066de284d2c95c688aa4faf00201289ff165be7604b762c8ed",
+    "improvements.test.mjs": "efc559b807b67dbfa060d91aef9a7121317adf1788dd4e0def5dc8a640434cd0",
+    "media-scenes.js": "9f12696173cc1a7b6ebad6dd2170d9862623d29a8d217d7a5a67981f199b0707",
+    "file-lock.mjs": "1c4fadeaba4f7bc6493eb00a2440e961e7c32954951893d4a93244885f3d6b2b",
+    "history.mjs": "558b2e841e675ab989cc219361ceb9094064e3d48e0f36b0ee41e7769ee71729",
+    "ui.js": "8d9490ee8ca207808d06e4c0274911cc52592b7bad639bca79d71b81cb505134",
+    "voz.test.mjs": "3e6588ec8a6497a367cc65c93ba3252406cece359d623d7d0d07d3f427384223",
+    "voice-reviews.mjs": "929364f1223ffc00b78bc7265bd430d5f8e1479735736cfa4ec9db4832f6f163",
+    "jobs.mjs": "488e53583c488df35c24dacce92915e472a526fc04773580cf2350ade7cfc0a6",
+    "image-runtime.mjs": "a7eba8078b139adb18f7e204c67fcc4bf8660c7c28874fbf7b9c337d429d2001",
+    "editor-tools.js": "cbae0d8643d42cfc04ea344bd1b169611a65ea9e77b5916f25c63542a1c965e0",
+    "creative.test.mjs": "1a1ed1ca7a6d2951f519672f03e3c7d10574def4bd5a27056deb909b26bd97bc",
+    "local.mjs": "acacd232b8222d1e6d97104b1ff4f0d6664bd8dad0e2e297411b4738c4c90e5c",
+    "creative.mjs": "4240ed343910df06c22190d15d513f025f2c7890c169360a17fbcb6318a59492",
+    "marketing.mjs": "6ad71aed32eba03a812dfdda99f23fe5d6345ada381c1ab1a422332f6f073d63",
+    "recovery.test.mjs": "02e8995083e5fcc07a01f93a0836d61faf36b77a692cb8f1a1185d70fa7dc859",
+    "action-plan.test.mjs": "913a55444e05db405b088acbf5115a078e7b4b8acea48196c03725751811c45a",
+    "styles.test.mjs": "9e647f9f955bae1f68f45a2831fbda57e9c0882902edc7a08109dc054fe99882",
+    "storage.mjs": "8359fb4960e249d3eedb9c57526957f22ab37a21570ecae2b36625eaf41b45fe",
+    "validar.mjs": "115d1a883181f30826079ac235d5ba25b2c184d01fb3ccd5f44117def2292eb0",
+    "alinear_test.py": "ab59a4562a3312ce7fba8a9031044b30483d3ba3b54405276b8bba3f65c44000",
+    "subtitulos.mjs": "3149ac5c47ba68918a00da9e25b5476db23caeda93a489876fb12f138babc3e6",
+    "carousel-ui.js": "d2e4b8a8e159313186efe8c335f51def8aab11c8be973fec72826c6aa3d848ef",
+    "render.mjs": "056f1b116e2a252fc360840eee0f995ed927f0100dbced89075d74a53046bf2a",
+    "jobs.test.mjs": "727a4d19c32b196b29218e900bf90e076e0a1a90fcd09e1c300b2aecfcef8a08",
+    "visual-runtime.js": "de6925c9ca3ab6065925727454258881cc0d69eb0b6a344d3d51595085571a41",
+    "evidence.mjs": "30eb6ac9e3908b29d3b8a28f0f7b34d69afb69b01c60d8019654d281242ca052",
+    "create.html": "e45f92c33812851f74dcc2a419aa71c1094369721720e5a72f45ec07044c4f1f",
+    "brand-feed.mjs": "8458a883511eeb25ca4679af9292176b2d273982e32b5d659964b4290d134029",
+    "editorial.mjs": "6a52c1530896984267f84d8fa843bb10621ee6e38696e4dfd02467a05d95a0c6",
+    "editor.html": "0e60e78286bbfbb57e865c7b56b740ffde5cc72780fecfb5c70aae31dbf993bb",
+    "planning.mjs": "de39fd7a671c05d2a79ab16390542ee0364747fe1ca7175f8a2edb3d2b19ec6d",
+    "home.js": "eea10ec1264025990f1cdc1356cb63071caeacdf25f32ae2b41833a7f2ac76c5",
+    "centro.html": "ebb4dda1cb3cb24ce7c57e3ad18fe3fe97818f7c94cb630008778e5bea7636c8",
+    "fontconfig.mjs": "da154200045b90fa85de45422bff885b02931d0aa1f5b8dacfb6b9adb3986098",
+    "contracts.mjs": "31e895c0d6a9196c08dc5f1362223ccf73564db5781773bad0b1472c3cef0af3",
+    "account.html": "564540bb456de3964504db295e049577b70f7fb20b8b9a4d042da8ffb463849d",
+    "budget.mjs": "8d343c573e2d6b4577d03ca7b53bb45bfa1b14236b111f28c6a0a9cbc91897d3",
+    "studio.html": "5f0f5e1e8ae938cb31d2694017e67b318e4c2faf67dc2c31a07c294d2bac4924",
+    "preview.mjs": "73d832f50f78c2c145f3b57f78e079645b761fd048cbe9a6cdcbfe155fbc9310",
+    "brand-feed.test.mjs": "355ce77c6d9a6c29d6ec4fcd91081a3dfa2e81ac51760e532786376f52354e19",
+    "access.mjs": "5312e70625946e4cbfe457f51cfec1566e18a2604e69f97522583d994d515072",
+    "feed.mjs": "63feb9a23b017f771e4bf5baf4bb01a2b83a7b01de6f4d8c04c89700907edf1b",
+    "batches.mjs": "9fb5fb9d0211369a15ebd5108e3451b33cbeba874e8df735f32fa2e28483a475",
+    "design.mjs": "a48ae1230529c9178d2fb84bb653ba2a406fa805ba2ab863801bcba31e49fc33",
+    "ui.css": "ba888b26dd4dbe33ef14d067778020f90608c9d82c95e5c0485fbd743a7902c3",
+    "versions.mjs": "cc41d8c21a899240917bfee363edc0a8e9e97adab6bc00c491d8ad6a091cf968",
+    "versions.test.mjs": "197f584c73de77516782295a293aec0654f8ad54930576be569298aaa4e8e6ff",
+    "marketing.test.mjs": "f42241f233ebd3adbe9cd7a761fc663b1afcd38290940ac229317e10ebebdf08",
+    "marketing.html": "156da6b5290b0f95deb7bc21af102b0cb74e3963ed1409ae4d16eb0871c7f13f",
+    "version-diff.mjs": "ec7775c6c60850024011a74f8965d9608d1650faf5bad28600f025247efdec35",
+    "create-ui.js": "0bf166a7ec60da457eb87c194bb6af4714c6cc8a418bad455f3c4e3f211144e0",
+    "marketing-ui.js": "80761dbfd8a52a15b20b916a13c94f5beb8b51a7eaed5bbd03b09be4e55861a2",
+    "alinear.py": "f0407cd6104b182a1b099dd3cae02344aea0523730abe7a067d0f5daac3c91ee",
+    "api-scopes.mjs": "19333dade5d4eeff368ad1f92244cda268fb7c2abef5c78fb5a2254de20bb9d2",
+    "publisher.test.mjs": "dd3ba81d917cafb3d01bca9c1e20dc37b9471d83cbdb1c2305e52db175f277b9",
+    "captions.mjs": "d0e8bb93cc04e686c67f9e747e4dfa6a788270644c00bf3dec331eebbc44d93b",
+    "casting.mjs": "4190c5de33727a9ff80813f612f80998ca57968850933d8ea40139750e4027cf",
+    "voz.mjs": "d963c0fa3a0cbcb7111e343b35eab14e32dd28842c275c5c5bf268a50aa65584",
+    "operations-ui.js": "5c62a80039c4cd7e44c8e225de0983588e16324a103f5e9cde4bdba87e8f0ced",
+    "capabilities.mjs": "75c43be7bfe21d630783deef69a2d71ccfca16b5873d76602ad8157cc2230684",
+    "access.test.mjs": "44083a7d879c0ab19a694440423315b9ca867fc5aebc84b174436fb53631336c",
+    "feed-editor.html": "dbf9e273e748367f67a6ce9d5134c3b7b225815a4f9b13bfb1356a75cb27961a",
+    "styles.mjs": "7add6d6bcf356b6a06e3365c66c0f28b16ace59cc62f4c81121aa4480b55fa11",
+    "feed.test.mjs": "57ce44e744927461fe137a68d4ca1456faeb4e4f41ee654298671167e1d91164",
+    "formats.js": "018ac7b6159eba3fcca1e04b792171985a491aac1b28832cc695ad32d642c6fe",
+    "scene-cache.mjs": "89c356063e2db8b765bbb29107a701ac587e7f62daf06661ecfde0c2d08d8dd1",
+    "n8n-style.js": "86392d1f3b4f466117cb86dc939d9061467fe7ba1607738003baae328307a54d",
+    "photo-jobs.mjs": "b9c6e3dc44906b3d41176b784180c4d5c4ab57c090e7db57d272e129f3897116",
+    "feed/renderer.cjs": "98f40eaf9a4b69b8ad84cbd917f89e29bc2a1d35f9f631e0995d263d2df8995a",
+    "deploy/update-code.sh": "8b6faace4b3627fde0110422be1b7e6abf6b3acdbfd8954c3ff9f9b8175de757",
+    "deploy/studio-publisher.cjs": "c83696b5b51d5ef464b38c6e01d661297c7a101e90a57df04d1eb19e4f061bc1",
+    "LEEME.md": "da1ba69ef3ab8f3c94743e57f5529aa0ff91cc9a8da721803fb09116f4313131",
+    "scripts/verify-implementation.mjs": "123fa0af2591fef4d4fee37845cea6ba95dc4de0500869abd8238a110d00ded3",
+    "scripts/verify-style-matrix.mjs": "b43f30723890bcb616874c2b43b03d2e38bfbded8342b656c6c4fb365e942c5f",
+    "docs/benchmark-github-historico-20261001.md": "c992ecc464f3bf640682a93d9c0320138e0e50740bb8555760451aa46d76b9a3",
+    "docs/implementacion-mejoras-20261001.md": "38a708b78bdad61c48a5b587d0867cef5112792a3f50e79579d6e9cc3becac67",
+    "docs/benchmark-github.md": "7f2f7f51711025c06bc017edaae7bca5f65aabf853f9fc800b0280e6e25c883a",
+    "docs/mejoras-studio-historico-20261001.md": "e1336be5a9f69c122d993d0bae12f75d4553323f6cdb28462337bcd16a0fbd8e",
+    "docs/implementacion-2026-10-01.md": "9177326753d74dfd0ce79bc516f611ef1c620acae0fdd7af02f36facffe85145",
+    "docs/mejoras-studio.md": "72c4df911e1c975addb6c574828464c6a586c10e42cd4e3785c158db96cfca52"
+  }
+}

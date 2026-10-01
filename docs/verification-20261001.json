@@ -1,0 +1,58 @@
+{
+  "date": "2026-10-01",
+  "tests": {
+    "node_passed": 64,
+    "python_alignment_passed": 6,
+    "editorial_offline_passed": 20
+  },
+  "integration": {
+    "date": "2026-10-01T13:19:48.629Z",
+    "api": "passed",
+    "browser": "passed",
+    "render": "passed",
+    "handoff": "created; NLE import not exercised",
+    "job": "job_a7bf4ad4-147e-4b92-b5eb-dfc9fd1d2ca8",
+    "artifacts": "/private/tmp/studio-validation-20261001/verified-final"
+  },
+  "render_aspects_checked": [
+    "vertical",
+    "horizontal",
+    "square",
+    "portrait"
+  ],
+  "actual_alignment": {
+    "existing_audio": true,
+    "cache_hit": true,
+    "corrupt_cache_recovered": true,
+    "new_tts_requests": 0
+  },
+  "remote_checks": {
+    "linux_budget_lock": "passed",
+    "chrome_ffmpeg_temporary_render": "passed",
+    "authenticated_api_read": "passed",
+    "public_login_http": 200,
+    "unauthenticated_batches_http": 401
+  },
+  "not_exercised": [
+    "Publicación real GST-009",
+    "Permisos vigentes de cada cuenta social",
+    "Importación XML en Premiere o Resolve",
+    "Nuevo lote pagado completo"
+  ],
+  "deployment_final": "applied; startup health check passed",
+  "rollback_image": "gcode-studio:before-20261001T132447Z",
+  "commercial_v2_native_aspects_checked": [
+    "horizontal",
+    "square",
+    "portrait"
+  ],
+  "automatic_video_incident": {
+    "parent_job": "job_4611c0b3-398c-45d2-9cbd-88570ed71283",
+    "recovery_job": "job_fc7946d2-85fb-4854-ac0c-d83703c414c6",
+    "previous_reserved_usd": 0.85,
+    "recovery_max_usd": 1.14,
+    "result": "third voice received; alignment guard requires human confirmation of brand pronunciation",
+    "approval": "pending",
+    "published": false
+  }
+}

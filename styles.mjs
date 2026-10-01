@@ -21,5 +21,5 @@ export function automaticBrief(brand,history=[]){
  const topic=facts.find(x=>!used.includes(x))||facts[recent.length%facts.length]
  const rotation=['tutorial','pregunta','lista','solucion','marca','comparativa']
  const style=rotation[recent.length%rotation.length]
- return {topic,style,idea:`Crea una pieza educativa para ${brand?.audience||'negocios de República Dominicana'} sobre este hecho verificado: ${topic}. Elige una situación cotidiana ilustrativa y explica únicamente lo que este hecho permite afirmar. No inventes pasos de interfaz, testimonios, cifras ni resultados. Cierra con ${brand?.cta||'Solicita tu demo'}.`}
+ return {topic,style,idea:`Crea una pieza educativa para ${brand?.audience||'negocios de República Dominicana'} sobre este hecho de la ficha de marca (requiere revisión de evidencia): ${topic}. Elige una situación cotidiana ilustrativa y explica únicamente lo que este hecho permite afirmar. No inventes pasos de interfaz, testimonios, cifras ni resultados. Cierra con ${brand?.cta||'Solicita tu demo'}.`}
 }

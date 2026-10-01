@@ -308,3 +308,19 @@ por envíos automáticos sin aprobación.
 Comprobación final: 47 pruebas Node, 6 Python, 20 fixtures editoriales; GitHub Actions pasó
 40 pruebas independientes de recursos privados, 6 Python y los mismos 20 fixtures. La restauración
 final verificó 202 registros y ocho hashes de video. No se publicó contenido de prueba.
+
+## Mejoras del benchmark (octubre 2026)
+
+Operación y costes reúne lotes de campaña, conciliación de facturas y recibos,
+diagnóstico de caché y exportación experimental para otro editor. Los lotes generan
+borradores con techo conjunto; cada salida mantiene revisión y aprobación independientes.
+Diseño de marca y plantillas v2 permiten ajustar composición y límites de subtítulos.
+Consulta [la implementación y sus límites](docs/implementacion-2026-10-01.md)
+y [el inventario de oportunidades](docs/mejoras-studio.md).
+
+## Mejoras de recuperación y composición (1 de octubre de 2026)
+
+- **Marketing → Operación y costes:** presupuesto compartido entre reintentos, estado agregado de lotes, revisión de frases retenidas y corrección de respuestas creativas guardadas sin otra compra.
+- **Editor → Voz de la escena:** escuchar y seleccionar tomas anteriores; conservar el perfil de voz existente.
+- **Imágenes/carruseles:** de 2 a 8 páginas, duplicar/ordenar/quitar; la composición de marca admite foto por página. Producir mantiene pendiente la revisión y no publica.
+- Detalle, pruebas, límites y referencias: [implementación GST-017–026](docs/implementacion-mejoras-20261001.md), [benchmark de GitHub](docs/benchmark-github.md).

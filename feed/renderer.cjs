@@ -33,7 +33,7 @@ async function renderFeed(c,slide,sharp,fs,assets){
   rect(x-12,y-12,w+24,h+24,WHITE,24);
   layers.push({input:await img.resize(w,h,{fit:'contain',background:WHITE}).png().toBuffer(),left:x,top:y});
  }
- const idx=slide?.slideIndex||1,inside=slide&&idx>1&&idx<4,end=slide&&idx===4;
+ const idx=slide?.slideIndex||1,inside=slide&&idx>1&&idx<(slide.slideCount||4),end=slide&&idx===(slide.slideCount||4);
  const headline=end?c.ctaVisual:inside?slide.slideText:c.texto_en_imagen;
  const layout=c.design.layout;
  if(inside){

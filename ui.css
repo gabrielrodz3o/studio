@@ -7,3 +7,6 @@
 body[data-page="create"] .row button[aria-pressed="true"]{background:var(--soft);border-color:#e6b9a5;color:#9c472b}body[data-page="create"] #mode-hint{margin-top:18px}body[data-page="create"] #style-description{margin:10px 0;color:#646a76}body[data-page="create"] .row>label{flex:1}body[data-page="create"] #export-options{padding:0 18px 14px;background:#f7f7f6;border-radius:10px;margin-top:16px}
 
 .release-dialog{border:1px solid #e2e8f0;border-radius:22px;padding:28px;max-width:660px;width:90vw;max-height:90vh;overflow:auto}.release-dialog::backdrop{background:#14233b99}.release-dialog video,.release-dialog img{max-width:100%;max-height:380px;border-radius:12px}.release-dialog label{display:flex;gap:10px}
+
+/* Operations: readable tables and separate review tools. */
+#operations-report{overflow-x:auto}#operations-report table{width:100%;border-collapse:collapse;margin:20px 0}#operations-report th,#operations-report td{text-align:left;padding:12px 16px;border-bottom:1px solid #e7e9ee;white-space:nowrap}#marketing-content>.card{margin-bottom:20px}.ledger{overflow-wrap:anywhere}.batches article{padding:16px 0;border-bottom:1px solid #e7e9ee}.tools-message:empty{display:none}

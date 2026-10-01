@@ -32,6 +32,7 @@ test('voz conserva tareas, limita reintentos y evita POST duplicados', async () 
   process.env.KIE_API_KEY = 'test-sin-red'
   try {
     await copyFile(new URL('./voz.mjs', import.meta.url), join(dir, 'voz.mjs'))
+    await copyFile(new URL('./file-lock.mjs', import.meta.url), join(dir, 'file-lock.mjs'))
     await copyFile(new URL('./budget.mjs', import.meta.url), join(dir, 'budget.mjs'))
     const {voz} = await import(pathToFileURL(join(dir, 'voz.mjs')))
     const v = {model:'test',voice_name:'test'}
@@ -58,3 +59,7 @@ test('voz conserva tareas, limita reintentos y evita POST duplicados', async () 
     await rm(dir,{recursive:true,force:true})
   }
 })
+
+test('cached voice takes keep profile/text identity and need no provider',async t=>{
+ const {mkdir}=await import('node:fs/promises'),{execFile}=await import('node:child_process'),{promisify}=await import('node:util');const dir=await mkdtemp(join(tmpdir(),'studio-takes-'));t.after(()=>rm(dir,{recursive:true,force:true}));for(const f of ['voz.mjs','budget.mjs','file-lock.mjs'])await copyFile(new URL('./'+f,import.meta.url),join(dir,f));const {voiceTakes,voiceKey}=await import(pathToFileURL(join(dir,'voz.mjs')));await mkdir(join(dir,'voz'));const text='Registra el pedido',profile={model:'fixture',voice_name:'speaker'};for(const take of [0,2])await promisify(execFile)('ffmpeg',['-v','error','-y','-f','lavfi','-i','sine=frequency=440:duration=1',join(dir,'voz',voiceKey(text,profile,take)+'.wav')]);const takes=await voiceTakes(text,profile);assert.deepEqual(takes.map(t=>t.take),[0,2]);assert.ok(takes.every(t=>t.duration===1));assert.equal((await voiceTakes(text+' nuevo',profile)).length,0);assert.equal((await voiceTakes(text,{...profile,voice_name:'other'})).length,0);
+});

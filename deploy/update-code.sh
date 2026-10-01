@@ -5,6 +5,7 @@ set -eu
 cd /root/gcode-studio
 archive=${1:?Provide release archive relative to /root/gcode-studio}
 test -f "$archive"
+check_queue() {
 python3 - <<'PY'
 import json
 from pathlib import Path
@@ -12,6 +13,8 @@ for p in Path('data/state/jobs').glob('job_*/job.json'):
  if json.loads(p.read_text()).get('status') in ('running','queued'):
   raise SystemExit('Active production; deploy after the queue drains.')
 PY
+}
+check_queue
 stamp=$(date -u +%Y%m%dT%H%M%SZ)
 previous="gcode-studio:before-$stamp"
 docker image tag gcode-studio:local "$previous"
@@ -22,6 +25,11 @@ if ! docker build -t gcode-studio:local app; then
  echo 'Build failed. Running service was not changed.'
  exit 1
 fi
+check_queue
+# The feed directory is a data mount; update only its renderer code, never photos/templates.
+cp -p data/feed/renderer.cjs "backups/feed-renderer-$stamp.cjs"
+cp app/feed/renderer.cjs data/feed/renderer.cjs
+chown --reference="backups/feed-renderer-$stamp.cjs" data/feed/renderer.cjs
 docker compose -f deploy/compose.yaml up -d --no-build --force-recreate studio
 for n in 1 2 3 4 5 6 7 8 9 10 11 12; do
  if docker exec gcode-studio node -e "fetch('http://127.0.0.1:4173/login').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"; then
@@ -30,6 +38,7 @@ for n in 1 2 3 4 5 6 7 8 9 10 11 12; do
  fi
  sleep 2
 done
+cp -p "backups/feed-renderer-$stamp.cjs" data/feed/renderer.cjs
 docker image tag "$previous" gcode-studio:local
 docker compose -f deploy/compose.yaml up -d --no-build --force-recreate studio
 echo 'Health failed; previous image restored. Private data retained.'

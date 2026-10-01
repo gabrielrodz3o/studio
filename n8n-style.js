@@ -44,11 +44,7 @@ function headline(s,x,y,size,max,t,delay=0,fill=WHITE){const ls=wrap(s,size,max,
 
 // Subtítulos cinéticos: grupos cortos por frase, palabra activa resaltada. Nunca se corta una palabra ni se deja un grupo huérfano.
 function captionGroups(words){const groups=[];let cur=[];for(const w of words){cur.push(w);const end=/[.,;:!?]$/.test(w.word),long=cur.map(x=>x.word).join(' ').length>=16||cur.length>=3;if(end||long){groups.push(cur);cur=[];}}if(cur.length){if(groups.length&&cur.length===1&&groups.at(-1).length<4)groups.at(-1).push(...cur);else groups.push(cur);}return groups;}
-function captions(j,index,t){const s=j.plan.scenes[index],v=j.voices[index],tempo=v.tempo||1,lt=t-s.voice_lead;if(lt<-.05)return '';
- const groups=captionGroups(v.words);let g=groups.find((g,i)=>lt>=g[0].start/tempo-.05&&lt<Math.min(g.at(-1).end/tempo+.18,groups[i+1]?.[0].start/tempo-.05||Infinity));if(!g){const next=groups.find(g=>g[0].start/tempo>lt);g=next&&lt>(groups[groups.indexOf(next)-1]?.at(-1).end/tempo||0)?null:null;}if(!g)return '';
- const size=Math.min(66,66*900/Math.max(900,widthOf(g.map(w=>w.word).join(' '),66,900))),y=1478,p=back((lt-g[0].start/tempo+.05)/.22);
- const spans=g.map(w=>{const active=lt>=w.start/tempo-.03&&lt<=w.end/tempo+.08;return `<tspan fill="${active?ORANGE:WHITE}">${xml(w.word.replace(/[{}\\]/g,''))}</tspan>`;}).join(' ');
- return `<g transform="translate(${W/2},${y}) scale(${.86+.14*p}) translate(${-W/2},${-y})" opacity="${clamp(p*1.4)}"><text x="${W/2}" y="${y}" text-anchor="middle" font-family="${FONT}" font-weight="900" font-size="${size}" stroke="#061020" stroke-width="12" paint-order="stroke" stroke-linejoin="round" letter-spacing="-0.5">${spans}</text></g>`;}
+function captions(j,index,t){const s=j.plan.scenes[index],v=j.voices[index];return window.studioCaption(v.words,t-s.voice_lead,window.currentStoryboard||{},W,H,1478,66)}
 
 function sceneBody(j,r,index,t){const s=j.plan.scenes[index],e=j.evidence,d=s.duration,n=j.plan.scenes.length,variant=j.design_variant||0;
  const enter=easeOut(t/.45);

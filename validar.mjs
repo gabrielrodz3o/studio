@@ -1,8 +1,11 @@
+import {validateDesign,validateTemplate} from './design.mjs'
 import {styles} from './styles.mjs'
 export const tipos = ['media','gancho_local', 'caos_acumulado', 'transicion', 'tablet_comanda', 'pantalla_cocina', 'caja_cuadra', 'inventario_alerta', 'grafica_ventas', 'remate', 'cierre', 'comercial_doble', 'comercial_foco', 'comercial_cierre', 'comercial_n8n']
 export const formatos = Object.fromEntries(Object.entries(styles).map(([id,s])=>[id,s.name]))
 export function validar(sb) {
+  if (!sb || typeof sb !== 'object') throw new Error('Guion inválido')
   const errores = []
+  validateDesign(sb?.brand?.design||{});validateTemplate(sb)
   if(sb?.brand){const b=sb.brand;if(b.logo_resource_id&&!/^[a-f0-9-]{36}$/.test(b.logo_resource_id))errores.push('Logo inválido');if(b.logo_url&&!/^assets\/resource-[a-f0-9-]{36}\.(jpg|jpeg|png|webp)$/.test(b.logo_url))errores.push('Ruta de logo inválida');if(typeof b.name!=='string'||b.name.length>100||!/^#[a-f0-9]{6}$/i.test(b.primary||'')||!/^#[a-f0-9]{6}$/i.test(b.accent||''))errores.push('Identidad visual inválida')}
   for(const k of ['music_volume','music_duck'])if(sb?.[k]!=null&&(!Number.isFinite(sb[k])||sb[k]<0||sb[k]>1))errores.push('Volumen de música inválido')
   if(sb?.cover_time!=null&&(!Number.isFinite(sb.cover_time)||sb.cover_time<0||sb.cover_time>180))errores.push('Portada inválida')
