@@ -55,7 +55,7 @@
     },
     {
       "id": "delivery",
-      "status": "final_verification_in_progress",
+      "status": "implemented_and_verified",
       "tasks": [
         "regression tests",
         "browser checks",
@@ -77,7 +77,7 @@
     "live_draft": "provider returned 4 scenes with claim references; reserve USD 0.10, invoice cost not reconciled",
     "n8n": "producer execution 389539 succeeded and downloaded preview; connections checked read-only",
     "server_render": "job_200290b3-2286-4bb7-8c87-a26e3de133bf succeeded, preview, quality passed, pending human review",
-    "backup": "encrypted offsite copy; isolated restore verified users, brands and six media hashes",
+    "backup": "Final encrypted offsite copy restored in isolation: 1 user, 2 brands, 202 history records, 8 video hashes",
     "history": {
       "unique_records": 202,
       "confirmed": 174,
@@ -85,12 +85,23 @@
       "instagram_source_rows": 199,
       "instagram_unique_ids": 174
     },
-    "live_publications_in_tests": 0
+    "live_publications_in_tests": 0,
+    "github_actions": {
+      "run": 36814886601,
+      "conclusion": "success",
+      "core_tests": 40,
+      "alignment_tests": 6,
+      "editorial_fixtures": 20
+    },
+    "runtime_parity": "14 principal runtime modules match local and deployed SHA256",
+    "legacy_workflows_paused": 8,
+    "n8n_temporary_workflows_remaining": 0
   },
   "deferred": [
     "First public delivery needs a human-approved real piece; no test publication was made",
     "Remotion/BullMQ/WhisperX and multitrack editing remain optional future evaluation",
     "Provider invoice reconciliation is manual; reserves are not claimed as exact costs",
-    "Historical Instagram IDs without verified links remain explicitly unverified"
+    "Historical Instagram IDs without verified links remain explicitly unverified",
+    "DGII legacy campaign retained as a draft; claims and requirements need human verification before reuse"
   ]
 }

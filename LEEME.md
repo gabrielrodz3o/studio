@@ -144,9 +144,9 @@ Una advertencia se muestra para revisión; no se convierte en aprobación autom�
 ## Publicación aprobada y resultados
 
 Workflow independiente: **GCODE Studio - Publicación aprobada y resultados**,
-`XnDxoyTcnbawgPgY`. Revisa cada cinco minutos y recoge métricas aproximadamente cada seis
+`XnDxoyTcnbawgPgY`. Revisa cada cinco minutos y recoge métricas por lotes, con una separación mínima de seis
 horas por publicación. Reutiliza las cuentas existentes de Instagram `gcoderd`, Facebook
-`G code` y TikTok `g.code.rd`. Los dos workflows antiguos de publicación automática están pausados y conservados como respaldo.
+`G code` y TikTok `g.code.rd`. Los workflows antiguos de publicación, distribución e historias están pausados y conservados como respaldo.
 
 Para enviar: campaña activa → exportación final aprobada → asociar archivo/caption/fecha
 al calendario → **Revisar publicación** (archivo, texto y cuenta) → **Programar entrega** (administrador). Solo entonces se copia el archivo
@@ -288,3 +288,23 @@ La comprobación real del primer envío público se hará con una pieza que el a
 
 Remotion, BullMQ, WhisperX y un editor de montaje multipista quedan como evolución opcional;
 no son dependencias instaladas ni capacidades que esta versión prometa ofrecer.
+
+
+### Cierre de la migración de automatizaciones
+
+Quedaron pausados ocho workflows, con sus definiciones completas en el respaldo privado:
+publicación Instagram y Reel diario; distribución de posts (`SKiw4KmhMpJhm0XM`) y de historias
+(`4urOQ4jH3OE9K2K3`); historias de 1 PM (`rbn4mKfY8pGoHBsN`), 6 PM (`X5RXeY2ZKvUvwyq5`)
+y Stories automático (`p6U1w186HLXjFhhA`); campaña DGII (`Ju46elvP4d8YWKoa`).
+Estos circuitos podían publicar sin consultar la aprobación de Studio. No se eliminaron.
+La campaña DGII se conserva en Studio como borrador de revisión; no se migraron sus afirmaciones
+como hechos verificados. Para retomarla hay que revisar su contenido y producir piezas aprobables.
+
+Los informes, captación y demás automatizaciones ajenas a la publicación multimedia no se modificaron.
+El ciclo nuevo prepara un video diario para revisión. Imágenes, carruseles e historias se crean
+mediante Studio o solicitudes al productor; las antiguas horas de publicación no se sustituyen
+por envíos automáticos sin aprobación.
+
+Comprobación final: 47 pruebas Node, 6 Python, 20 fixtures editoriales; GitHub Actions pasó
+40 pruebas independientes de recursos privados, 6 Python y los mismos 20 fixtures. La restauración
+final verificó 202 registros y ocho hashes de video. No se publicó contenido de prueba.
