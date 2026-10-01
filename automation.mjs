@@ -1,3 +1,4 @@
+import {qualityDecision} from './content-policy.mjs';
 import {readFile,writeFile,mkdir,rename} from 'node:fs/promises';
 import {join} from 'node:path';
 import {createHash,randomUUID} from 'node:crypto';
@@ -39,7 +40,7 @@ export class Automation{
  const cfg=this.data.config;if(cfg.publication_mode!=='automatic'||!cfg.publication_authorization)throw Error('Falta autorización de publicación automática');
  if(!['video','feed','story-13','story-18'].includes(slot.key)||piece.automation_slot!==slot.id||piece.job_id!==slot.job_id||piece.brand_id!==cfg.brand_id||piece.campaign_id!==cfg.campaign_id||job.campaign_id!==cfg.campaign_id||job.brand_id!==cfg.brand_id||job.kind!==slot.kind)throw Error('Pieza fuera del calendario autorizado');
  const target=slot.targets.find(t=>t.channel===piece.channel);if(!target||piece.scheduled_at!==target.at||piece.caption!==(job.caption||job.artifact?.caption||'')||piece.account_key!==this.marketing.data.accounts.find(a=>a.channel===piece.channel)?.key)throw Error('La pieza fue modificada: revisar antes de publicar');
- if(job.review?.status==='rejected'||job.options?.preview||job.artifact?.quality?.passed===false||this.marketing.data.comments.some(c=>c.job_id===job.id&&!c.resolved))throw Error('La pieza tiene un rechazo, vista previa o control pendiente');
+ if(job.review?.status==='rejected'||job.options?.preview||!qualityDecision(job).allowed||this.marketing.data.comments.some(c=>c.job_id===job.id&&!c.resolved))throw Error('La pieza tiene un rechazo, vista previa o control pendiente');
  const actor='automation-policy-v1';if(job.review?.status!=='approved')await this.store.review(job.id,'approved',actor,'Publicación automática autorizada por el propietario; controles de producción superados. No es revisión humana.');
  const preview=this.marketing.releasePreview(piece.id,this.store);return this.marketing.approveRelease({piece_id:piece.id,hash:preview.hash,acknowledge_warnings:true,note:'Autorización por política del calendario. Advertencias registradas; no representan verificación humana de afirmaciones.'},actor,this.store);
  }

@@ -1,3 +1,4 @@
+import {captionForChannel} from './content-policy.mjs'
 import {createHash} from 'node:crypto'
 
 export const canonical = value => JSON.stringify(sort(value))
@@ -11,7 +12,7 @@ export function publicationBundle(piece, job, brand, account) {
     ? [{kind:'video',sha256:job.artifact?.sha256}]
     : (job.artifact?.images || []).map(x => ({kind:'image',index:x.index,sha256:x.sha256}))
   if (!files.length || files.some(x => !/^[a-f0-9]{64}$/.test(x.sha256 || ''))) throw Error('El archivo necesita una huella verificada antes de aprobar la publicación')
-  let caption = piece.caption.trim()
+  let caption = piece.caption_policy==='channel-v1'?captionForChannel(piece.caption.trim(),piece.channel):piece.caption.trim()
   const aiVoice = job.kind === 'video' && job.options?.voice === true
   if (aiVoice && !/narración generada con ia\./i.test(caption)) caption += '\n\nNarración generada con IA.'
   const captionSupported=!(['facebook','instagram'].includes(piece.channel)&&piece.kind==='historia_social');if(!captionSupported)caption='';

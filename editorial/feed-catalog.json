@@ -15,7 +15,8 @@
           "Comprueba la estación que debe preparar cada producto.",
           "Revisa la comanda cuando el cliente cambie un detalle."
         ],
-        "explicacion": "Confirma productos, cantidades y notas antes de enviar."
+        "explicacion": "Confirma productos, cantidades y notas antes de enviar.",
+        "intent": "teach"
       },
       {
         "id": "1-educativo-2",
@@ -27,7 +28,8 @@
           "Confirma mesas, áreas y personal asignado al servicio.",
           "Comprueba conexión, impresoras y pantalla de cocina."
         ],
-        "explicacion": "Revisa la disponibilidad de productos del menú."
+        "explicacion": "Revisa la disponibilidad de productos del menú.",
+        "intent": "teach"
       },
       {
         "id": "1-educativo-3",
@@ -39,7 +41,8 @@
           "Desperdicio: producto que se descarta sin aprovecharse.",
           "Registra la causa para decidir qué proceso revisar."
         ],
-        "explicacion": "Merma: pérdida de cantidad o rendimiento de un insumo."
+        "explicacion": "Merma: pérdida de cantidad o rendimiento de un insumo.",
+        "intent": "teach"
       },
       {
         "id": "1-educativo-4",
@@ -51,7 +54,8 @@
           "Usa el costo de compra correspondiente a cada insumo.",
           "Revisa el costo cuando cambie una receta o un precio."
         ],
-        "explicacion": "Lista los ingredientes y cantidades de una porción."
+        "explicacion": "Lista los ingredientes y cantidades de una porción.",
+        "intent": "teach"
       },
       {
         "id": "1-educativo-5",
@@ -63,7 +67,8 @@
           "Revisa entradas por compras y salidas registradas.",
           "Documenta las diferencias antes de ajustar el inventario."
         ],
-        "explicacion": "Compara existencia registrada y conteo físico."
+        "explicacion": "Compara existencia registrada y conteo físico.",
+        "intent": "teach"
       },
       {
         "id": "1-educativo-6",
@@ -75,7 +80,8 @@
           "Incluye productos, cantidades y modificadores.",
           "Especifica las notas que cocina necesita conocer."
         ],
-        "explicacion": "Identifica la mesa o el destino del pedido."
+        "explicacion": "Identifica la mesa o el destino del pedido.",
+        "intent": "teach"
       },
       {
         "id": "1-educativo-7",
@@ -87,7 +93,8 @@
           "Revisa el mesero asignado y el estado de la mesa.",
           "Confirma cualquier cambio de responsable durante el turno."
         ],
-        "explicacion": "Ubica la mesa dentro del salón correspondiente."
+        "explicacion": "Ubica la mesa dentro del salón correspondiente.",
+        "intent": "teach"
       },
       {
         "id": "1-educativo-8",
@@ -99,7 +106,8 @@
           "Revisa descuentos, cargos y condiciones de la cuenta.",
           "Confirma con el cliente cómo desea pagar."
         ],
-        "explicacion": "Comprueba que productos y cantidades sean correctos."
+        "explicacion": "Comprueba que productos y cantidades sean correctos.",
+        "intent": "teach"
       },
       {
         "id": "1-educativo-9",
@@ -111,7 +119,8 @@
           "Ejemplo: un ingrediente adicional o un término de cocción.",
           "Comprueba que la instrucción aparezca en la comanda."
         ],
-        "explicacion": "Un modificador precisa cómo se prepara el producto."
+        "explicacion": "Un modificador precisa cómo se prepara el producto.",
+        "intent": "teach"
       },
       {
         "id": "1-educativo-10",
@@ -123,7 +132,8 @@
           "Contrasta los cobros con cada método de pago.",
           "Documenta diferencias y pendientes del turno."
         ],
-        "explicacion": "Revisa las cuentas que permanecen abiertas."
+        "explicacion": "Revisa las cuentas que permanecen abiertas.",
+        "intent": "teach"
       },
       {
         "id": "1-educativo-11",
@@ -135,7 +145,8 @@
           "Revisa los ingredientes necesarios para prepararlos.",
           "Avisa al equipo cuando una opción deje de estar disponible."
         ],
-        "explicacion": "Comprueba qué productos están disponibles."
+        "explicacion": "Comprueba qué productos están disponibles.",
+        "intent": "teach"
       },
       {
         "id": "1-educativo-12",
@@ -147,11 +158,12 @@
           "Confirma los productos disponibles y las estaciones.",
           "Acuerda cómo comunicar cambios y pedidos especiales."
         ],
-        "explicacion": "Revisa las mesas y áreas antes del servicio."
+        "explicacion": "Revisa las mesas y áreas antes del servicio.",
+        "intent": "teach"
       },
       {
         "id": "1-social_proof-1",
-        "tipo": "social_proof",
+        "tipo": "product_demo",
         "titulo": "Así se ven tus mesas en ComandPOS",
         "asset": "mesas",
         "consejos": [
@@ -159,11 +171,12 @@
           "Consulta su estado y la asignación visible.",
           "Explora la gestión del salón en una demo."
         ],
-        "explicacion": "Ubica las mesas dentro del salón."
+        "explicacion": "Ubica las mesas dentro del salón.",
+        "intent": "demonstrate"
       },
       {
         "id": "1-social_proof-2",
-        "tipo": "social_proof",
+        "tipo": "product_demo",
         "titulo": "Del pedido a la pantalla de cocina",
         "asset": "cocina",
         "consejos": [
@@ -171,11 +184,12 @@
           "Identifica el pedido y su estado en la pantalla de cocina.",
           "Conoce el módulo con una demostración guiada."
         ],
-        "explicacion": "Consulta productos, cantidades y modificadores de la comanda."
+        "explicacion": "Consulta productos, cantidades y modificadores de la comanda.",
+        "intent": "demonstrate"
       },
       {
         "id": "1-social_proof-3",
-        "tipo": "social_proof",
+        "tipo": "product_demo",
         "titulo": "Una cuenta de mesa, a la vista",
         "asset": "cuenta",
         "consejos": [
@@ -183,67 +197,73 @@
           "Revisa el detalle del pedido antes de continuar.",
           "Conoce el recorrido de una mesa en ComandPOS."
         ],
-        "explicacion": "Consulta productos, cantidades y valores de la cuenta."
+        "explicacion": "Consulta productos, cantidades y valores de la cuenta.",
+        "intent": "demonstrate"
       },
       {
         "id": "1-social_proof-4",
-        "tipo": "social_proof",
+        "tipo": "product_demo",
         "titulo": "Cantidades y modificadores en la comanda",
         "asset": "cocina",
         "consejos": [
-          "Consulta productos, cantidades y modificadores de la comanda.",
-          "Identifica el pedido y su estado en la pantalla de cocina.",
-          "Conoce el módulo con una demostración guiada."
+          "Localiza la cantidad junto al nombre del producto.",
+          "Lee los modificadores antes de preparar ese producto.",
+          "Contrasta esos detalles con la instrucción del cliente."
         ],
-        "explicacion": "Consulta productos, cantidades y modificadores de la comanda."
+        "explicacion": "Localiza la cantidad junto al nombre del producto.",
+        "intent": "demonstrate"
       },
       {
         "id": "1-social_proof-5",
-        "tipo": "social_proof",
+        "tipo": "product_demo",
         "titulo": "Localiza una mesa desde el salón",
         "asset": "mesas",
         "consejos": [
-          "Ubica las mesas dentro del salón.",
-          "Consulta su estado y la asignación visible.",
-          "Explora la gestión del salón en una demo."
+          "Identifica el nombre de la mesa en la vista del salón.",
+          "Observa la tarjeta correspondiente, no una mesa vecina.",
+          "Consulta su estado antes de orientar a tu equipo."
         ],
-        "explicacion": "Ubica las mesas dentro del salón."
+        "explicacion": "Identifica el nombre de la mesa en la vista del salón.",
+        "intent": "demonstrate"
       },
       {
         "id": "1-social_proof-6",
-        "tipo": "social_proof",
+        "tipo": "product_demo",
         "titulo": "Consulta los productos de una cuenta",
         "asset": "cuenta",
         "consejos": [
-          "Consulta productos, cantidades y valores de la cuenta.",
-          "Revisa el detalle del pedido antes de continuar.",
-          "Conoce el recorrido de una mesa en ComandPOS."
+          "Localiza cada producto dentro de la cuenta.",
+          "Compara la cantidad de cada renglón con lo solicitado.",
+          "Revisa el valor mostrado antes de continuar."
         ],
-        "explicacion": "Consulta productos, cantidades y valores de la cuenta."
+        "explicacion": "Localiza cada producto dentro de la cuenta.",
+        "intent": "demonstrate"
       },
       {
         "id": "1-social_proof-7",
-        "tipo": "social_proof",
+        "tipo": "product_demo",
         "titulo": "Así organiza ComandPOS la cola de cocina",
         "asset": "cocina",
         "consejos": [
-          "Consulta productos, cantidades y modificadores de la comanda.",
-          "Identifica el pedido y su estado en la pantalla de cocina.",
-          "Conoce el módulo con una demostración guiada."
+          "Distingue las columnas de estado de la pantalla de cocina.",
+          "Ubica en qué columna aparece la comanda de ejemplo.",
+          "Consulta el detalle de esa comanda antes de preparar."
         ],
-        "explicacion": "Consulta productos, cantidades y modificadores de la comanda."
+        "explicacion": "Distingue las columnas de estado de la pantalla de cocina.",
+        "intent": "demonstrate"
       },
       {
         "id": "1-social_proof-8",
-        "tipo": "social_proof",
+        "tipo": "product_demo",
         "titulo": "ComandPOS: conoce la pantalla de pedidos",
         "asset": "cuenta",
         "consejos": [
-          "Consulta productos, cantidades y valores de la cuenta.",
-          "Revisa el detalle del pedido antes de continuar.",
-          "Conoce el recorrido de una mesa en ComandPOS."
+          "Distingue el catálogo de productos del detalle de la cuenta.",
+          "Ubica dónde aparecen los renglones del pedido.",
+          "Explora esa diferencia durante una demostración."
         ],
-        "explicacion": "Consulta productos, cantidades y valores de la cuenta."
+        "explicacion": "Distingue el catálogo de productos del detalle de la cuenta.",
+        "intent": "demonstrate"
       },
       {
         "id": "1-venta_directa-1",
@@ -251,11 +271,12 @@
         "titulo": "Tus pedidos merecen una comanda clara",
         "asset": "cocina",
         "consejos": [
-          "Consulta productos, cantidades y modificadores de la comanda.",
-          "Identifica el pedido y su estado en la pantalla de cocina.",
-          "Conoce el módulo con una demostración guiada."
+          "Lleva a la demo un ejemplo de pedido con una modificación.",
+          "Pide ver cómo aparece el detalle en la comanda.",
+          "Evalúa si el equipo entiende la información mostrada."
         ],
-        "explicacion": "Consulta productos, cantidades y modificadores de la comanda."
+        "explicacion": "Lleva a la demo un ejemplo de pedido con una modificación.",
+        "intent": "consider"
       },
       {
         "id": "1-venta_directa-2",
@@ -263,11 +284,12 @@
         "titulo": "¿Todavía transcribes los pedidos a cocina?",
         "asset": "cocina",
         "consejos": [
-          "Consulta productos, cantidades y modificadores de la comanda.",
-          "Identifica el pedido y su estado en la pantalla de cocina.",
-          "Conoce el módulo con una demostración guiada."
+          "Describe cómo se comunica hoy un pedido a cocina.",
+          "Pide ver el recorrido de una comanda en la demostración.",
+          "Confirma los equipos y la configuración que necesita tu operación."
         ],
-        "explicacion": "Consulta productos, cantidades y modificadores de la comanda."
+        "explicacion": "Describe cómo se comunica hoy un pedido a cocina.",
+        "intent": "consider"
       },
       {
         "id": "1-venta_directa-3",
@@ -275,11 +297,12 @@
         "titulo": "Tu salón y cocina pueden estar conectados",
         "asset": "mesas",
         "consejos": [
-          "Ubica las mesas dentro del salón.",
-          "Consulta su estado y la asignación visible.",
-          "Explora la gestión del salón en una demo."
+          "Explica cómo se identifican las mesas en tu restaurante.",
+          "Revisa la vista del salón durante la demostración.",
+          "Pregunta cómo se relaciona ese trabajo con las comandas."
         ],
-        "explicacion": "Ubica las mesas dentro del salón."
+        "explicacion": "Explica cómo se identifican las mesas en tu restaurante.",
+        "intent": "consider"
       },
       {
         "id": "1-venta_directa-4",
@@ -287,11 +310,12 @@
         "titulo": "Pon tus cuentas de mesa en orden",
         "asset": "cuenta",
         "consejos": [
-          "Consulta productos, cantidades y valores de la cuenta.",
-          "Revisa el detalle del pedido antes de continuar.",
-          "Conoce el recorrido de una mesa en ComandPOS."
+          "Elige una cuenta de ejemplo con varios productos.",
+          "Revisa el detalle de cantidades y valores en la demo.",
+          "Anota qué necesita comprobar tu equipo antes de cobrar."
         ],
-        "explicacion": "Consulta productos, cantidades y valores de la cuenta."
+        "explicacion": "Elige una cuenta de ejemplo con varios productos.",
+        "intent": "consider"
       },
       {
         "id": "1-venta_directa-5",
@@ -299,11 +323,12 @@
         "titulo": "Conoce ComandPOS con tu propio menú",
         "asset": "cuenta",
         "consejos": [
-          "Consulta productos, cantidades y valores de la cuenta.",
-          "Revisa el detalle del pedido antes de continuar.",
-          "Conoce el recorrido de una mesa en ComandPOS."
+          "Prepara ejemplos de productos y sus modificaciones.",
+          "Pregunta cómo se representarían en el sistema.",
+          "Confirma el alcance de la configuración de tu menú."
         ],
-        "explicacion": "Consulta productos, cantidades y valores de la cuenta."
+        "explicacion": "Prepara ejemplos de productos y sus modificaciones.",
+        "intent": "consider"
       },
       {
         "id": "1-venta_directa-6",
@@ -311,11 +336,12 @@
         "titulo": "Dale seguimiento a las comandas de cocina",
         "asset": "cocina",
         "consejos": [
-          "Consulta productos, cantidades y modificadores de la comanda.",
-          "Identifica el pedido y su estado en la pantalla de cocina.",
-          "Conoce el módulo con una demostración guiada."
+          "Identifica qué estados necesita consultar cocina.",
+          "Pide que te muestren los estados visibles de las comandas.",
+          "Confirma el recorrido de trabajo antes de contratar."
         ],
-        "explicacion": "Consulta productos, cantidades y modificadores de la comanda."
+        "explicacion": "Identifica qué estados necesita consultar cocina.",
+        "intent": "consider"
       },
       {
         "id": "1-venta_directa-7",
@@ -323,11 +349,12 @@
         "titulo": "¿Listo para organizar las mesas?",
         "asset": "mesas",
         "consejos": [
-          "Ubica las mesas dentro del salón.",
-          "Consulta su estado y la asignación visible.",
-          "Explora la gestión del salón en una demo."
+          "Describe las áreas y los nombres de tus mesas.",
+          "Compara esa organización con la vista del salón.",
+          "Consulta qué configuración corresponde a tu restaurante."
         ],
-        "explicacion": "Ubica las mesas dentro del salón."
+        "explicacion": "Describe las áreas y los nombres de tus mesas.",
+        "intent": "consider"
       },
       {
         "id": "1-venta_directa-8",
@@ -335,11 +362,12 @@
         "titulo": "Evalúa ComandPOS antes de cambiar sistema",
         "asset": "cuenta",
         "consejos": [
-          "Consulta productos, cantidades y valores de la cuenta.",
-          "Revisa el detalle del pedido antes de continuar.",
-          "Conoce el recorrido de una mesa en ComandPOS."
+          "Enumera las tareas que hoy te cuestan más trabajo.",
+          "Selecciona una tarea para probar durante la demo.",
+          "Confirma funciones, configuración y alcance antes de decidir."
         ],
-        "explicacion": "Consulta productos, cantidades y valores de la cuenta."
+        "explicacion": "Enumera las tareas que hoy te cuestan más trabajo.",
+        "intent": "consider"
       },
       {
         "id": "1-entretenimiento-1",
@@ -355,7 +383,8 @@
           "expectativa": "«Me acuerdo de todos los cambios».",
           "realidad": "La cebolla tenía otros planes."
         },
-        "explicacion": "Registra productos, cantidades y los detalles del pedido."
+        "explicacion": "Registra productos, cantidades y los detalles del pedido.",
+        "intent": "engage"
       },
       {
         "id": "1-entretenimiento-2",
@@ -363,15 +392,16 @@
         "titulo": "Cerrar caja: expectativa y realidad",
         "asset": "none",
         "consejos": [
-          "Registra productos, cantidades y los detalles del pedido.",
-          "Comprueba que la información llegue a la estación correspondiente.",
-          "Revisa la cuenta antes de cobrar."
+          "Al final del turno aparecen los pendientes olvidados.",
+          "Deja anotado lo que falta revisar y quién lo recibe.",
+          "El cierre también necesita una conversación entre turnos."
         ],
         "humor": {
           "expectativa": "«Cerramos y nos vamos».",
           "realidad": "Aparece la cuenta que seguía abierta."
         },
-        "explicacion": "Registra productos, cantidades y los detalles del pedido."
+        "explicacion": "Al final del turno aparecen los pendientes olvidados.",
+        "intent": "engage"
       },
       {
         "id": "1-entretenimiento-3",
@@ -379,15 +409,16 @@
         "titulo": "La mesa pide «una cuenta separada»",
         "asset": "none",
         "consejos": [
-          "Registra productos, cantidades y los detalles del pedido.",
-          "Comprueba que la información llegue a la estación correspondiente.",
-          "Revisa la cuenta antes de cobrar."
+          "La petición de pagar separados llega al final de la cena.",
+          "Aclara qué desea pagar cada persona antes de continuar.",
+          "Confirma con el cliente el detalle que está revisando."
         ],
         "humor": {
           "expectativa": "Una mesa, una cuenta.",
           "realidad": "«Lo mío aparte… y compartimos la entrada»."
         },
-        "explicacion": "Registra productos, cantidades y los detalles del pedido."
+        "explicacion": "La petición de pagar separados llega al final de la cena.",
+        "intent": "engage"
       },
       {
         "id": "1-entretenimiento-4",
@@ -395,15 +426,16 @@
         "titulo": "El pedido cambia antes de salir",
         "asset": "none",
         "consejos": [
-          "Registra productos, cantidades y los detalles del pedido.",
-          "Comprueba que la información llegue a la estación correspondiente.",
-          "Revisa la cuenta antes de cobrar."
+          "El último cambio llega cuando cocina ya está preparando.",
+          "Confirma qué cambió y comunica la corrección al equipo.",
+          "Comprueba que todos consulten la misma versión del pedido."
         ],
         "humor": {
           "expectativa": "El pedido ya está confirmado.",
           "realidad": "«Una cosita más…»"
         },
-        "explicacion": "Registra productos, cantidades y los detalles del pedido."
+        "explicacion": "El último cambio llega cuando cocina ya está preparando.",
+        "intent": "engage"
       }
     ]
   },
@@ -423,7 +455,8 @@
           "El e-CF corresponde al comprobante fiscal electrónico.",
           "Confirma con tu contador cuál aplica a tu operación."
         ],
-        "explicacion": "NCF identifica un comprobante fiscal."
+        "explicacion": "NCF identifica un comprobante fiscal.",
+        "intent": "teach"
       },
       {
         "id": "2-educativo-2",
@@ -435,7 +468,8 @@
           "Revisa productos, cantidades y valores registrados.",
           "Confirma el tipo de comprobante que corresponde."
         ],
-        "explicacion": "Verifica los datos del cliente y la operación."
+        "explicacion": "Verifica los datos del cliente y la operación.",
+        "intent": "teach"
       },
       {
         "id": "2-educativo-3",
@@ -447,7 +481,8 @@
           "Relaciona la venta con su comprobante correspondiente.",
           "Investiga diferencias antes de cerrar el período."
         ],
-        "explicacion": "Ubica el registro de la venta que vas a revisar."
+        "explicacion": "Ubica el registro de la venta que vas a revisar.",
+        "intent": "teach"
       },
       {
         "id": "2-educativo-4",
@@ -459,7 +494,8 @@
           "Clasifica los documentos por período y operación.",
           "Acuerda con tu contador cómo revisar los pendientes."
         ],
-        "explicacion": "Reúne los comprobantes de compras y ventas."
+        "explicacion": "Reúne los comprobantes de compras y ventas.",
+        "intent": "teach"
       },
       {
         "id": "2-educativo-5",
@@ -471,7 +507,8 @@
           "Una nota de crédito puede ajustar una operación previa.",
           "Confirma el motivo y tratamiento con tu contador."
         ],
-        "explicacion": "La factura documenta una operación."
+        "explicacion": "La factura documenta una operación.",
+        "intent": "teach"
       },
       {
         "id": "2-educativo-6",
@@ -483,7 +520,8 @@
           "Confirma identificación y datos que correspondan.",
           "Corrige datos incompletos antes de continuar."
         ],
-        "explicacion": "Revisa nombre o razón social antes de emitir."
+        "explicacion": "Revisa nombre o razón social antes de emitir.",
+        "intent": "teach"
       },
       {
         "id": "2-educativo-7",
@@ -495,7 +533,8 @@
           "Reúne compras, ventas y ajustes del período.",
           "Resuelve pendientes antes de la fecha acordada."
         ],
-        "explicacion": "Define qué documentos necesita revisar tu contador."
+        "explicacion": "Define qué documentos necesita revisar tu contador.",
+        "intent": "teach"
       },
       {
         "id": "2-educativo-8",
@@ -507,67 +546,73 @@
           "Confirma requisitos y configuración de tu negocio.",
           "Revisa puesta en marcha y costos antes de contratar."
         ],
-        "explicacion": "Consulta el plan y alcance de e-CF que necesitas."
+        "explicacion": "Consulta el plan y alcance de e-CF que necesitas.",
+        "intent": "teach"
       },
       {
         "id": "2-social_proof-1",
-        "tipo": "social_proof",
+        "tipo": "product_demo",
         "titulo": "La cuenta empieza con un pedido registrado",
         "asset": "cuenta",
         "consejos": [
-          "Consulta productos, cantidades y valores de la cuenta.",
-          "Revisa el detalle del pedido antes de continuar.",
-          "Conoce el recorrido de una mesa en ComandPOS."
+          "Identifica los productos registrados en la cuenta de ejemplo.",
+          "Comprueba que el detalle represente la operación revisada.",
+          "Esta pantalla muestra la cuenta, no una certificación fiscal."
         ],
-        "explicacion": "Consulta productos, cantidades y valores de la cuenta."
+        "explicacion": "Identifica los productos registrados en la cuenta de ejemplo.",
+        "intent": "demonstrate"
       },
       {
         "id": "2-social_proof-2",
-        "tipo": "social_proof",
+        "tipo": "product_demo",
         "titulo": "Revisa el detalle antes de facturar",
         "asset": "cuenta",
         "consejos": [
-          "Consulta productos, cantidades y valores de la cuenta.",
-          "Revisa el detalle del pedido antes de continuar.",
-          "Conoce el recorrido de una mesa en ComandPOS."
+          "Revisa cantidades y valores antes de seguir con la operación.",
+          "Aclara cualquier diferencia en el detalle de la cuenta.",
+          "Consulta por separado el alcance de facturación disponible."
         ],
-        "explicacion": "Consulta productos, cantidades y valores de la cuenta."
+        "explicacion": "Revisa cantidades y valores antes de seguir con la operación.",
+        "intent": "demonstrate"
       },
       {
         "id": "2-social_proof-3",
-        "tipo": "social_proof",
+        "tipo": "product_demo",
         "titulo": "Productos y cantidades, en una cuenta",
         "asset": "cuenta",
         "consejos": [
-          "Consulta productos, cantidades y valores de la cuenta.",
-          "Revisa el detalle del pedido antes de continuar.",
-          "Conoce el recorrido de una mesa en ComandPOS."
+          "Distingue el nombre del producto de la cantidad registrada.",
+          "Observa cómo se presentan ambos en la cuenta.",
+          "Usa ese detalle para revisar la operación con tu equipo."
         ],
-        "explicacion": "Consulta productos, cantidades y valores de la cuenta."
+        "explicacion": "Distingue el nombre del producto de la cantidad registrada.",
+        "intent": "demonstrate"
       },
       {
         "id": "2-social_proof-4",
-        "tipo": "social_proof",
+        "tipo": "product_demo",
         "titulo": "Conoce la cuenta de mesa en ComandPOS",
         "asset": "cuenta",
         "consejos": [
-          "Consulta productos, cantidades y valores de la cuenta.",
-          "Revisa el detalle del pedido antes de continuar.",
-          "Conoce el recorrido de una mesa en ComandPOS."
+          "Consulta el detalle de una cuenta de mesa en la demo.",
+          "Pregunta qué pasos siguen antes de emitir un comprobante.",
+          "Confirma requisitos y configuración con los responsables."
         ],
-        "explicacion": "Consulta productos, cantidades y valores de la cuenta."
+        "explicacion": "Consulta el detalle de una cuenta de mesa en la demo.",
+        "intent": "demonstrate"
       },
       {
         "id": "2-social_proof-5",
-        "tipo": "social_proof",
+        "tipo": "product_demo",
         "titulo": "Antes del comprobante, revisa la operación",
         "asset": "cuenta",
         "consejos": [
-          "Consulta productos, cantidades y valores de la cuenta.",
-          "Revisa el detalle del pedido antes de continuar.",
-          "Conoce el recorrido de una mesa en ComandPOS."
+          "Identifica la operación que vas a revisar antes de facturar.",
+          "Localiza su cuenta y comprueba el detalle registrado.",
+          "Consulta por separado los requisitos del comprobante aplicable."
         ],
-        "explicacion": "Consulta productos, cantidades y valores de la cuenta."
+        "explicacion": "Identifica la operación que vas a revisar antes de facturar.",
+        "intent": "demonstrate"
       },
       {
         "id": "2-venta_directa-1",
@@ -575,11 +620,12 @@
         "titulo": "Consulta e-CF para tu restaurante",
         "asset": "none",
         "consejos": [
-          "Revisa qué necesita facturar tu restaurante.",
-          "Consulta plan, requisitos y configuración de e-CF.",
-          "Solicita una demo para definir el alcance."
+          "Describe qué documentos necesita emitir tu negocio.",
+          "Reúne las preguntas que debes consultar con tu contador.",
+          "Solicita una evaluación del alcance de facturación."
         ],
-        "explicacion": "Revisa qué necesita facturar tu restaurante."
+        "explicacion": "Describe qué documentos necesita emitir tu negocio.",
+        "intent": "consider"
       },
       {
         "id": "2-venta_directa-2",
@@ -587,11 +633,12 @@
         "titulo": "ComandPOS: operación y facturación conectadas",
         "asset": "cuenta",
         "consejos": [
-          "Consulta productos, cantidades y valores de la cuenta.",
-          "Revisa el detalle del pedido antes de continuar.",
-          "Conoce el recorrido de una mesa en ComandPOS."
+          "Explica qué tipo de operaciones realiza tu restaurante.",
+          "Consulta qué incluye el plan y qué necesita configuración.",
+          "Pide una confirmación del alcance antes de contratar."
         ],
-        "explicacion": "Consulta productos, cantidades y valores de la cuenta."
+        "explicacion": "Explica qué tipo de operaciones realiza tu restaurante.",
+        "intent": "consider"
       },
       {
         "id": "2-venta_directa-3",
@@ -599,11 +646,12 @@
         "titulo": "Aclara el alcance de tu facturación",
         "asset": "none",
         "consejos": [
-          "Revisa qué necesita facturar tu restaurante.",
-          "Consulta plan, requisitos y configuración de e-CF.",
-          "Solicita una demo para definir el alcance."
+          "Lleva una lista de dudas concretas sobre tu operación.",
+          "Revisa esas dudas durante la demostración.",
+          "Verifica los requisitos aplicables con fuentes oficiales y tu asesor."
         ],
-        "explicacion": "Revisa qué necesita facturar tu restaurante."
+        "explicacion": "Lleva una lista de dudas concretas sobre tu operación.",
+        "intent": "consider"
       },
       {
         "id": "2-venta_directa-4",
@@ -611,11 +659,12 @@
         "titulo": "Revisa tus necesidades de e-CF en demo",
         "asset": "none",
         "consejos": [
-          "Revisa qué necesita facturar tu restaurante.",
-          "Consulta plan, requisitos y configuración de e-CF.",
-          "Solicita una demo para definir el alcance."
+          "Distingue una pantalla de cuenta de un comprobante emitido.",
+          "Pide ver el recorrido que corresponde a tu operación.",
+          "Confirma las opciones disponibles sin asumir certificaciones."
         ],
-        "explicacion": "Revisa qué necesita facturar tu restaurante."
+        "explicacion": "Distingue una pantalla de cuenta de un comprobante emitido.",
+        "intent": "consider"
       },
       {
         "id": "2-venta_directa-5",
@@ -623,11 +672,12 @@
         "titulo": "Conoce las opciones de facturación ComandPOS",
         "asset": "none",
         "consejos": [
-          "Revisa qué necesita facturar tu restaurante.",
-          "Consulta plan, requisitos y configuración de e-CF.",
-          "Solicita una demo para definir el alcance."
+          "Ubica la cuenta que corresponde a la operación.",
+          "Comprueba productos, cantidades y valores registrados.",
+          "Aclara el detalle antes de solicitar el siguiente paso."
         ],
-        "explicacion": "Revisa qué necesita facturar tu restaurante."
+        "explicacion": "Ubica la cuenta que corresponde a la operación.",
+        "intent": "consider"
       },
       {
         "id": "2-entretenimiento-1",
@@ -635,15 +685,16 @@
         "titulo": "La factura que «estaba por aquí»",
         "asset": "none",
         "consejos": [
-          "Revisa qué necesita facturar tu restaurante.",
-          "Consulta plan, requisitos y configuración de e-CF.",
-          "Solicita una demo para definir el alcance."
+          "El documento aparece justo después de volver a pedirlo.",
+          "Acuerda un lugar y un nombre para guardar cada respaldo.",
+          "Prueba si otra persona puede encontrarlo sin preguntarte."
         ],
         "humor": {
           "expectativa": "«La dejé justo aquí».",
           "realidad": "La factura decidió jugar al escondite."
         },
-        "explicacion": "Revisa qué necesita facturar tu restaurante."
+        "explicacion": "El documento aparece justo después de volver a pedirlo.",
+        "intent": "engage"
       },
       {
         "id": "2-entretenimiento-2",
@@ -651,15 +702,16 @@
         "titulo": "Cuando el contador pide los documentos",
         "asset": "none",
         "consejos": [
-          "Revisa qué necesita facturar tu restaurante.",
-          "Consulta plan, requisitos y configuración de e-CF.",
-          "Solicita una demo para definir el alcance."
+          "La carpeta del período todavía tiene documentos sueltos.",
+          "Reúne lo disponible y distingue lo que falta.",
+          "Comparte con tu contador una lista clara de pendientes."
         ],
         "humor": {
           "expectativa": "«Tengo todo organizado».",
           "realidad": "El contador pregunta por ese comprobante."
         },
-        "explicacion": "Revisa qué necesita facturar tu restaurante."
+        "explicacion": "La carpeta del período todavía tiene documentos sueltos.",
+        "intent": "engage"
       }
     ]
   },
@@ -679,7 +731,8 @@
           "Por pagar: compromisos pendientes con proveedores.",
           "Revisa fechas y saldos para organizar el flujo de caja."
         ],
-        "explicacion": "Por cobrar: dinero pendiente de recibir de clientes."
+        "explicacion": "Por cobrar: dinero pendiente de recibir de clientes.",
+        "intent": "teach"
       },
       {
         "id": "5-educativo-2",
@@ -691,7 +744,8 @@
           "Relaciona cada pago con la cuenta correspondiente.",
           "Revisa vencimientos y saldos antes de planificar gastos."
         ],
-        "explicacion": "Una venta puede quedar pendiente de cobro."
+        "explicacion": "Una venta puede quedar pendiente de cobro.",
+        "intent": "teach"
       },
       {
         "id": "5-educativo-3",
@@ -703,7 +757,8 @@
           "Compara cantidades, precios y condiciones del proveedor.",
           "Registra la compra para conservar su seguimiento."
         ],
-        "explicacion": "Revisa la existencia y el consumo esperado."
+        "explicacion": "Revisa la existencia y el consumo esperado.",
+        "intent": "teach"
       },
       {
         "id": "5-educativo-4",
@@ -715,7 +770,8 @@
           "Compras: bienes e insumos adquiridos al proveedor.",
           "Gastos: salidas que debes clasificar para analizarlas."
         ],
-        "explicacion": "Ventas: operaciones realizadas con tus clientes."
+        "explicacion": "Ventas: operaciones realizadas con tus clientes.",
+        "intent": "teach"
       },
       {
         "id": "5-educativo-5",
@@ -727,7 +783,8 @@
           "Distingue ventas, comisiones y costos relacionados.",
           "Revisa qué incluye cada reporte antes de compararlo."
         ],
-        "explicacion": "Elige el mismo período para todos los canales."
+        "explicacion": "Elige el mismo período para todos los canales.",
+        "intent": "teach"
       },
       {
         "id": "5-educativo-6",
@@ -739,7 +796,8 @@
           "Contrasta compras y gastos del período.",
           "Documenta ajustes antes de interpretar el resultado."
         ],
-        "explicacion": "Revisa cuentas pendientes de cobro y de pago."
+        "explicacion": "Revisa cuentas pendientes de cobro y de pago.",
+        "intent": "teach"
       },
       {
         "id": "5-educativo-7",
@@ -751,7 +809,8 @@
           "Identifica dónde repites datos o cambias de herramienta.",
           "Evalúa qué módulo encaja con cada necesidad."
         ],
-        "explicacion": "Lista las tareas que vuelves a hacer cada semana."
+        "explicacion": "Lista las tareas que vuelves a hacer cada semana.",
+        "intent": "teach"
       },
       {
         "id": "5-educativo-8",
@@ -763,11 +822,12 @@
           "Selecciona el período y los datos relacionados.",
           "Verifica el alcance del reporte antes de concluir."
         ],
-        "explicacion": "Define la pregunta que necesitas responder."
+        "explicacion": "Define la pregunta que necesitas responder.",
+        "intent": "teach"
       },
       {
         "id": "5-social_proof-1",
-        "tipo": "social_proof",
+        "tipo": "product_demo",
         "titulo": "Conoce las cuentas por cobrar de ComandPOS",
         "asset": "cuentaxcobrar",
         "consejos": [
@@ -775,11 +835,12 @@
           "Distingue importes vencidos y próximos compromisos.",
           "Revisa el módulo según las necesidades de tu negocio."
         ],
-        "explicacion": "Consulta los saldos pendientes de cobro."
+        "explicacion": "Consulta los saldos pendientes de cobro.",
+        "intent": "demonstrate"
       },
       {
         "id": "5-social_proof-2",
-        "tipo": "social_proof",
+        "tipo": "product_demo",
         "titulo": "Consulta el panel contable de ComandPOS",
         "asset": "comtabilidad",
         "consejos": [
@@ -787,11 +848,12 @@
           "Revisa cómo se organiza la información del negocio.",
           "Confirma el alcance del módulo en una demo."
         ],
-        "explicacion": "Conoce el panel de administración contable."
+        "explicacion": "Conoce el panel de administración contable.",
+        "intent": "demonstrate"
       },
       {
         "id": "5-social_proof-3",
-        "tipo": "social_proof",
+        "tipo": "product_demo",
         "titulo": "Explora los reportes de ComandPOS",
         "asset": "reporteBI",
         "consejos": [
@@ -799,11 +861,12 @@
           "Consulta el período y los indicadores que estás revisando.",
           "Confirma el alcance de los reportes según tu plan."
         ],
-        "explicacion": "Explora los reportes disponibles para tu operación."
+        "explicacion": "Explora los reportes disponibles para tu operación.",
+        "intent": "demonstrate"
       },
       {
         "id": "5-social_proof-4",
-        "tipo": "social_proof",
+        "tipo": "product_demo",
         "titulo": "Un vistazo al módulo de empleados",
         "asset": "recursohumanos_empleados",
         "consejos": [
@@ -811,11 +874,12 @@
           "Revisa qué información organiza tu administración.",
           "Confirma el alcance de recursos humanos antes de contratar."
         ],
-        "explicacion": "Explora el módulo de empleados de ComandPOS."
+        "explicacion": "Explora el módulo de empleados de ComandPOS.",
+        "intent": "demonstrate"
       },
       {
         "id": "5-social_proof-5",
-        "tipo": "social_proof",
+        "tipo": "product_demo",
         "titulo": "Conoce la pantalla de nómina",
         "asset": "nomina",
         "consejos": [
@@ -823,7 +887,8 @@
           "Consulta cómo se organiza la información del período.",
           "Confirma funciones y configuración antes de contratar."
         ],
-        "explicacion": "Conoce la pantalla de nómina de ComandPOS."
+        "explicacion": "Conoce la pantalla de nómina de ComandPOS.",
+        "intent": "demonstrate"
       },
       {
         "id": "5-venta_directa-1",
@@ -831,11 +896,12 @@
         "titulo": "Lleva tu administración junto a la operación",
         "asset": "comtabilidad",
         "consejos": [
-          "Conoce el panel de administración contable.",
-          "Revisa cómo se organiza la información del negocio.",
-          "Confirma el alcance del módulo en una demo."
+          "Describe las tareas administrativas que realiza tu equipo.",
+          "Pide ver el panel relacionado con esas tareas.",
+          "Confirma qué módulos corresponden al plan que evalúas."
         ],
-        "explicacion": "Conoce el panel de administración contable."
+        "explicacion": "Describe las tareas administrativas que realiza tu equipo.",
+        "intent": "consider"
       },
       {
         "id": "5-venta_directa-2",
@@ -843,11 +909,12 @@
         "titulo": "Pon en orden tus cuentas pendientes",
         "asset": "cuentaxcobrar",
         "consejos": [
-          "Consulta los saldos pendientes de cobro.",
-          "Distingue importes vencidos y próximos compromisos.",
-          "Revisa el módulo según las necesidades de tu negocio."
+          "Explica cómo identifica hoy tu equipo los cobros pendientes.",
+          "Consulta la vista de saldos durante la demo.",
+          "Pregunta qué información necesita registrar tu operación."
         ],
-        "explicacion": "Consulta los saldos pendientes de cobro."
+        "explicacion": "Explica cómo identifica hoy tu equipo los cobros pendientes.",
+        "intent": "consider"
       },
       {
         "id": "5-venta_directa-3",
@@ -855,11 +922,12 @@
         "titulo": "¿Tu restaurante necesita módulos de administración?",
         "asset": "comtabilidad",
         "consejos": [
-          "Conoce el panel de administración contable.",
-          "Revisa cómo se organiza la información del negocio.",
-          "Confirma el alcance del módulo en una demo."
+          "Separa tus necesidades de operación y administración.",
+          "Prioriza la tarea administrativa que quieres revisar.",
+          "Evalúa el módulo correspondiente antes de ampliar el plan."
         ],
-        "explicacion": "Conoce el panel de administración contable."
+        "explicacion": "Separa tus necesidades de operación y administración.",
+        "intent": "consider"
       },
       {
         "id": "5-venta_directa-4",
@@ -867,11 +935,12 @@
         "titulo": "Conoce ComandPOS más allá de la caja",
         "asset": "reporteBI",
         "consejos": [
-          "Explora los reportes disponibles para tu operación.",
-          "Consulta el período y los indicadores que estás revisando.",
-          "Confirma el alcance de los reportes según tu plan."
+          "Elige una pregunta que no respondes mirando solo la caja.",
+          "Busca el indicador relacionado durante la demostración.",
+          "Confirma el alcance del dato antes de interpretarlo."
         ],
-        "explicacion": "Explora los reportes disponibles para tu operación."
+        "explicacion": "Elige una pregunta que no respondes mirando solo la caja.",
+        "intent": "consider"
       },
       {
         "id": "5-venta_directa-5",
@@ -879,11 +948,12 @@
         "titulo": "Evalúa los reportes que tu negocio necesita",
         "asset": "reporteBI",
         "consejos": [
-          "Explora los reportes disponibles para tu operación.",
-          "Consulta el período y los indicadores que estás revisando.",
-          "Confirma el alcance de los reportes según tu plan."
+          "Define qué decisión quieres preparar con un reporte.",
+          "Pide ver los datos que contiene ese reporte.",
+          "Comprueba si esos datos responden a tu pregunta."
         ],
-        "explicacion": "Explora los reportes disponibles para tu operación."
+        "explicacion": "Define qué decisión quieres preparar con un reporte.",
+        "intent": "consider"
       },
       {
         "id": "5-entretenimiento-1",
@@ -899,7 +969,8 @@
           "expectativa": "Archivo: final.xlsx.",
           "realidad": "Final_ahora_si_version_7.xlsx."
         },
-        "explicacion": "Distingue lo vendido, lo cobrado y lo pendiente."
+        "explicacion": "Distingue lo vendido, lo cobrado y lo pendiente.",
+        "intent": "engage"
       },
       {
         "id": "5-entretenimiento-2",
@@ -907,15 +978,16 @@
         "titulo": "Vendiste bien… falta revisar los cobros",
         "asset": "none",
         "consejos": [
-          "Distingue lo vendido, lo cobrado y lo pendiente.",
-          "Mantén organizadas las compras y los compromisos de pago.",
-          "Revisa el mismo período antes de comparar resultados."
+          "El total vendido parece suficiente hasta revisar los pendientes.",
+          "Distingue las ventas de los pagos efectivamente recibidos.",
+          "Ordena el seguimiento sin tratar una venta como dinero cobrado."
         ],
         "humor": {
           "expectativa": "«Vendimos bien, todo listo».",
           "realidad": "La lista de cuentas pendientes saluda."
         },
-        "explicacion": "Distingue lo vendido, lo cobrado y lo pendiente."
+        "explicacion": "El total vendido parece suficiente hasta revisar los pendientes.",
+        "intent": "engage"
       }
     ]
   }

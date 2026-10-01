@@ -56,7 +56,7 @@ function sceneBody(j,r,index,t){const s=j.plan.scenes[index],e=j.evidence,d=s.du
  if(s.rol==='cierre'){// Cierre: marca, oferta y un único llamado.
   const p=back(t/.5),pulse=1+.035*Math.sin(t*5.5);
   let v=`<g opacity="${clamp(t/.3)}" transform="translate(${W/2},560) scale(${.8+.2*p}) translate(${-W/2},-560)"><image href="${r.logo}" x="${(W-620)/2}" y="440" width="620" height="176"/></g>`;
-  v+=headline('Solicita tu demo',W/2,800,92,900,t,.2,WHITE).replace(/x="540"/g,'x="540" text-anchor="middle"');
+  v+=headline(s.titulo||'Solicita tu demo',W/2,800,92,900,t,.2,WHITE).replace(/x="540"/g,'x="540" text-anchor="middle"');
   v+=`<g opacity="${easeOut((t-.5)/.4)}">`+T(e.label+', en un solo sistema.',W/2,1045,34,MUTED,600,'text-anchor="middle"')+'</g>';
   const bp=easeOut((t-.7)/.4);v+=`<g opacity="${bp}" transform="translate(${W/2},1170) scale(${pulse*(0.9+.1*bp)}) translate(${-W/2},-1170)"><g filter="url(#sh)">`+R(140,1100,800,140,'#25D366',70)+`</g>`+
    `<path transform="translate(200,1128) scale(3.6)" fill="#fff" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.7.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.7-1.3a.5.5 0 0 0 0-.5l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.1 5.1 0 0 0 1.1 2.7 11.6 11.6 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6a2.7 2.7 0 0 0 1.8-1.3 2.2 2.2 0 0 0 .1-1.3c0-.1-.2-.2-.4-.3z"/>`+

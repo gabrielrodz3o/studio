@@ -221,6 +221,7 @@ const server=createServer(async(req,res)=>{
       return json(202,{ok:true,id:result.job.id})
     }
     if(!['GET','HEAD'].includes(req.method))throw problem(405,'Método no permitido')
+    if(/^\/assets\/editorial-[a-f0-9]{20}\.webp$/.test(path))return await sendFile(req,res,join(state,'editorial-assets',path.split('/').at(-1)))
     if(/^\/voice-cache\/[a-f0-9]{16}\.wav$/.test(path))return await sendFile(req,res,join(root,'voz',path.split('/').at(-1)))
     if(/^\/api\/photos\/photo_[a-f0-9-]{36}$/.test(path))return json(200,await photos.status(path.split('/').at(-1)))
     if(path==='/api/feed/catalog')return json(200,await feedCatalog(root))

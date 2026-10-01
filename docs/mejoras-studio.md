@@ -168,3 +168,7 @@ No hacen falta agentes para locks, cuotas, reintentos, programación o releases.
 ## GST-027 — Paridad editorial y calendario legado
 
 **Implementado y comprobado** en código, pruebas y producción de una historia pendiente de revisión. Migrados 72 temas, cuotas 60/25/15 y 40/30/20/10, feriados, fotografías con caché/reconsulta, 24 temas de historias y seis diseños, horarios diarios 13:00/18:00. Se mantienen releases humanos y publicador n8n. Evidencia y excepciones deliberadas: `migracion-editorial-completa-20261001.md`. No se marca publicación real como comprobada; no se publicó contenido de prueba.
+
+## Seguimiento editorial — 1 octubre 2026
+
+CONT-01 a CONT-08: implementación y pruebas en [mejoras-contenido-20261001.md](mejoras-contenido-20261001.md). Evidencia inicial en [auditoria-contenido-editorial-20261001.md](auditoria-contenido-editorial-20261001.md). La verificación de nuevas funciones/capturas y la medición de resultados comerciales siguen siendo trabajo continuo; no se confunden con los cambios técnicos implementados.
