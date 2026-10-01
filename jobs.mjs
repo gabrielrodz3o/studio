@@ -183,11 +183,12 @@ export class JobStore {
     const info = JSON.parse(stdout), v = info.streams.find(s => s.codec_type === 'video'), a = info.streams.find(s => s.codec_type === 'audio')
     const expected=job.options.preview?({vertical:[540,960],horizontal:[960,540],square:[540,540],portrait:[432,540]}[job.options.aspect||'vertical']):({vertical:[1080,1920],horizontal:[1920,1080],square:[1080,1080],portrait:[1080,1350]}[job.options.aspect||'vertical']);
     if (v?.width !== expected[0] || v?.height !== expected[1] || v?.codec_name !== 'h264' || a?.codec_name !== 'aac' || !(Number(info.format.duration) > 0)) throw new Error('El archivo no pasó la verificación técnica')
-    await run('ffmpeg',['-v','error','-y','-ss',String(Math.min(script.cover_time??.8,Number(info.format.duration)-.1)),'-i',video,'-frames:v','1','-vf','scale=360:-2','-threads','1',join(dir,'artifacts','cover.jpg')],{timeout:30000}).catch(()=>{})
+    const coverTime=Math.max(0,Math.min(script.cover_time??1,Number(info.format.duration)-.1));
+    await run('ffmpeg',['-v','error','-y','-ss',String(coverTime),'-i',video,'-frames:v','1','-vf','scale=1080:-2','-threads','1',join(dir,'artifacts','cover.jpg')],{timeout:30000})
     const rendered=JSON.parse(await readFile(manifest,'utf8'));const report=rendered.quality||{status:'review',warnings:['Falta el informe técnico']};const issues=creativeIssues(rendered.guion||{});const creative_quality={status:issues.length?'blocked':'passed',issues}
-    const cover=await readFile(join(dir,'artifacts','cover.jpg')).catch(()=>null)
+    const cover=await readFile(join(dir,'artifacts','cover.jpg'));if(!cover.length)throw Error('No se pudo generar la portada')
     const bytes = await readFile(video)
-    return { cover_sha256:cover?createHash('sha256').update(cover).digest('hex'):null, filename: stem + '.mp4', manifest_filename: stem + '.json', bytes: bytes.length, sha256: createHash('sha256').update(bytes).digest('hex'), duration: Number(info.format.duration), width: v.width, height: v.height, content_type: 'video/mp4', quality:report,creative_quality }
+    return { cover_time:coverTime, cover_sha256:cover?createHash('sha256').update(cover).digest('hex'):null, filename: stem + '.mp4', manifest_filename: stem + '.json', bytes: bytes.length, sha256: createHash('sha256').update(bytes).digest('hex'), duration: Number(info.format.duration), width: v.width, height: v.height, content_type: 'video/mp4', quality:report,creative_quality }
   }
   artifactPath(id, kind) {
     const j = this.jobs.get(id)

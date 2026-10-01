@@ -77,9 +77,9 @@ function sceneBody(j,r,index,t){const s=j.plan.scenes[index],e=j.evidence,d=s.du
 
 function frame(j,r,index,t){const s=j.plan.scenes[index],n=j.plan.scenes.length,total=j.plan.scenes.reduce((a,b)=>a+b.duration,0),elapsed=j.plan.scenes.slice(0,index).reduce((a,b)=>a+b.duration,0)+t;
  // Transición: la escena entra con un leve empuje y sale acelerando hacia arriba.
- const out=clamp((t-(s.duration-.22))/.22),inn=easeOut(t/.28),dy=(1-inn)*60-out*90,op=Math.min(inn*1.2,1-out*.9);
+ const out=clamp((t-(s.duration-.22))/.22),inn=index===0?1:easeOut(t/.28),dy=(1-inn)*60-out*90,op=Math.min(inn*1.2,1-out*.9);
  let v=`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}">`+background(elapsed,j.design_variant||0)+header(r,index,n,elapsed,total);
- v+=`<g transform="translate(0,${dy})" opacity="${op}">`+sceneBody(j,r,index,t)+'</g>';
+ v+=`<g transform="translate(0,${dy})" opacity="${op}">`+sceneBody(j,r,index,index===0?Math.max(1,t):t)+'</g>';
  v+=captions(j,index,t);
  v+=T((index===0?'Caso ilustrativo · producto real':index===n-1?'ComandPOS by GCODE':'Captura real · datos de ejemplo')+' · Locución generada con IA',72,1580,21,MUTED,600,'opacity=".85"');
  return v+'</svg>';}

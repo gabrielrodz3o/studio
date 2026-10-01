@@ -20,6 +20,7 @@ class StudioPublisher {
  if(d.status==='uncertain')return;
  const {job,urls}=await this.media(d),kind=({video:'video',imagen:'image',carrusel:'carousel',historia_social:'story'})[job.kind];
  const input=inputFor({kind,caption:d.caption||'Historia',title:d.caption.slice(0,90),urls,isAiGenerated:job.options?.voice===true},d.channel);
+ if(job.kind==='video'&&d.channel==='tiktok'&&Number.isFinite(job.artifact?.cover_time)){const ms=Math.round(job.artifact.cover_time*1000);assert(ms>=0&&ms<job.artifact.duration*1000,'Momento de portada fuera del video');input.assets[0].video.metadata={thumbnailOffset:ms};}
  input.text=d.caption; // Preserve the exact approved copy; legacy adapter normalization must not modify it.
  if(d.channel==='facebook'&&job.kind==='video')input.metadata.facebook.type='post';
  const destination=await this.buffer.channel(d.channel);assert(!d.account?.provider_id||destination.id===d.account.provider_id,'Cuenta distinta de la aprobada');const verified=await this.api('/deliveries/'+d.id+'/verify');assert(verified.release.hash===d.release_hash,'Aprobación revocada');d.status='sending';this.save(d);
