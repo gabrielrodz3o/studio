@@ -1,0 +1,113 @@
+{
+  "nombre": "piloto-comandas",
+  "voz": false,
+  "escenas": [
+    {
+      "tipo": "gancho_local",
+      "dur": 3.0,
+      "rotulo": "Viernes, 8:30 de la noche.",
+      "sub": "El restaurante, full.",
+      "voz": "Viernes en la noche, y el restaurante está full."
+    },
+    {
+      "tipo": "caos_acumulado",
+      "dur": 3.8,
+      "rotulo": "Y las comandas, en papelitos.",
+      "frases": [
+        "¿La 4 era sin cebolla?",
+        "¡Falta el mofongo de la 7!",
+        "¿Quién cobró la 2?",
+        "¡Eso no fue lo que pedí!"
+      ],
+      "voz": "Pero las comandas andan en papelitos, y nadie sabe qué pidió cada mesa."
+    },
+    {
+      "tipo": "transicion",
+      "dur": 2.3,
+      "texto": "Hasta que Don Ramón probó ComandPOS.",
+      "voz": "Hasta que Don Ramón probó ComandPOS."
+    },
+    {
+      "tipo": "tablet_comanda",
+      "dur": 4.6,
+      "rotulo": "Tomas la orden en la mesa.",
+      "mesa": "Mesa 4",
+      "items": [
+        [
+          "Mofongo de chicharrón",
+          1,
+          true
+        ],
+        [
+          "Morir soñando",
+          2
+        ]
+      ],
+      "mod": "sin cebolla",
+      "voz": "Ahora el mesero toma la orden en la mesa, con cada detalle, y la envía a cocina."
+    },
+    {
+      "tipo": "pantalla_cocina",
+      "dur": 3.4,
+      "rotulo": "La cocina la recibe, clarita.",
+      "mesa": "Mesa 4",
+      "items": [
+        [
+          "Mofongo de chicharrón",
+          1,
+          true
+        ],
+        [
+          "Morir soñando",
+          2
+        ]
+      ],
+      "mod": "sin cebolla",
+      "voz": "La cocina la recibe clarita: mofongo, sin cebolla."
+    },
+    {
+      "tipo": "caja_cuadra",
+      "dur": 3.6,
+      "rotulo": "Y al cierre, la caja cuadra.",
+      "filas": [
+        [
+          "Ventas del día",
+          48650
+        ],
+        [
+          "Efectivo contado",
+          21300
+        ],
+        [
+          "Tarjetas y transferencias",
+          27350
+        ],
+        [
+          "Diferencia",
+          0,
+          "#2FB36D"
+        ]
+      ],
+      "voz": "Y al final de la noche, la caja cuadra."
+    },
+    {
+      "tipo": "remate",
+      "dur": 2.8,
+      "lineas": [
+        "Menos papelitos.",
+        "*Más control.*"
+      ],
+      "voz": "Menos papelitos. Más control."
+    },
+    {
+      "tipo": "cierre",
+      "dur": 3.6,
+      "cta": "Pide tu demo",
+      "whatsapp": "+1 849 540 6093",
+      "web": "comandpos.com",
+      "voz": "Pide tu demo de ComandPOS por WhatsApp."
+    }
+  ],
+  "formato": "historia",
+  "perfil_voz": "original"
+}

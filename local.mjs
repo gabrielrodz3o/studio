@@ -1,0 +1,178 @@
+import { createServer } from 'node:http'
+import { createReadStream, readFileSync, unlinkSync } from 'node:fs'
+import { readFile, readdir, stat, writeFile, rename, mkdir, open, unlink } from 'node:fs/promises'
+import { dirname, resolve, extname, basename, sep, join } from 'node:path'
+import { fileURLToPath } from 'node:url'
+import { randomBytes, randomUUID, createHash, timingSafeEqual } from 'node:crypto'
+import { validar } from './validar.mjs'
+import { Access, loginPage } from './access.mjs'
+import {publicationsFor} from './history.mjs'
+import { Marketing } from './marketing.mjs'
+import { Versions } from './versions.mjs'
+import { Creative } from './creative.mjs'
+import { PhotoJobs } from './photo-jobs.mjs'
+import { previewAudio } from './preview.mjs'
+import { JobStore, problem } from './jobs.mjs'
+import { feedCatalog, validateFeed, approvePhoto } from './feed.mjs'
+let photoWrite=Promise.resolve()
+
+const root = dirname(fileURLToPath(import.meta.url)), port = Number(process.env.STUDIO_PORT || 4173)
+const state = resolve(root,'.studio-state')
+await mkdir(state,{recursive:true,mode:0o700})
+const origin=process.env.STUDIO_ORIGIN||`http://127.0.0.1:${port}`
+const access=await new Access(state,{origin,enabled:process.env.STUDIO_REQUIRE_LOGIN!=='0'}).init()
+const marketing=await new Marketing(root).init()
+const versions=new Versions(root)
+const creative=new Creative(root)
+const photos=new PhotoJobs(root)
+const lockFile=join(state,'service.lock')
+async function lock(){
+  try {const f=await open(lockFile,'wx',0o600);await f.writeFile(String(process.pid));await f.close()}
+  catch(e){
+    if(e.code!=='EEXIST')throw e
+    const pid=Number(await readFile(lockFile,'utf8'))
+    if(!Number.isInteger(pid)||pid<=0)throw Error('Bloqueo de servicio inválido; revisa .studio-state/service.lock')
+    let alive=pid!==process.pid;try{if(alive)process.kill(pid,0)}catch(err){if(err.code==='ESRCH')alive=false}
+    if(alive)throw Error(`Studio ya está ejecutándose (PID ${pid})`)
+    await unlink(lockFile);await lock()
+  }
+}
+await lock()
+process.on('exit',()=>{try{if(Number(readFileSync(lockFile,'utf8'))===process.pid)unlinkSync(lockFile)}catch{}})
+const tokenFile=join(state,'api-token')
+let token=process.env.STUDIO_API_TOKEN
+if(!token){try{token=(await readFile(tokenFile,'utf8')).trim()}catch(e){if(e.code!=='ENOENT')throw e;token=randomBytes(32).toString('hex');await writeFile(tokenFile,token+'\n',{mode:0o600,flag:'wx'})}}
+if(token.length<32)throw Error('STUDIO_API_TOKEN debe tener al menos 32 caracteres')
+const store=await new JobStore({root,publications:id=>publicationsFor(marketing.data.deliveries,id)}).init()
+const mime={'.css':'text/css; charset=utf-8','.html':'text/html; charset=utf-8','.mjs':'text/javascript','.js':'text/javascript','.json':'application/json','.png':'image/png','.webp':'image/webp','.jpg':'image/jpeg','.ttf':'font/ttf','.mp3':'audio/mpeg','.wav':'audio/wav','.mp4':'video/mp4'}
+const digest=x=>createHash('sha256').update(x).digest()
+function authenticated(req){return timingSafeEqual(digest(req.headers.authorization||''),digest('Bearer '+token))}
+async function body(req,limit=250000){
+  if(!req.headers['content-type']?.startsWith('application/json'))throw problem(415,'Se requiere application/json')
+  const chunks=[];let bytes=0
+  for await(const chunk of req){bytes+=chunk.length;if(bytes>limit)throw problem(413,'Solicitud demasiado grande');chunks.push(chunk)}
+  try{return JSON.parse(Buffer.concat(chunks).toString())}catch{throw problem(400,'JSON inválido')}
+}
+async function catalog(){
+  const config=JSON.parse(await readFile(join(root,'centro-config.json'),'utf8'))
+  const templates=[]
+  for(const file of (await readdir(join(root,'storyboards'))).filter(f=>!f.startsWith('.')&&f.endsWith('.json'))){
+    const s=JSON.parse(await readFile(join(root,'storyboards',file),'utf8'))
+    templates.push({id:file.slice(0,-5),name:s.nombre,format:s.formato||'historia',kind:'video',brand_id:s.brand_id||'comandpos',voice:s.voz===true,subtitles:s.subtitulos===true,seconds:s.escenas.reduce((n,e)=>n+e.dur,0)})
+  }
+  for(const file of (await readdir(join(root,'feed/templates'))).filter(f=>!f.startsWith('.')&&f.endsWith('.json'))){const s=JSON.parse(await readFile(join(root,'feed/templates',file),'utf8'));templates.push({id:file.slice(0,-5),name:s.nombre,kind:s.tipo,brand_id:s.brand_id||'comandpos',format:s.layout,pages:s.tipo==='carrusel'?4:1})}
+  return {api_version:1,center:config.nombre,brands:marketing.snapshot().brands,modules:config.modulos,templates}
+}
+async function sendFile(req,res,file){
+  const s=await stat(file);if(!s.isFile())throw problem(404,'Archivo no encontrado')
+  const headers={'Content-Type':mime[extname(file)]||'application/octet-stream','Accept-Ranges':'bytes','X-Content-Type-Options':'nosniff','Cache-Control':'private, no-store','Vary':'Cookie, Authorization'}
+  let start=0,end=s.size-1,status=200
+  if(req.headers.range){
+    const m=/^bytes=(\d*)-(\d*)$/.exec(req.headers.range)
+    if(!m || (!m[1]&&!m[2])){res.writeHead(416,{'Content-Range':`bytes */${s.size}`});return res.end()}
+    if(!m[1])start=Math.max(0,s.size-Number(m[2]));else{start=Number(m[1]);if(m[2])end=Math.min(end,Number(m[2]))}
+    if(start>end||start>=s.size){res.writeHead(416,{'Content-Range':`bytes */${s.size}`});return res.end()}
+    status=206;headers['Content-Range']=`bytes ${start}-${end}/${s.size}`
+  }
+  headers['Content-Length']=end-start+1;res.writeHead(status,headers)
+  if(req.method==='HEAD')return res.end()
+  const stream=createReadStream(file,{start,end});stream.on('error',()=>res.destroy());res.on('close',()=>stream.destroy());stream.pipe(res)
+}
+const server=createServer(async(req,res)=>{
+  const json=(code,data)=>{res.writeHead(code,{'Content-Type':'application/json','Cache-Control':'no-store'});res.end(JSON.stringify(data))}
+  try{
+    const url=new URL(req.url,'http://localhost'),path=url.pathname
+    res.setHeader('X-Content-Type-Options','nosniff');res.setHeader('Referrer-Policy','same-origin');res.setHeader('X-Frame-Options','SAMEORIGIN')
+    if(path==='/ui.css'&&req.method==='GET')return await sendFile(req,res,join(root,'ui.css'))
+    if(path==='/login'&&req.method==='GET'){res.writeHead(200,{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-store'});return res.end(loginPage)}
+    if(path==='/auth/login'&&req.method==='POST'){const result=await access.login(req,await body(req));res.setHeader('Set-Cookie',result.cookie);return json(200,result.user)}
+    if(path.startsWith('/api/v1/')){
+      if(!authenticated(req))return json(401,{error:'Se requiere una clave de API válida'})
+      if(req.headers.origin)throw problem(403,'La API de integración no acepta solicitudes de navegador; usa el editor')
+      if(path==='/api/v1/marketing'&&req.method==='GET')return json(200,marketing.snapshot())
+      if(path==='/api/v1/deliveries/claim'&&req.method==='POST')return json(200,await marketing.claim(await body(req),'n8n',store))
+      if(path==='/api/v1/deliveries/result'&&req.method==='POST')return json(200,await marketing.result(await body(req),'n8n'))
+      if(path==='/api/v1/metrics'&&req.method==='POST')return json(200,await marketing.addMetrics(await body(req),'n8n'))
+      if(req.method==='POST'&&/^\/api\/v1\/photos\/photo_[a-f0-9-]{36}\/retry$/.test(path))return json(202,await photos.retry(path.split('/').at(-2)))
+      if(req.method==='POST'&&path==='/api/v1/photos')return json(202,await photos.start(await body(req),req.headers['idempotency-key'],'n8n'))
+      if(req.method==='GET'&&/^\/api\/v1\/photos\/photo_[a-f0-9-]{36}$/.test(path))return json(200,await photos.status(path.split('/').at(-1)))
+      if(req.method==='POST'&&path==='/api/v1/ideas'){const result=await creative.create(await body(req),req.headers['idempotency-key'],'n8n');await versions.save(result.kind,result.script,'n8n');return json(200,result)}
+      const action=/^\/api\/v1\/jobs\/(job_[a-f0-9-]{36})\/(cancel|retry|delivery|log)$/.exec(path)
+      if(action){if(req.method==='POST'&&action[2]==='cancel')return json(200,await store.cancel(action[1]));if(req.method==='POST'&&action[2]==='retry')return json(202,await store.retry(action[1],req.headers['idempotency-key']));if(req.method==='GET'&&action[2]==='log')return json(200,{log:await store.log(action[1])});if(req.method==='GET'&&action[2]==='delivery'){const j=store.get(action[1]);if(j.review.status!=='approved')throw problem(409,'La pieza requiere aprobación');return json(200,j)}}
+      if(req.method==='GET'&&path==='/api/v1/health')return json(200,{ok:true,api_version:1,active_jobs:store.active?1:0})
+      if(req.method==='GET'&&path==='/api/v1/catalog')return json(200,await catalog())
+      if(req.method==='GET'&&path==='/api/v1/jobs')return json(200,{jobs:store.list()})
+      if(req.method==='POST'&&path==='/api/v1/jobs'){
+        const result=await store.create(await body(req),req.headers['idempotency-key'])
+        res.setHeader('Location',result.job.status_url);return json(result.reused?200:202,result)
+      }
+      const match=/^\/api\/v1\/jobs\/(job_[a-f0-9-]{36})(?:\/artifacts\/(video|cover|manifest|image-[1-4]))?$/.exec(path)
+      if(match&&['GET','HEAD'].includes(req.method)){
+        if(match[2])return await sendFile(req,res,store.artifactPath(match[1],match[2]))
+        return json(200,store.get(match[1]))
+      }
+      throw problem(404,'Endpoint no encontrado')
+    }
+    if(req.headers.host!==new URL(origin).host)throw problem(403,'Host no autorizado')
+    const actor=access.user(req)
+    if(!actor){if(req.method==='GET'&&!path.startsWith('/api/')){res.writeHead(302,{Location:'/login','Cache-Control':'no-store'});return res.end()}throw problem(401,'Inicia sesión')}
+    if(path==='/auth/me'&&req.method==='GET')return json(200,actor)
+    if(path==='/auth/logout'&&req.method==='POST'){access.sameOrigin(req);res.setHeader('Set-Cookie',access.logout(req));return json(200,{ok:true})}
+    if(path==='/auth/account'&&req.method==='POST'){access.sameOrigin(req);return json(200,await access.change(actor,await body(req)))}
+    if(path==='/api/marketing'&&req.method==='GET')return json(200,marketing.snapshot())
+    const resource=/^\/api\/library\/([a-f0-9-]{36})$/.exec(path)
+    if(resource&&['GET','HEAD'].includes(req.method))return await sendFile(req,res,marketing.asset(resource[1]).path)
+    if(path==='/api/budget'&&req.method==='GET'){access.require(req,['admin']);return json(200,await creative.budget.summary())}
+    if(path==='/api/accounts'&&req.method==='GET'){access.require(req,['admin']);return json(200,access.users.map(u=>({username:u.username,role:u.role})))}
+    if(path==='/api/versions'&&req.method==='GET')return json(200,await versions.list(url.searchParams.get('kind'),url.searchParams.get('name')))
+    if(path==='/api/version'&&req.method==='GET')return json(200,await versions.get(url.searchParams.get('kind'),url.searchParams.get('name'),url.searchParams.get('id')))
+    if(req.method==='POST'){
+      access.sameOrigin(req);access.require(req,['admin','editor'])
+      if(path==='/api/marketing/brands'){access.require(req,['admin']);return json(200,await marketing.saveBrand(await body(req),actor.username))}
+      if(path==='/api/marketing/campaigns')return json(200,await marketing.saveCampaign(await body(req),actor.username))
+      if(path==='/api/marketing/pieces')return json(200,await marketing.savePiece(await body(req),actor.username,store))
+      if(path==='/api/marketing/comments')return json(200,await marketing.addComment(await body(req),actor.username,store))
+      if(path==='/api/marketing/comments/resolve')return json(200,await marketing.resolveComment(await body(req),actor.username))
+      if(path==='/api/marketing/cancel-delivery'){access.require(req,['admin']);return json(200,await marketing.cancelDelivery(await body(req),actor.username))}
+      if(path==='/api/marketing/schedule'){access.require(req,['admin']);return json(200,await marketing.schedule(await body(req),actor.username,store))}
+      if(path==='/api/marketing/metrics')return json(200,await marketing.addMetrics(await body(req),actor.username))
+      if(path==='/api/marketing/assets'){const d=await body(req,85000000);return json(201,await marketing.upload(d,Buffer.from(d.base64||'','base64'),actor.username))}
+      if(/^\/api\/photos\/photo_[a-f0-9-]{36}\/retry$/.test(path))return json(202,await photos.retry(path.split('/').at(-2)))
+      if(path==='/api/photos')return json(202,await photos.start(await body(req),req.headers['idempotency-key'],actor.username))
+      if(path==='/api/ideas'){const input=await body(req),key=req.headers['idempotency-key'];const result=await creative.create(input,key,actor.username);await versions.save(result.kind,result.script,actor.username);await access.audit(actor.username,'idea_created',{id:result.id});return json(200,result)}
+      if(path==='/api/preview/audio')return json(200,await previewAudio(root,(await body(req)).script))
+      const jobAction=/^\/api\/jobs\/(job_[a-f0-9-]{36})\/(cancel|retry|review)$/.exec(path);if(jobAction){let out;if(jobAction[2]==='review'){access.require(req,['admin']);const d=await body(req);out=await store.review(jobAction[1],d.status,actor.username,d.note||'')}else if(jobAction[2]==='cancel')out=await store.cancel(jobAction[1],actor.username);else out=await store.retry(jobAction[1],req.headers['idempotency-key']);await access.audit(actor.username,'job_'+jobAction[2],{id:jobAction[1]});return json(200,out)}
+      if(path==='/api/feed/photo'){const data=await body(req,17000000);const task=photoWrite.then(()=>approvePhoto(data,root));photoWrite=task.catch(()=>{});return json(201,await task)}
+      if(path==='/api/feed/render'||path==='/api/feed/save'){const data=await body(req),s=validateFeed(data.script,data.kind);let result;if(path.endsWith('/render'))result=await store.create({brand_id:s.brand_id||'comandpos',kind:s.tipo,script:s},data.idempotency_key,'feed-editor');await versions.save(s.tipo,s,actor.username);await access.audit(actor.username,'save_feed',{name:s.nombre});return json(result?202:200,result||{ok:true})}
+      if(!['/api/guardar','/api/render'].includes(path))throw problem(404,'Ruta desconocida')
+      const data=await body(req),sb=validar(data.guion)
+      if(path==='/api/guardar'){
+        await versions.save('video',sb,actor.username);await access.audit(actor.username,'save_video',{name:sb.nombre})
+        return json(200,{ok:true})
+      }
+      const result=await store.create({brand_id:sb.brand_id||'comandpos',kind:'video',script:sb,voice:data.voz===true,allow_paid_voice:data.cacheOnly===false,aspect:data.aspect||'vertical',preview:data.preview===true,max_budget_usd:data.max_budget_usd||2},'editor:'+randomUUID(),'editor')
+      await versions.save('video',sb,actor.username);await access.audit(actor.username,'render_video',{id:result.job.id})
+      return json(202,{ok:true,id:result.job.id})
+    }
+    if(!['GET','HEAD'].includes(req.method))throw problem(405,'Método no permitido')
+    if(/^\/voice-cache\/[a-f0-9]{16}\.wav$/.test(path))return await sendFile(req,res,join(root,'voz',path.split('/').at(-1)))
+    if(/^\/api\/photos\/photo_[a-f0-9-]{36}$/.test(path))return json(200,await photos.status(path.split('/').at(-1)))
+    if(path==='/api/feed/catalog')return json(200,await feedCatalog(root))
+    if(path==='/api/centro')return json(200,{...await catalog(),jobs:store.list()})
+    const localArtifact=/^\/api\/centro\/jobs\/(job_[a-f0-9-]{36})\/artifacts\/(video|cover|manifest|image-[1-4])$/.exec(path)
+    if(localArtifact)return await sendFile(req,res,store.artifactPath(localArtifact[1],localArtifact[2]))
+    if(path==='/api/estado'){
+      const j=store.list().find(j=>j.source==='editor')
+      if(!j)return json(200,{estado:'libre',log:''})
+      return json(200,{estado:['queued','running'].includes(j.status)?'renderizando':j.status==='succeeded'?'listo':'error',log:(await store.log(j.id))||j.error||'',archivo:j.status==='succeeded'?`/api/centro/jobs/${j.id}/artifacts/video`:null,id:j.id})
+    }
+    if(path==='/api/lista')return json(200,{guiones:(await readdir(join(root,'storyboards'))).filter(f=>!f.startsWith('.')&&f.endsWith('.json')),voces:(await readdir(join(root,'casting'))).filter(f=>/^\d.*\.mp3$/.test(f)),videos:(await readdir(join(root,'salida'))).filter(f=>!f.startsWith('.')&&f.endsWith('.mp4'))})
+    const route=decodeURIComponent(path==='/'?'/centro.html':path)
+    if(!/^\/(history\.mjs|marketing.html|marketing-ui.js|editor-tools.js|media-scenes.js|ui\.css|ui\.js|home\.js|account\.html|create\.html|editor\.html|feed-editor\.html|centro\.html|studio\.html|validar\.mjs|n8n-style\.js|formats\.js|feed\/templates\/[^/]+\.json|feed\/photos\/[a-z0-9-]+\.(jpg|png)|assets\/[^/]+|storyboards\/[^/]+\.json|casting\/[^/]+\.mp3|salida\/[^/]+\.(mp4|json))$/.test(route)||basename(route).startsWith('.'))throw problem(404,'No disponible')
+    const file=resolve(root,'.'+route);if(!file.startsWith(root+sep))throw problem(403,'Ruta inválida')
+    return await sendFile(req,res,file)
+  }catch(e){if(!res.headersSent)json(e.status||(e.code==='ENOENT'?404:400),{error:e.message});else res.destroy()}
+})
+server.listen(port,process.env.STUDIO_BIND_HOST||'127.0.0.1',()=>console.log(`Centro multimedia: http://127.0.0.1:${port}/centro.html\nEditor: http://127.0.0.1:${port}\nAPI v1 habilitada; clave guardada en .studio-state/api-token (no se muestra).`))
+async function shutdown(){server.close();await store.stop();process.exit(0)}
+process.once('SIGTERM',shutdown);process.once('SIGINT',shutdown)

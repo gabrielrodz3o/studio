@@ -1,0 +1,10 @@
+{
+  "model": "google/gemini-2-5-pro-tts",
+  "voice_name": "Charon",
+  "accent": "Neutral",
+  "style": "Vocal Smile",
+  "pace": "Natural",
+  "temperature": 0.6,
+  "audio_profile": "Locutor latinoamericano de comerciales, voz masculina cálida y cercana con un toque caribeño dominicano, sonrisa en la voz",
+  "sample_context": "Anuncio corto para redes sociales de un sistema para restaurantes en República Dominicana. Español latinoamericano natural y conversacional, con calidez caribeña; nada de acento de España ni de locutor de radio exagerado. Pronunciación clara. Lee exactamente el texto entregado, una sola vez, sin añadir ni quitar palabras, sin música ni efectos."
+}

@@ -1,0 +1,23 @@
+// Escenas de marca y recursos propios; el reproductor conserva el video al cambiar de cuadro.
+(()=>{
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const priorSeek=window.seek,priorPrepare=window.preparar;let story={},players=new Map();
+const lines=(s,n=24)=>{const a=[];for(const w of String(s||'').split(/\s+/)){if(a.length&&(a.at(-1)+' '+w).length<=n)a[a.length-1]+=' '+w;else a.push(w)}return a};
+window.preparar=async sb=>{story=sb;await priorPrepare(sb);const logo=sb.brand?.logo_url||(sb.brand?.logo_resource_id?'/api/library/'+sb.brand.logo_resource_id:null);if(logo){const image=new Image();image.src=logo;await image.decode()}for(const v of players.values())v.remove();players.clear();for(const e of sb.escenas){if(e.tipo!=='media')continue;const url=e.media_url||(e.resource_id?'/api/library/'+e.resource_id:null);if(!url)continue;if(e.media_kind==='video'){const v=document.createElement('video');v.src=url;v.muted=true;v.preload='auto';v.playsInline=true;v.style.cssText='position:absolute;inset:0;width:1080px;height:1920px;object-fit:cover;display:none;pointer-events:none';document.body.insertBefore(v,document.body.firstChild);await new Promise((ok,no)=>{v.onloadedmetadata=ok;v.onerror=()=>no(Error('No se pudo cargar el clip'));if(v.readyState>=1)ok()});players.set(url,v)}else{const img=new Image();img.src=url;await img.decode()}}return true};
+window.seek=async t=>{priorSeek(t);let start=0,scene;for(const e of story.escenas||[]){if(t<start+e.dur){scene=e;break}start+=e.dur}scene||=story.escenas?.at(-1);for(const v of players.values())v.style.display='none';if(!scene)return;
+const stage=document.querySelector('#stage');let html='';const b=story.brand||{name:'ComandPOS',primary:'#14233b',accent:'#ff6b35'},edit=scene.design||{},x=edit.x??80,y=edit.y??450,size=edit.size??72;
+if(scene.tipo==='media'){
+const url=scene.media_url||(scene.resource_id?'/api/library/'+scene.resource_id:null),v=players.get(url),wide=stage.getAttribute('viewBox')==='0 0 1920 1080',height=stage.viewBox.baseVal.height,width=stage.viewBox.baseVal.width;
+if(v){v.style.display='block';v.style.width=width+'px';v.style.height=height+'px';v.style.objectFit=scene.fit||'cover';v.style.objectPosition=`${scene.focus_x??50}% ${scene.focus_y??50}%`;const target=Math.max(0,Math.min((scene.clip_start||0)+t-start,v.duration-.04));if(Math.abs(v.currentTime-target)>.005)await new Promise((ok,no)=>{const timer=setTimeout(()=>{v.removeEventListener('seeked',done);no(Error('El clip no pudo posicionarse'))},5000);function done(){clearTimeout(timer);ok()}v.addEventListener('seeked',done,{once:true});v.currentTime=target})}
+html=`<rect width="${width}" height="${height}" fill="${v?'transparent':esc(b.primary)}"/>`;
+if(url&&!v)html+=`<image href="${esc(url)}" width="${width}" height="${height}" preserveAspectRatio="${scene.fit==='contain'?'xMidYMid meet':'xMidYMid slice'}"/>`;
+html+=`<rect width="${width}" height="${height}" fill="black" opacity="${scene.shade??.35}"/><text x="80" y="150" fill="white" font-size="34" font-family="Montserrat" font-weight="800">${esc(b.name)}</text>`;
+lines(scene.titulo,wide?38:24).forEach((line,i)=>html+=`<text x="${x}" y="${y+i*size*1.12}" fill="white" font-size="${size}" font-family="Montserrat" font-weight="900">${esc(line)}</text>`);
+lines(scene.texto,wide?65:44).forEach((line,i)=>html+=`<text x="80" y="${height-440+i*43}" fill="white" font-size="36" font-family="Montserrat" font-weight="600">${esc(line)}</text>`);
+html+=`<rect x="80" y="${height-235}" width="${width-160}" height="5" fill="${esc(b.accent)}"/><text x="80" y="${height-160}" fill="white" font-size="30" font-family="Montserrat">${esc(scene.cta||b.cta)}</text>`;
+if(b.logo_url||b.logo_resource_id){html+=`<rect x="60" y="70" width="650" height="115" fill="${esc(b.primary)}"/><image href="${esc(b.logo_url||'/api/library/'+b.logo_resource_id)}" x="80" y="85" width="350" height="90" preserveAspectRatio="xMinYMid meet"/>`}
+if(story.subtitulos)html+=window.subtitulosCineticos(scene,t-start,height-330);stage.innerHTML=html;
+}else if(scene.design){const texts=[...stage.querySelectorAll('text')];for(const el of texts){if(Number(el.getAttribute('font-size'))>=64&&el.getAttribute('y')<650){el.setAttribute('transform',`translate(${edit.dx||0} ${edit.dy||0}) scale(${edit.scale||1})`)}}}
+if(scene.overlay){const o=scene.overlay;const ns='http://www.w3.org/2000/svg',el=document.createElementNS(ns,'text');for(const [k,v]of Object.entries({x:o.x,y:o.y,fill:o.color||'#ffffff','font-size':o.size||48,'font-family':'Montserrat','font-weight':800}))el.setAttribute(k,v);el.textContent=o.text;stage.append(el)}
+};
+})();

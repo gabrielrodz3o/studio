@@ -1,0 +1,17 @@
+[
+  {
+    "id": "insumos",
+    "file": "insumos.png",
+    "title": "Revisión de ingredientes en cocina",
+    "source": "Fotografía ilustrativa existente de la campaña v16",
+    "sha256": "ff1bd26eaaa240fa157dfd00d5aa82bf6efafb4315eee5e01d2532850068d659",
+    "review": {
+      "status": "approved",
+      "reviewer": "Revisión visual local del asistente",
+      "scene": "Encargada revisando vegetales; cocina de restaurante; sin texto visible dominante.",
+      "topic_ids": [
+        "5-educativo-3"
+      ]
+    }
+  }
+]

@@ -1,0 +1,631 @@
+{
+  "nombre": "comercial-n8n",
+  "formato": "comercial",
+  "perfil_voz": "n8n",
+  "voz": true,
+  "subtitulos": true,
+  "evidencia": {
+    "key": "reporteBI",
+    "label": "Reportes del negocio",
+    "steps": [
+      "Plantea una pregunta",
+      "Consulta el reporte",
+      "Distingue las cifras"
+    ],
+    "claims": [
+      "El reporte diferencia venta bruta y venta neta.",
+      "El desglose identifica compras, costo de receta, nómina, mermas y descuentos. No demuestra editar inventario."
+    ],
+    "crop": [
+      0,
+      0,
+      811,
+      137
+    ],
+    "detail": [
+      0,
+      389,
+      1073,
+      402
+    ],
+    "focus": [
+      0,
+      0,
+      811,
+      137
+    ],
+    "labels": [
+      "Venta bruta y neta",
+      "Desglose de costos"
+    ],
+    "benefit": "Distingue conceptos del reporte.",
+    "asset": "reporteBI",
+    "imagen": "assets/reportes-real.webp",
+    "ancho": 1637,
+    "alto": 829
+  },
+  "escenas": [
+    {
+      "tipo": "comercial_n8n",
+      "rol": "gancho",
+      "dur": 5.21,
+      "titulo": "¿Bruta o neta? Compara canales con el mismo criterio.",
+      "etiqueta": "COMANDPOS",
+      "voz": "Comparar canales confunde cuando bruto y neto no significan igual.",
+      "voz_inicio": 0.12,
+      "palabras": [
+        {
+          "word": "Comparar",
+          "start": 0.0,
+          "end": 0.5799999833106995
+        },
+        {
+          "word": "canales",
+          "start": 0.5799999833106995,
+          "end": 0.9599999785423279
+        },
+        {
+          "word": "confunde",
+          "start": 0.9599999785423279,
+          "end": 1.7000000476837158
+        },
+        {
+          "word": "cuando",
+          "start": 2.0999999046325684,
+          "end": 2.3399999141693115
+        },
+        {
+          "word": "bruto",
+          "start": 2.3399999141693115,
+          "end": 2.819999933242798
+        },
+        {
+          "word": "y",
+          "start": 2.819999933242798,
+          "end": 3.0399999618530273
+        },
+        {
+          "word": "neto",
+          "start": 3.0399999618530273,
+          "end": 3.380000114440918
+        },
+        {
+          "word": "no",
+          "start": 3.380000114440918,
+          "end": 3.740000009536743
+        },
+        {
+          "word": "significan",
+          "start": 3.740000009536743,
+          "end": 4.320000171661377
+        },
+        {
+          "word": "igual.",
+          "start": 4.320000171661377,
+          "end": 4.559999942779541
+        }
+      ],
+      "audio_local": {
+        "archivo": "assets/n8n-voice-0.wav",
+        "texto": "Comparar canales confunde cuando bruto y neto no significan igual.",
+        "inicio": 0.12,
+        "palabras": [
+          {
+            "word": "Comparar",
+            "start": 0.0,
+            "end": 0.5799999833106995
+          },
+          {
+            "word": "canales",
+            "start": 0.5799999833106995,
+            "end": 0.9599999785423279
+          },
+          {
+            "word": "confunde",
+            "start": 0.9599999785423279,
+            "end": 1.7000000476837158
+          },
+          {
+            "word": "cuando",
+            "start": 2.0999999046325684,
+            "end": 2.3399999141693115
+          },
+          {
+            "word": "bruto",
+            "start": 2.3399999141693115,
+            "end": 2.819999933242798
+          },
+          {
+            "word": "y",
+            "start": 2.819999933242798,
+            "end": 3.0399999618530273
+          },
+          {
+            "word": "neto",
+            "start": 3.0399999618530273,
+            "end": 3.380000114440918
+          },
+          {
+            "word": "no",
+            "start": 3.380000114440918,
+            "end": 3.740000009536743
+          },
+          {
+            "word": "significan",
+            "start": 3.740000009536743,
+            "end": 4.320000171661377
+          },
+          {
+            "word": "igual.",
+            "start": 4.320000171661377,
+            "end": 4.559999942779541
+          }
+        ]
+      }
+    },
+    {
+      "tipo": "comercial_n8n",
+      "rol": "producto",
+      "dur": 4.41,
+      "titulo": "Diferencia venta bruta y venta neta",
+      "etiqueta": "COMANDPOS",
+      "voz": "ComandPOS diferencia la venta bruta y la venta neta en su reporte.",
+      "voz_inicio": 0.3,
+      "palabras": [
+        {
+          "word": "ComandPOS",
+          "start": 0.0,
+          "end": 0.6800000071525574
+        },
+        {
+          "word": "diferencia",
+          "start": 0.6800000071525574,
+          "end": 1.2999999523162842
+        },
+        {
+          "word": "la",
+          "start": 1.2999999523162842,
+          "end": 1.5199999809265137
+        },
+        {
+          "word": "venta",
+          "start": 1.5199999809265137,
+          "end": 1.8799999952316284
+        },
+        {
+          "word": "bruta",
+          "start": 1.8799999952316284,
+          "end": 2.1600000858306885
+        },
+        {
+          "word": "y",
+          "start": 2.1600000858306885,
+          "end": 2.359999895095825
+        },
+        {
+          "word": "la",
+          "start": 2.359999895095825,
+          "end": 2.5399999618530273
+        },
+        {
+          "word": "venta",
+          "start": 2.5399999618530273,
+          "end": 2.759999990463257
+        },
+        {
+          "word": "neta",
+          "start": 2.759999990463257,
+          "end": 3.0399999618530273
+        },
+        {
+          "word": "en",
+          "start": 3.0399999618530273,
+          "end": 3.0799999237060547
+        },
+        {
+          "word": "su",
+          "start": 3.0799999237060547,
+          "end": 3.200000047683716
+        },
+        {
+          "word": "reporte.",
+          "start": 3.200000047683716,
+          "end": 3.6600000858306885
+        }
+      ],
+      "audio_local": {
+        "archivo": "assets/n8n-voice-1.wav",
+        "texto": "ComandPOS diferencia la venta bruta y la venta neta en su reporte.",
+        "inicio": 0.3,
+        "palabras": [
+          {
+            "word": "ComandPOS",
+            "start": 0.0,
+            "end": 0.6800000071525574
+          },
+          {
+            "word": "diferencia",
+            "start": 0.6800000071525574,
+            "end": 1.2999999523162842
+          },
+          {
+            "word": "la",
+            "start": 1.2999999523162842,
+            "end": 1.5199999809265137
+          },
+          {
+            "word": "venta",
+            "start": 1.5199999809265137,
+            "end": 1.8799999952316284
+          },
+          {
+            "word": "bruta",
+            "start": 1.8799999952316284,
+            "end": 2.1600000858306885
+          },
+          {
+            "word": "y",
+            "start": 2.1600000858306885,
+            "end": 2.359999895095825
+          },
+          {
+            "word": "la",
+            "start": 2.359999895095825,
+            "end": 2.5399999618530273
+          },
+          {
+            "word": "venta",
+            "start": 2.5399999618530273,
+            "end": 2.759999990463257
+          },
+          {
+            "word": "neta",
+            "start": 2.759999990463257,
+            "end": 3.0399999618530273
+          },
+          {
+            "word": "en",
+            "start": 3.0399999618530273,
+            "end": 3.0799999237060547
+          },
+          {
+            "word": "su",
+            "start": 3.0799999237060547,
+            "end": 3.200000047683716
+          },
+          {
+            "word": "reporte.",
+            "start": 3.200000047683716,
+            "end": 3.6600000858306885
+          }
+        ]
+      }
+    },
+    {
+      "tipo": "comercial_n8n",
+      "rol": "detalle",
+      "dur": 7.47,
+      "titulo": "El desglose aporta contexto",
+      "etiqueta": "COMANDPOS",
+      "voz": "El desglose identifica compras, costo de receta, nómina, mermas y descuentos para orientar la revisión.",
+      "voz_inicio": 0.3,
+      "palabras": [
+        {
+          "word": "El",
+          "start": 0.0,
+          "end": 0.15215634311338694
+        },
+        {
+          "word": "desglose",
+          "start": 0.15215634311338694,
+          "end": 0.5917190785178958
+        },
+        {
+          "word": "identifica",
+          "start": 0.5917190785178958,
+          "end": 1.2510632320092392
+        },
+        {
+          "word": "compras,",
+          "start": 1.2510632320092392,
+          "end": 2.0456574850628977
+        },
+        {
+          "word": "costo",
+          "start": 2.3837825576226552,
+          "end": 2.4683139769163347
+        },
+        {
+          "word": "de",
+          "start": 2.4683139769163347,
+          "end": 2.738814075271805
+        },
+        {
+          "word": "receta,",
+          "start": 2.738814075271805,
+          "end": 3.1107518364720264
+        },
+        {
+          "word": "nómina,",
+          "start": 3.617939747619143,
+          "end": 3.922252131538436
+        },
+        {
+          "word": "mermas",
+          "start": 4.497065218428161,
+          "end": 4.7168463845920945
+        },
+        {
+          "word": "y",
+          "start": 4.7168463845920945,
+          "end": 5.004252928036957
+        },
+        {
+          "word": "descuentos",
+          "start": 5.004252928036957,
+          "end": 5.443815663441466
+        },
+        {
+          "word": "para",
+          "start": 5.443815663441466,
+          "end": 5.7481284504374
+        },
+        {
+          "word": "orientar",
+          "start": 5.7481284504374,
+          "end": 6.28912864714834
+        },
+        {
+          "word": "la",
+          "start": 6.28912864714834,
+          "end": 6.441284839107986
+        },
+        {
+          "word": "revisión.",
+          "start": 6.441284839107986,
+          "end": 6.7286913825528485
+        }
+      ],
+      "audio_local": {
+        "archivo": "assets/n8n-voice-2.wav",
+        "texto": "El desglose identifica compras, costo de receta, nómina, mermas y descuentos para orientar la revisión.",
+        "inicio": 0.3,
+        "palabras": [
+          {
+            "word": "El",
+            "start": 0.0,
+            "end": 0.15215634311338694
+          },
+          {
+            "word": "desglose",
+            "start": 0.15215634311338694,
+            "end": 0.5917190785178958
+          },
+          {
+            "word": "identifica",
+            "start": 0.5917190785178958,
+            "end": 1.2510632320092392
+          },
+          {
+            "word": "compras,",
+            "start": 1.2510632320092392,
+            "end": 2.0456574850628977
+          },
+          {
+            "word": "costo",
+            "start": 2.3837825576226552,
+            "end": 2.4683139769163347
+          },
+          {
+            "word": "de",
+            "start": 2.4683139769163347,
+            "end": 2.738814075271805
+          },
+          {
+            "word": "receta,",
+            "start": 2.738814075271805,
+            "end": 3.1107518364720264
+          },
+          {
+            "word": "nómina,",
+            "start": 3.617939747619143,
+            "end": 3.922252131538436
+          },
+          {
+            "word": "mermas",
+            "start": 4.497065218428161,
+            "end": 4.7168463845920945
+          },
+          {
+            "word": "y",
+            "start": 4.7168463845920945,
+            "end": 5.004252928036957
+          },
+          {
+            "word": "descuentos",
+            "start": 5.004252928036957,
+            "end": 5.443815663441466
+          },
+          {
+            "word": "para",
+            "start": 5.443815663441466,
+            "end": 5.7481284504374
+          },
+          {
+            "word": "orientar",
+            "start": 5.7481284504374,
+            "end": 6.28912864714834
+          },
+          {
+            "word": "la",
+            "start": 6.28912864714834,
+            "end": 6.441284839107986
+          },
+          {
+            "word": "revisión.",
+            "start": 6.441284839107986,
+            "end": 6.7286913825528485
+          }
+        ]
+      }
+    },
+    {
+      "tipo": "comercial_n8n",
+      "rol": "cierre",
+      "dur": 6.78,
+      "titulo": "Solicita una demo con GCODE",
+      "etiqueta": "COMANDPOS",
+      "voz": "Solicita tu demo de ComandPOS con GCODE y conoce el reporte para tu operación.",
+      "voz_inicio": 0.3,
+      "palabras": [
+        {
+          "word": "Solicita",
+          "start": 0.0,
+          "end": 0.5799999833106995
+        },
+        {
+          "word": "tu",
+          "start": 0.5799999833106995,
+          "end": 0.7799999713897705
+        },
+        {
+          "word": "demo",
+          "start": 0.7799999713897705,
+          "end": 1.0199999809265137
+        },
+        {
+          "word": "de",
+          "start": 1.0199999809265137,
+          "end": 1.2599999904632568
+        },
+        {
+          "word": "ComandPOS",
+          "start": 1.2599999904632568,
+          "end": 1.8600000143051147
+        },
+        {
+          "word": "con",
+          "start": 1.8600000143051147,
+          "end": 2.0999999046325684
+        },
+        {
+          "word": "GCODE",
+          "start": 2.0999999046325684,
+          "end": 2.5799999237060547
+        },
+        {
+          "word": "y",
+          "start": 2.5799999237060547,
+          "end": 2.9000000953674316
+        },
+        {
+          "word": "conoce",
+          "start": 2.9000000953674316,
+          "end": 3.299999952316284
+        },
+        {
+          "word": "el",
+          "start": 3.299999952316284,
+          "end": 3.4800000190734863
+        },
+        {
+          "word": "reporte",
+          "start": 3.4800000190734863,
+          "end": 3.9200000762939453
+        },
+        {
+          "word": "para",
+          "start": 3.9200000762939453,
+          "end": 4.0
+        },
+        {
+          "word": "tu",
+          "start": 4.0,
+          "end": 4.199999809265137
+        },
+        {
+          "word": "operación.",
+          "start": 4.199999809265137,
+          "end": 4.5
+        }
+      ],
+      "audio_local": {
+        "archivo": "assets/n8n-voice-3.wav",
+        "texto": "Solicita tu demo de ComandPOS con GCODE y conoce el reporte para tu operación.",
+        "inicio": 0.3,
+        "palabras": [
+          {
+            "word": "Solicita",
+            "start": 0.0,
+            "end": 0.5799999833106995
+          },
+          {
+            "word": "tu",
+            "start": 0.5799999833106995,
+            "end": 0.7799999713897705
+          },
+          {
+            "word": "demo",
+            "start": 0.7799999713897705,
+            "end": 1.0199999809265137
+          },
+          {
+            "word": "de",
+            "start": 1.0199999809265137,
+            "end": 1.2599999904632568
+          },
+          {
+            "word": "ComandPOS",
+            "start": 1.2599999904632568,
+            "end": 1.8600000143051147
+          },
+          {
+            "word": "con",
+            "start": 1.8600000143051147,
+            "end": 2.0999999046325684
+          },
+          {
+            "word": "GCODE",
+            "start": 2.0999999046325684,
+            "end": 2.5799999237060547
+          },
+          {
+            "word": "y",
+            "start": 2.5799999237060547,
+            "end": 2.9000000953674316
+          },
+          {
+            "word": "conoce",
+            "start": 2.9000000953674316,
+            "end": 3.299999952316284
+          },
+          {
+            "word": "el",
+            "start": 3.299999952316284,
+            "end": 3.4800000190734863
+          },
+          {
+            "word": "reporte",
+            "start": 3.4800000190734863,
+            "end": 3.9200000762939453
+          },
+          {
+            "word": "para",
+            "start": 3.9200000762939453,
+            "end": 4.0
+          },
+          {
+            "word": "tu",
+            "start": 4.0,
+            "end": 4.199999809265137
+          },
+          {
+            "word": "operación.",
+            "start": 4.199999809265137,
+            "end": 4.5
+          }
+        ]
+      }
+    }
+  ]
+}

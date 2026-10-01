@@ -1,0 +1,115 @@
+{
+  "nombre": "inventario-platano",
+  "voz": false,
+  "escenas": [
+    {
+      "tipo": "gancho_local",
+      "dur": 3.0,
+      "rotulo": "Sábado, 1:00 de la tarde.",
+      "sub": "El comedor, lleno.",
+      "voz": "Sábado a la una, y el comedor está lleno."
+    },
+    {
+      "tipo": "caos_acumulado",
+      "dur": 3.8,
+      "rotulo": "Y se acabó el plátano.",
+      "frases": [
+        "¡No hay plátano!",
+        "¿Quién hizo el pedido?",
+        "¿Qué le digo a la 5?",
+        "¡Otra vez lo mismo!"
+      ],
+      "voz": "Y en plena hora pico, se acabó el plátano. Otra vez."
+    },
+    {
+      "tipo": "transicion",
+      "dur": 2.3,
+      "texto": "Ahora Don Ramón usa ComandPOS.",
+      "voz": "Ahora Don Ramón usa ComandPOS."
+    },
+    {
+      "tipo": "inventario_alerta",
+      "dur": 4.2,
+      "rotulo": "Te avisa cuando queda poco.",
+      "alerta": 0,
+      "items": [
+        [
+          "Plátano verde",
+          24,
+          6,
+          60,
+          "und."
+        ],
+        [
+          "Pollo",
+          38,
+          38,
+          60,
+          "lb"
+        ],
+        [
+          "Arroz",
+          45,
+          45,
+          60,
+          "lb"
+        ],
+        [
+          "Aguacate",
+          20,
+          20,
+          40,
+          "und."
+        ]
+      ],
+      "voz": "El sistema te avisa cuando algo se está acabando, para que compres a tiempo."
+    },
+    {
+      "tipo": "grafica_ventas",
+      "dur": 3.6,
+      "rotulo": "Y ves qué se vende más.",
+      "barras": [
+        [
+          "Mofongo",
+          124
+        ],
+        [
+          "Pica pollo",
+          98
+        ],
+        [
+          "Chivo guisado",
+          76
+        ],
+        [
+          "Tostones",
+          64
+        ],
+        [
+          "Morir soñando",
+          58
+        ]
+      ],
+      "voz": "Y ves qué platos se venden más, para comprar lo justo."
+    },
+    {
+      "tipo": "remate",
+      "dur": 2.8,
+      "lineas": [
+        "Menos sorpresas.",
+        "*Más control.*"
+      ],
+      "voz": "Menos sorpresas. Más control."
+    },
+    {
+      "tipo": "cierre",
+      "dur": 3.6,
+      "cta": "Pide tu demo",
+      "whatsapp": "+1 849 540 6093",
+      "web": "comandpos.com",
+      "voz": "Pide tu demo de ComandPOS por WhatsApp."
+    }
+  ],
+  "formato": "historia",
+  "perfil_voz": "original"
+}

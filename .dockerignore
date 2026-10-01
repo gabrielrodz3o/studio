@@ -1,0 +1,12 @@
+node_modules
+.studio-state
+salida
+referencias
+__pycache__
+.git
+*.test.mjs
+*.pyc
+models
+
+**/._*
+ACCESO_STUDIO.txt

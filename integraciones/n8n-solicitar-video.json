@@ -1,0 +1,298 @@
+{
+  "name": "GCODE Centro multimedia - solicitar y descargar",
+  "active": false,
+  "nodes": [
+    {
+      "id": "595af2ff-6e9e-4574-a337-ca293416198c",
+      "name": "Inicio manual",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "d2b3acdd-fa75-4d94-aa67-621d3bc03a27",
+      "name": "Preparar solicitud",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        220,
+        0
+      ],
+      "parameters": {
+        "jsCode": "return [{json:{base_url:'http://127.0.0.1:4173',idempotency_key:'piloto-centro-comercial-001',started_at:Date.now(),request:{brand_id:'comandpos',kind:'video',template_id:'comercial-n8n',voice:true,subtitles:true,allow_paid_voice:false,brief:'Prueba del centro multimedia; no publicar.'}}}];"
+      }
+    },
+    {
+      "id": "318b8447-221a-47f8-a1fc-e0b4aa1f6294",
+      "name": "Solicitar video",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        450,
+        0
+      ],
+      "parameters": {
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "method": "POST",
+        "url": "={{ $json.base_url + '/api/v1/jobs' }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Idempotency-Key",
+              "value": "={{ $json.idempotency_key }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.request) }}",
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000
+    },
+    {
+      "id": "b9065be0-582a-4488-9b51-b1830dfa5c57",
+      "name": "Guardar ID",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        680,
+        0
+      ],
+      "parameters": {
+        "jsCode": "return [{json:{job_id:$json.job.id}}];"
+      }
+    },
+    {
+      "id": "962e71d7-b1b1-43e3-ba95-6772a66cf778",
+      "name": "Esperar",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        900,
+        0
+      ],
+      "parameters": {
+        "amount": 15,
+        "unit": "seconds"
+      }
+    },
+    {
+      "id": "7f4ace48-60e1-47d0-bfa3-a2ea48d84df2",
+      "name": "Consultar trabajo",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1120,
+        0
+      ],
+      "parameters": {
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "url": "={{ $('Preparar solicitud').first().json.base_url + '/api/v1/jobs/' + $('Guardar ID').first().json.job_id }}",
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000
+    },
+    {
+      "id": "6e356ed6-1eff-43fb-a361-18727c23898a",
+      "name": "Esta listo",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1350,
+        0
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "a1b18ffe-a2fe-418e-850e-812934148067",
+              "leftValue": "={{ $json.status }}",
+              "rightValue": "succeeded",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "5d1b7082-bf9f-4c03-9d12-ce26e17a8740",
+      "name": "Descargar video",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1600,
+        -100
+      ],
+      "parameters": {
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "url": "={{ $('Preparar solicitud').first().json.base_url + $json.artifact.video_url }}",
+        "options": {
+          "timeout": 120000,
+          "response": {
+            "response": {
+              "responseFormat": "file",
+              "outputPropertyName": "video"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "5f4f7596-3c04-4abe-8393-4f12543c445e",
+      "name": "Revisar estado y plazo",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1550,
+        160
+      ],
+      "parameters": {
+        "jsCode": "if (!['queued','running'].includes($json.status)) throw new Error($json.error || ('Estado: '+$json.status)); if(Date.now()-$('Preparar solicitud').first().json.started_at>30*60*1000) throw new Error('Plazo agotado; consultar el mismo trabajo, no crear otro.'); return $input.all();"
+      }
+    },
+    {
+      "id": "17e4ff69-8f30-4f2b-ba7a-44d69a995739",
+      "name": "Configuracion necesaria",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        160,
+        -310
+      ],
+      "parameters": {
+        "content": "## Antes de ejecutar\n1. Usa una URL accesible desde n8n. Su localhost no es la Mac.\n2. En los tres HTTP Request elige la credencial Header Auth: Authorization = Bearer <clave>.\n3. Mantén la misma idempotency_key para reintentar la misma pieza; cambia la clave para una pieza distinta.\n4. Este flujo solo genera y descarga. No publica.",
+        "height": 250,
+        "width": 640
+      }
+    }
+  ],
+  "connections": {
+    "Inicio manual": {
+      "main": [
+        [
+          {
+            "node": "Preparar solicitud",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparar solicitud": {
+      "main": [
+        [
+          {
+            "node": "Solicitar video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Solicitar video": {
+      "main": [
+        [
+          {
+            "node": "Guardar ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Guardar ID": {
+      "main": [
+        [
+          {
+            "node": "Esperar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Esperar": {
+      "main": [
+        [
+          {
+            "node": "Consultar trabajo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consultar trabajo": {
+      "main": [
+        [
+          {
+            "node": "Esta listo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Esta listo": {
+      "main": [
+        [
+          {
+            "node": "Descargar video",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Revisar estado y plazo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Revisar estado y plazo": {
+      "main": [
+        [
+          {
+            "node": "Esperar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {}
+}

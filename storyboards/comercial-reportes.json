@@ -1,0 +1,88 @@
+{
+  "nombre": "comercial-reportes",
+  "formato": "comercial",
+  "voz": true,
+  "escenas": [
+    {
+      "tipo": "comercial_doble",
+      "dur": 5.4,
+      "etiqueta": "REPORTES · COMANDPOS",
+      "titulo": "¿Venta bruta o venta neta?",
+      "texto": "Mismo reporte. Dos conceptos distintos.",
+      "capturas": [
+        {
+          "imagen": "assets/reportes-real.webp",
+          "ancho": 1637,
+          "alto": 829,
+          "recorte": [
+            0,
+            0,
+            405,
+            140
+          ],
+          "etiqueta": "01 · VENTA BRUTA"
+        },
+        {
+          "imagen": "assets/reportes-real.webp",
+          "ancho": 1637,
+          "alto": 829,
+          "recorte": [
+            410,
+            0,
+            400,
+            140
+          ],
+          "etiqueta": "02 · VENTA NETA"
+        }
+      ],
+      "voz": "Venta bruta y venta neta no son lo mismo."
+    },
+    {
+      "tipo": "comercial_foco",
+      "dur": 5.8,
+      "etiqueta": "01 · VENTA BRUTA",
+      "titulo": "Lee qué incluye cada cifra.",
+      "texto": "Incluye impuestos y propinas.",
+      "nota": "Así aparece identificado en este reporte.",
+      "imagen": "assets/reportes-real.webp",
+      "ancho": 1637,
+      "alto": 829,
+      "recorte": [
+        0,
+        0,
+        405,
+        140
+      ],
+      "voz": "La venta bruta incluye impuestos y propinas. Mira la etiqueta del reporte."
+    },
+    {
+      "tipo": "comercial_foco",
+      "dur": 6,
+      "etiqueta": "02 · VENTA NETA",
+      "titulo": "Neta no significa ganancia.",
+      "texto": "Sin ITBIS ni propinas. Antes de costos.",
+      "nota": "El reporte distingue ingreso y utilidad.",
+      "imagen": "assets/reportes-real.webp",
+      "ancho": 1637,
+      "alto": 829,
+      "recorte": [
+        410,
+        0,
+        400,
+        140
+      ],
+      "voz": "La venta neta aparece sin ITBIS ni propinas, antes de costos."
+    },
+    {
+      "tipo": "comercial_cierre",
+      "dur": 4.2,
+      "etiqueta": "CONOCE COMANDPOS",
+      "titulo": "Tus reportes, más claros.",
+      "cta": "Pide tu demo",
+      "whatsapp": "+1 849 540 6093",
+      "web": "comandpos.com",
+      "voz": "Pide tu demo de ComandPOS por WhatsApp."
+    }
+  ],
+  "perfil_voz": "original"
+}

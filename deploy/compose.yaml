@@ -1,0 +1,41 @@
+services:
+  studio:
+    build:
+      context: ../app
+    image: gcode-studio:local
+    container_name: gcode-studio
+    init: true
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:4173:4173"
+      - "10.108.0.3:4173:4173"
+    env_file:
+      - ../private/studio.env
+    environment:
+      STUDIO_BIND_HOST: 0.0.0.0
+      STUDIO_REQUIRE_LOGIN: "1"
+      STUDIO_DAILY_BUDGET: "5"
+      # Chromium renders controlled local templates inside this non-root container.
+      STUDIO_CHROME_NO_SANDBOX: "1"
+    volumes:
+      - ../data/state:/app/.studio-state
+      - ../data/voice:/app/voz
+      - ../data/storyboards:/app/storyboards
+      - ../data/feed:/app/feed
+      - ../data/models:/app/models:ro
+    mem_limit: 1700m
+    cpus: 1.0
+    pids_limit: 256
+    shm_size: 256m
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:4173/login').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"

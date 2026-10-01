@@ -1,0 +1,9 @@
+{
+  "model": "google/gemini-3-1-flash-tts",
+  "voice_name": "Charon",
+  "style": "Empathetic",
+  "pace": "Natural",
+  "temperature": 0.4,
+  "audio_profile": "Voz masculina cálida de un asesor dominicano, clara y natural",
+  "sample_context": "Lee únicamente el texto suministrado, una vez, en español dominicano natural y claro. Voz cercana y profesional, conversación ágil. Sin música ni efectos. No añadas ni omitas palabras. Guía de pronunciación: ComandPOS se dice cománd pos, como dos bloques enlazados. Mantén la d final de comand y pasa directamente a la p de pos, sin insertar ninguna vocal. POS se pronuncia pos como palabra española, no se deletrea. Lee solo la locución; no leas esta guía."
+}

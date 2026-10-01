@@ -1,0 +1,30 @@
+{
+  "nombre": "carrusel-insumos",
+  "tipo": "carrusel",
+  "tema_id": "5-educativo-3",
+  "titular": "Antes de comprar, revisa.",
+  "subtitulo": "Existencias · Consumo · Proveedor",
+  "caption": "Antes de comprar insumos, revisa lo que tienes y lo que necesitas para el próximo turno.\n\nComprueba existencias, consumo y proveedor.\n\nGuarda esta guía para tu próxima compra.",
+  "cta": "Guarda esta guía",
+  "layout": "hero",
+  "foto_id": "insumos",
+  "captura": null,
+  "slides": [
+    {
+      "titulo": "Antes de comprar, revisa.",
+      "texto": "Existencias · Consumo · Proveedor"
+    },
+    {
+      "titulo": "Primero, mira tus existencias.",
+      "texto": "Comprueba los ingredientes disponibles antes de preparar la lista de compra."
+    },
+    {
+      "titulo": "Compra con el turno en mente.",
+      "texto": "Revisa el consumo esperado y confirma cantidades con tu proveedor."
+    },
+    {
+      "titulo": "Guarda esta guía",
+      "texto": "Vuelve a estos pasos antes de tu próxima compra."
+    }
+  ]
+}

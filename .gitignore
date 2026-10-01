@@ -1,0 +1,46 @@
+# Estado privado, acceso y configuración de proveedores
+.studio-state/
+.env
+.env.*
+!.env.example
+private/
+backups/
+ACCESO_STUDIO.txt
+*password*.txt
+*acceso*.txt
+*.pem
+*.key
+# Dependencias y archivos generados
+node_modules/
+__pycache__/
+*.pyc
+.DS_Store
+._*
+models/
+referencias/
+voz/*
+!voz/.gitkeep
+casting/*
+!casting/.gitkeep
+salida/*
+!salida/.gitkeep
+# Recursos de marca, capturas y medios: se conservan en el servidor privado
+assets/*
+!assets/.gitkeep
+feed/brand/*
+!feed/brand/.gitkeep
+feed/photos/*
+!feed/photos/.gitkeep
+# Proyectos creados durante el uso; solo las plantillas base se versionan
+storyboards/*
+!storyboards/piloto-voz-selectiva.json
+!storyboards/piloto-comandas.json
+!storyboards/inventario-platano.json
+!storyboards/comercial-n8n.json
+!storyboards/comercial-reportes.json
+!storyboards/consejo-venta-neta.json
+!storyboards/comercial-voz-selectiva.json
+feed/templates/*
+!feed/templates/imagen-insumos.json
+!feed/templates/carrusel-insumos.json
+!feed/templates/historia-insumos.json

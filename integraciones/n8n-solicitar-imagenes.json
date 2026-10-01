@@ -1,0 +1,322 @@
+{
+  "name": "GCODE Centro - solicitar imagen o carrusel",
+  "active": false,
+  "nodes": [
+    {
+      "id": "dc39fbc5-852b-43b8-9596-6f1b7c811044",
+      "name": "Inicio manual",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "95f294c4-4aaa-4208-b1ed-b65ff2b0e12c",
+      "name": "Preparar solicitud",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        220,
+        0
+      ],
+      "parameters": {
+        "jsCode": "return [{json:{base_url:'http://127.0.0.1:4173',idempotency_key:'piloto-centro-carrusel-001',started_at:Date.now(),request:{brand_id:'comandpos',kind:'carrusel',template_id:'carrusel-insumos',brief:'Prueba local de carrusel; no publicar.'}}}];"
+      }
+    },
+    {
+      "id": "eb2c09c6-4857-4da8-bd49-2d6808b5d419",
+      "name": "Solicitar pieza",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        450,
+        0
+      ],
+      "parameters": {
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "method": "POST",
+        "url": "={{ $json.base_url + '/api/v1/jobs' }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Idempotency-Key",
+              "value": "={{ $json.idempotency_key }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.request) }}",
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000
+    },
+    {
+      "id": "9c4ef915-5a3d-4397-b71d-44bc483fb7a8",
+      "name": "Guardar ID",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        680,
+        0
+      ],
+      "parameters": {
+        "jsCode": "return [{json:{job_id:$json.job.id}}];"
+      }
+    },
+    {
+      "id": "c2d4563b-5943-430d-919e-fb770fa3b232",
+      "name": "Esperar",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        900,
+        0
+      ],
+      "parameters": {
+        "amount": 15,
+        "unit": "seconds"
+      }
+    },
+    {
+      "id": "0a4fa2c9-dab2-4df1-9d7b-524e92d4df4a",
+      "name": "Consultar trabajo",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1120,
+        0
+      ],
+      "parameters": {
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "url": "={{ $('Preparar solicitud').first().json.base_url + '/api/v1/jobs/' + $('Guardar ID').first().json.job_id }}",
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000
+    },
+    {
+      "id": "7b829529-4dcb-4cc0-97e0-83b0f01b5541",
+      "name": "Esta listo",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1350,
+        0
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "a1b18ffe-a2fe-418e-850e-812934148067",
+              "leftValue": "={{ $json.status }}",
+              "rightValue": "succeeded",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "06068f42-c59a-4b8f-9206-c88594fca2dc",
+      "name": "Descargar pagina",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1850,
+        -100
+      ],
+      "parameters": {
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "url": "={{ $('Preparar solicitud').first().json.base_url + $json.url }}",
+        "options": {
+          "timeout": 120000,
+          "response": {
+            "response": {
+              "responseFormat": "file",
+              "outputPropertyName": "imagen"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "041d5c65-6ce0-4927-b706-cf56bfac62d9",
+      "name": "Revisar estado y plazo",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1550,
+        160
+      ],
+      "parameters": {
+        "jsCode": "if (!['queued','running'].includes($json.status)) throw new Error($json.error || ('Estado: '+$json.status)); if(Date.now()-$('Preparar solicitud').first().json.started_at>30*60*1000) throw new Error('Plazo agotado; consultar el mismo trabajo, no crear otro.'); return $input.all();"
+      }
+    },
+    {
+      "id": "ce1148d2-9714-4bc3-bb56-379dcbdc6ed0",
+      "name": "Configuracion necesaria",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        160,
+        -310
+      ],
+      "parameters": {
+        "content": "## Antes de ejecutar\n1. Usa una URL accesible desde n8n. Su localhost no es la Mac.\n2. En los tres HTTP Request elige la credencial Header Auth: Authorization = Bearer <clave>.\n3. Mantén la misma idempotency_key para reintentar la misma pieza; cambia la clave para una pieza distinta.\n4. Este flujo solo genera y descarga. No publica.",
+        "height": 250,
+        "width": 640
+      }
+    },
+    {
+      "id": "4acb051d-4b79-47ee-a973-e5edafb97592",
+      "name": "Separar paginas",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1600,
+        -100
+      ],
+      "parameters": {
+        "jsCode": "return $json.artifact.images.map(p=>({json:{...p,job_id:$json.id,caption:$json.artifact.caption},pairedItem:{item:0}}));"
+      }
+    }
+  ],
+  "connections": {
+    "Inicio manual": {
+      "main": [
+        [
+          {
+            "node": "Preparar solicitud",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparar solicitud": {
+      "main": [
+        [
+          {
+            "node": "Solicitar pieza",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Solicitar pieza": {
+      "main": [
+        [
+          {
+            "node": "Guardar ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Guardar ID": {
+      "main": [
+        [
+          {
+            "node": "Esperar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Esperar": {
+      "main": [
+        [
+          {
+            "node": "Consultar trabajo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consultar trabajo": {
+      "main": [
+        [
+          {
+            "node": "Esta listo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Esta listo": {
+      "main": [
+        [
+          {
+            "node": "Separar paginas",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Revisar estado y plazo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Revisar estado y plazo": {
+      "main": [
+        [
+          {
+            "node": "Esperar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Separar paginas": {
+      "main": [
+        [
+          {
+            "node": "Descargar pagina",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {}
+}

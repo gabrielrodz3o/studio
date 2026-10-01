@@ -1,0 +1,36 @@
+{
+  "nombre": "consejo-venta-neta",
+  "formato": "consejo",
+  "voz": false,
+  "escenas": [
+    {
+      "tipo": "comercial_foco",
+      "dur": 7.8,
+      "etiqueta": "CONSEJO RÁPIDO · REPORTES",
+      "titulo": "Neta no significa ganancia.",
+      "texto": "Sin ITBIS ni propinas. Antes de costos.",
+      "nota": "El reporte distingue ingreso y utilidad.",
+      "imagen": "assets/reportes-real.webp",
+      "ancho": 1637,
+      "alto": 829,
+      "recorte": [
+        410,
+        0,
+        400,
+        140
+      ],
+      "voz": ""
+    },
+    {
+      "tipo": "comercial_cierre",
+      "dur": 4,
+      "etiqueta": "CONOCE COMANDPOS",
+      "titulo": "Tus reportes, más claros.",
+      "cta": "Pide tu demo",
+      "whatsapp": "+1 849 540 6093",
+      "web": "comandpos.com",
+      "voz": ""
+    }
+  ],
+  "perfil_voz": "original"
+}

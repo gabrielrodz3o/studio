@@ -1,0 +1,62 @@
+{
+  "version": 1,
+  "nombre": "Centro de marketing GCODE",
+  "marcas": [
+    {
+      "id": "comandpos",
+      "nombre": "ComandPOS by GCODE",
+      "empresa": "GCODE Digital",
+      "website": "https://comandpos.com",
+      "whatsapp": "+1 849 540 6093",
+      "pais": "República Dominicana",
+      "cta": "Solicita tu demo",
+      "tono": "Español dominicano, cercano, claro y profesional",
+      "preferencia_video": {
+        "plantilla": "comercial-n8n",
+        "voz": "Charon / Gemini 3.1 Flash TTS / Empathetic",
+        "tipografia": "Montserrat Black",
+        "subtitulos": "Grupos breves; palabra activa naranja; entrada con rebote"
+      },
+      "fuentes": [
+        "../../brand-profile.json",
+        "LEEME.md",
+        "referencias/n8n-referencia.json"
+      ],
+      "afirmaciones_historicas": "No se importan automáticamente porcentajes, superlativos, plazos ni promesas de soporte del perfil antiguo."
+    }
+  ],
+  "modulos": [
+    {
+      "id": "video",
+      "estado": "disponible",
+      "formatos": [
+        "historia",
+        "comercial",
+        "consejo"
+      ]
+    },
+    {
+      "id": "imagen",
+      "estado": "disponible",
+      "formatos": [
+        "imagen",
+        "carrusel"
+      ],
+      "editor": "/feed-editor.html",
+      "fotografia": "Biblioteca revisada, incorporación local y generación con IA con revisión y presupuesto"
+    },
+    {
+      "id": "historia_social",
+      "estado": "disponible",
+      "editor": "/feed-editor.html",
+      "formato": "1080x1920"
+    }
+  ],
+  "responsabilidades": {
+    "centro": "Marca, plantillas, guiones editables, generación, archivos y estado de trabajos",
+    "n8n": "Programación, solicitud de piezas, consulta de estado y distribución cuando se conecte",
+    "agente_marketing": "Ayudar a definir campañas, guiones y mejoras durante las sesiones; no implica supervisión permanente fuera de ellas"
+  },
+  "despliegue": "local",
+  "publicacion_automatica": false
+}
