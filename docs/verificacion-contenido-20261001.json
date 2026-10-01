@@ -1,0 +1,17 @@
+{
+  "date": "2026-10-01",
+  "deployed_code_commit": "a08c439",
+  "rollback_image": "gcode-studio:before-20261001T163146Z",
+  "tests": {"full": {"passed": 113, "failed": 0}, "acceptance_after_crop_adjustment": {"passed": 26, "failed": 0}},
+  "visual_samples_inspected": ["cocina", "mesas", "cuenta"],
+  "production_templates_validated": ["cocina", "mesas", "cuenta", "reporteBI"],
+  "production_resource_hashes_match": true,
+  "public_login_http": 200,
+  "anonymous_private_video_http": 401,
+  "calendar_enabled": true,
+  "publication_mode": "automatic",
+  "pending_owner_videos_active_deliveries": 0,
+  "paid_generations_for_validation": 0,
+  "test_publications": 0,
+  "limitations": ["No live paid generation was run for this release", "Deterministic creative checks do not certify aesthetic quality", "Uninspected modules are excluded from automatic video demonstrations", "Audience retention and commercial results were not measured"]
+}

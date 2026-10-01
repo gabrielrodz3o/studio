@@ -27,3 +27,14 @@ Alcance: CONT-01 a CONT-08 de `auditoria-contenido-editorial-20261001.md`. Se co
 La generación futura aún depende del proveedor de voz y de que las capturas sigan representando el producto. Si falla calidad, la pieza se retiene para corregirla; no se fuerza publicación para cumplir una cuota. Las pantallas administrativas adicionales y nuevas afirmaciones requieren evidencia inspeccionada antes de ampliar el registro de videos. No se midieron conversiones ni retención de audiencia.
 
 Despliegue: se registra el resultado real después de comprobar el servicio; este documento por sí solo no acredita instalación en producción.
+
+## Despliegue comprobado
+
+- Código desplegado: `a08c439`, también enviado a `origin/main`.
+- Actualización saludable en `gcoderd2` con imagen de reversión `gcode-studio:before-20261001T163146Z`.
+- Suite completa final: **113/113**; prueba de aceptación posterior al ajuste de mesas: **26/26**.
+- En el contenedor real se construyeron y validaron las cuatro plantillas; las cuatro copias persistentes coincidieron con el SHA-256 del recurso seleccionado.
+- `https://studio.gcoderd.com/login`: HTTP 200. Acceso anónimo al video privado: HTTP 401.
+- Calendario habilitado, `publication_mode=automatic`. Simulación con historial real para el 2–4 de octubre sin crear trabajos, releases ni entregas. Las historias se coordinan cuando hay una variante relacionada no usada; si se agotó en la ventana de repetición, conservan la alternativa del catálogo.
+- Video nuevo de mermas `job_dba0d887-ca86-4fcc-a903-372e7f3cf514`: pendiente, cero entregas activas. Versión de reportes `job_84cbfdbe-1691-4d8b-9264-e718f51313ef`: pendiente, cero entregas activas. Video rechazado de mesas: continúa rechazado, cero entregas activas.
+- No se envió contenido para probar estos cambios. La primera generación editorial pagada con el nuevo código no se ejecutó durante esta validación; el flujo de IA fue probado con proveedor simulado y las plantillas con el render real. Los guiones futuros seguirán pasando los controles y podrán requerir corrección si el proveedor devuelve contenido inadecuado.
