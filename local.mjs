@@ -1,3 +1,5 @@
+import {prepareEditorialPhoto} from './editorial-render.mjs'
+import {EditorialCalendar,editorialScript} from './editorial-calendar.mjs'
 import {Automation} from './automation.mjs'
 import {voiceTakes,perfil as voiceProfile} from './voz.mjs'
 import {voiceReviews,reviewFile,acceptVoiceReview} from './voice-reviews.mjs'
@@ -38,7 +40,8 @@ async function createPiece(input,key,actor){
  if(input.produce!=null&&typeof input.produce!=='boolean')throw problem(422,'produce debe ser booleano')
  if(input.aspect!=null&&!['vertical','horizontal','square','portrait'].includes(input.aspect))throw problem(422,'Formato de salida inválido')
  if(input.produce&&input.kind==='video'&&input.allow_paid_voice!==true)throw problem(422,'Autoriza la generación de voz para producir el video')
- const result=await creative.create(input,key,actor)
+ const result=actor==='automation'&&input.editorial&&input.kind!=='video'?{id:createHash('sha256').update(key).digest('hex'),kind:input.kind,campaign_id:input.campaign_id,concept_id:input.editorial.topic,script:editorialScript(input.editorial,input.kind,key),caption:editorialScript(input.editorial,input.kind,key).caption,selection:{topic:input.editorial.title},warnings:['Contenido editorial migrado: revisar hechos, imagen y texto antes de aprobar.']}:await creative.create(input,key,actor)
+ if(actor==='automation'&&input.editorial&&input.kind!=='video')result.script=await prepareEditorialPhoto(result.script,root,photos,key)
  await versions.save(result.kind,result.script,actor)
  if(!input.produce)return result
  const request={...(input.budget_group?{budget_group:input.budget_group}:{}),brand_id:input.brand_id||'comandpos',kind:result.kind,script:result.script,creative_id:result.id,concept_id:result.concept_id,caption:result.caption,...(result.campaign_id?{campaign_id:result.campaign_id}:{}),...(result.kind==='video'?{voice:true,subtitles:true,allow_paid_voice:true,aspect:input.aspect||'vertical',max_budget_usd:2}:{})}
@@ -69,7 +72,7 @@ if(token.length<32)throw Error('STUDIO_API_TOKEN debe tener al menos 32 caracter
 let apiClients;try{apiClients=JSON.parse(await readFile(join(state,'api-clients.json'),'utf8'))}catch(e){if(e.code!=='ENOENT')throw e}
 const store=await new JobStore({root,publications:id=>publicationsFor(marketing.data.deliveries,id)}).init()
 const batches=await new Batches(root,{produce:createPiece,budget:creative.budget,store,linkJob:async(pieceId,jobId,actor)=>{const p=marketing.data.pieces.find(p=>p.id===pieceId);if(!p)throw problem(404,'Pieza no encontrada');await marketing.savePiece({...p,job_id:jobId},actor,store)}}).init();
-const automation=await new Automation(root,{marketing,store,produce:createPiece}).init();
+const automation=await new Automation(root,{marketing,store,produce:createPiece,editorial:await new EditorialCalendar(root).init()}).init();
 const mime={'.gz':'application/gzip','.css':'text/css; charset=utf-8','.html':'text/html; charset=utf-8','.mjs':'text/javascript','.js':'text/javascript','.json':'application/json','.png':'image/png','.webp':'image/webp','.jpg':'image/jpeg','.ttf':'font/ttf','.mp3':'audio/mpeg','.wav':'audio/wav','.mp4':'video/mp4'}
 const digest=x=>createHash('sha256').update(x).digest()
 function authenticated(req){return timingSafeEqual(digest(req.headers.authorization||''),digest('Bearer '+token))}

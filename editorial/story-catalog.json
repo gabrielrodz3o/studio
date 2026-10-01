@@ -1,0 +1,482 @@
+[
+  {
+    "id": "notas",
+    "asset": "cocina",
+    "pattern": "comanda|modificador|pedido correcto",
+    "morning": {
+      "title": "¿Y el «sin cebolla»?",
+      "body": "Una nota que no llega a cocina cambia el pedido.",
+      "points": [
+        "Confirma el cambio.",
+        "Anótalo en la comanda.",
+        "Comprueba antes de enviar."
+      ],
+      "cta": "¿Qué detalle se les olvida más?"
+    },
+    "evening": {
+      "title": "El detalle también es parte del pedido",
+      "body": "En la pantalla de cocina puedes consultar los productos y modificadores de la comanda.",
+      "cta": "Conoce la pantalla de cocina"
+    }
+  },
+  {
+    "id": "mesas",
+    "asset": "mesas",
+    "pattern": "atendiendo|mesero|estado de.*mesa",
+    "morning": {
+      "title": "Mesa libre… ¿o por cobrar?",
+      "body": "Ver una mesa vacía no cuenta toda su historia.",
+      "points": [
+        "Revisa su estado.",
+        "Confirma quién la atiende.",
+        "Comprueba la cuenta."
+      ],
+      "cta": "¿Cómo lo confirma tu equipo?"
+    },
+    "evening": {
+      "title": "Una mesa, su estado y su responsable",
+      "body": "Consulta el salón y la asignación visible de las mesas en ComandPOS.",
+      "cta": "Conoce la gestión del salón"
+    }
+  },
+  {
+    "id": "cuenta",
+    "asset": "cuenta",
+    "pattern": "antes de cobrar|revisa la cuenta",
+    "morning": {
+      "title": "Antes de llevar la cuenta",
+      "body": "Ese último cambio del cliente también debe aparecer.",
+      "points": [
+        "Revisa los productos.",
+        "Comprueba las cantidades.",
+        "Confirma los cambios."
+      ],
+      "cta": "Pruébalo en tu próximo servicio"
+    },
+    "evening": {
+      "title": "Mira la cuenta antes de continuar",
+      "body": "Revisa productos, cantidades y valores en la cuenta de la mesa.",
+      "cta": "Pide una demostración de cuentas"
+    }
+  },
+  {
+    "id": "periodo",
+    "asset": "reporteBI",
+    "pattern": "periodo|período|separa los datos|comparar.*canal",
+    "morning": {
+      "title": "¿Un día contra una semana?",
+      "body": "Para comparar ventas, empieza por comparar el mismo período.",
+      "points": [
+        "Mismo período.",
+        "Mismo canal.",
+        "Mismo criterio."
+      ],
+      "cta": "¿Qué período revisas tú?"
+    },
+    "evening": {
+      "title": "El total necesita contexto",
+      "body": "Explora los reportes de ComandPOS y confirma qué incluye cada indicador.",
+      "cta": "Consulta los reportes en una demo"
+    }
+  },
+  {
+    "id": "cobros",
+    "asset": "cuentaxcobrar",
+    "pattern": "vender y cobrar|vendiste bien|venta.*cobr",
+    "morning": {
+      "title": "Vender no siempre es cobrar",
+      "body": "Una venta puede seguir pendiente de pago.",
+      "points": [
+        "Vendido: la operación.",
+        "Cobrado: el pago recibido.",
+        "Pendiente: lo que falta."
+      ],
+      "cta": "¿Separas estos datos al cerrar?"
+    },
+    "evening": {
+      "title": "Tus cobros pendientes, a la vista",
+      "body": "Consulta los saldos pendientes y revisa cuáles necesitan seguimiento.",
+      "cta": "Conoce cuentas por cobrar"
+    }
+  },
+  {
+    "id": "turno",
+    "asset": "cuenta",
+    "pattern": "terminar el turno|cierre|cerrar caja",
+    "morning": {
+      "title": "El turno termina. ¿Y las cuentas?",
+      "body": "Antes de salir, deja claros los pendientes para quien sigue.",
+      "points": [
+        "Revisa cuentas abiertas.",
+        "Contrasta métodos de pago.",
+        "Anota las diferencias."
+      ],
+      "cta": "¿Qué revisas primero al cerrar?"
+    },
+    "evening": {
+      "title": "Empieza por el detalle de la cuenta",
+      "body": "Una revisión de productos y cantidades ayuda a entender qué estás cobrando.",
+      "cta": "Explora el recorrido de una cuenta"
+    }
+  },
+  {
+    "id": "apertura",
+    "asset": "mesas",
+    "pattern": "abrir el salón|abrir el salon|hora pico",
+    "morning": {
+      "title": "Todavía no llega el primer cliente",
+      "body": "Es el momento de revisar lo que puede frenar el servicio.",
+      "points": [
+        "Productos disponibles.",
+        "Mesas y responsables.",
+        "Conexión y equipos."
+      ],
+      "cta": "Haz esta revisión antes de abrir"
+    },
+    "evening": {
+      "title": "Conoce tu salón de un vistazo",
+      "body": "Explora la vista de mesas de ComandPOS antes de llevarla a tu operación.",
+      "cta": "Solicita una demo del salón"
+    }
+  },
+  {
+    "id": "merma",
+    "asset": "reporteBI",
+    "pattern": "merma|desperdicio",
+    "morning": {
+      "title": "No toda pérdida tiene la misma causa",
+      "body": "Distingue lo que pierde rendimiento de lo que termina descartado.",
+      "points": [
+        "Merma: baja el rendimiento.",
+        "Desperdicio: se descarta.",
+        "Registra la causa."
+      ],
+      "cta": "¿Cuál revisaste esta semana?"
+    },
+    "evening": {
+      "title": "Los reportes abren preguntas útiles",
+      "body": "Consulta los indicadores disponibles y revisa su alcance según tu plan.",
+      "cta": "Revisa los reportes con nosotros"
+    }
+  },
+  {
+    "id": "receta",
+    "asset": "reporteBI",
+    "pattern": "costo.*plato|receta|ingrediente",
+    "morning": {
+      "title": "La receta cambió. ¿Y su costo?",
+      "body": "Un ingrediente distinto puede cambiar el costo de la porción.",
+      "points": [
+        "Lista los ingredientes.",
+        "Revisa cada cantidad.",
+        "Actualiza el costo de compra."
+      ],
+      "cta": "Elige un plato y revísalo hoy"
+    },
+    "evening": {
+      "title": "Pregunta por recetas y costos",
+      "body": "Evalúa inventario, recetas y costos según el plan y la configuración de tu restaurante.",
+      "cta": "Consulta el alcance para tu negocio"
+    }
+  },
+  {
+    "id": "conteo",
+    "asset": "comtabilidad",
+    "pattern": "conteo|existencia|inventario",
+    "morning": {
+      "title": "El conteo no coincide",
+      "body": "Antes de ajustar una existencia, busca qué pasó.",
+      "points": [
+        "Revisa entradas.",
+        "Comprueba salidas.",
+        "Documenta la diferencia."
+      ],
+      "cta": "¿Por dónde empezarías?"
+    },
+    "evening": {
+      "title": "Operación y administración se conectan",
+      "body": "Conoce los módulos administrativos y evalúa cuáles necesita tu restaurante.",
+      "cta": "Consulta los módulos disponibles"
+    }
+  },
+  {
+    "id": "menu",
+    "asset": "cocina",
+    "pattern": "menú|menu|disponib.*producto",
+    "morning": {
+      "title": "Se acabó… pero siguen pidiéndolo",
+      "body": "Cuando cambia la disponibilidad, el equipo necesita enterarse.",
+      "points": [
+        "Confirma qué se agotó.",
+        "Avisa al salón y a cocina.",
+        "Revisa las alternativas."
+      ],
+      "cta": "¿Cómo avisan en tu restaurante?"
+    },
+    "evening": {
+      "title": "Cocina necesita un pedido claro",
+      "body": "Consulta la comanda y los detalles necesarios para preparar el pedido.",
+      "cta": "Conoce el módulo de cocina"
+    }
+  },
+  {
+    "id": "traspaso",
+    "asset": "mesas",
+    "pattern": "cambio.*responsable|traspaso|cambio de turno",
+    "morning": {
+      "title": "Cambió el turno. La mesa sigue",
+      "body": "El relevo necesita saber qué está pendiente.",
+      "points": [
+        "Identifica la mesa.",
+        "Confirma el responsable.",
+        "Comunica lo pendiente."
+      ],
+      "cta": "¿Cómo hacen el relevo?"
+    },
+    "evening": {
+      "title": "Ubica las mesas del salón",
+      "body": "Revisa el estado y la asignación que muestra cada mesa en ComandPOS.",
+      "cta": "Explora la vista de mesas"
+    }
+  },
+  {
+    "id": "insumos",
+    "asset": "comtabilidad",
+    "pattern": "comprar insumos|proveedor|compras",
+    "morning": {
+      "title": "Antes de hacer otro pedido",
+      "body": "Mira lo que tienes y lo que esperas consumir.",
+      "points": [
+        "Revisa la existencia.",
+        "Compara las condiciones.",
+        "Registra la compra."
+      ],
+      "cta": "¿Compras por costumbre o por revisión?"
+    },
+    "evening": {
+      "title": "Revisa tus necesidades administrativas",
+      "body": "ComandPOS ofrece módulos de compras y administración; consulta su alcance.",
+      "cta": "Cuéntanos qué necesitas organizar"
+    }
+  },
+  {
+    "id": "gastos",
+    "asset": "comtabilidad",
+    "pattern": "compras.*gastos|clasific|contable",
+    "morning": {
+      "title": "Todo salió de caja. ¿Todo es igual?",
+      "body": "Compras y gastos necesitan identificarse para poder analizarlos.",
+      "points": [
+        "Identifica la operación.",
+        "Conserva su respaldo.",
+        "Clasifica con un criterio."
+      ],
+      "cta": "¿Cómo lo organiza tu negocio?"
+    },
+    "evening": {
+      "title": "Un vistazo al panel contable",
+      "body": "Explora cómo se organiza la información administrativa en ComandPOS.",
+      "cta": "Conoce el panel en una demo"
+    }
+  },
+  {
+    "id": "fechas",
+    "asset": "cuentaxcobrar",
+    "pattern": "vencimiento|quién te debe|quien te debe|por pagar",
+    "morning": {
+      "title": "No mires solo cuánto te deben",
+      "body": "La fecha también importa cuando organizas tus cobros.",
+      "points": [
+        "Revisa el saldo.",
+        "Comprueba el vencimiento.",
+        "Define el seguimiento."
+      ],
+      "cta": "¿Qué pendiente revisarías hoy?"
+    },
+    "evening": {
+      "title": "Distingue tus próximos cobros",
+      "body": "Consulta cuentas pendientes y revisa fechas e importes en el módulo.",
+      "cta": "Explora cuentas por cobrar"
+    }
+  },
+  {
+    "id": "equipo",
+    "asset": "recursohumanos_empleados",
+    "pattern": "empleado|equipo|personal",
+    "morning": {
+      "title": "Antes de empezar: un minuto juntos",
+      "body": "Un acuerdo claro evita que cada persona suponga algo distinto.",
+      "points": [
+        "Repartan responsabilidades.",
+        "Comenten los cambios.",
+        "Aclaren los pendientes."
+      ],
+      "cta": "¿Hacen una reunión antes del turno?"
+    },
+    "evening": {
+      "title": "Conoce el módulo de empleados",
+      "body": "Explora qué información organiza el módulo y confirma su alcance para tu negocio.",
+      "cta": "Consulta las opciones de personal"
+    }
+  },
+  {
+    "id": "nomina",
+    "asset": "nomina",
+    "pattern": "nómina|nomina",
+    "morning": {
+      "title": "La nómina empieza antes del pago",
+      "body": "Organiza la información del período antes de revisarla.",
+      "points": [
+        "Confirma el período.",
+        "Revisa los registros.",
+        "Aclara las diferencias."
+      ],
+      "cta": "¿Qué preparas antes de revisarla?"
+    },
+    "evening": {
+      "title": "Mira cómo se organiza la nómina",
+      "body": "Conoce la pantalla del módulo y consulta sus funciones y configuración.",
+      "cta": "Solicita una demo del módulo"
+    }
+  },
+  {
+    "id": "documentos",
+    "asset": "cuenta",
+    "pattern": "comprobante|document|factura.*aquí",
+    "morning": {
+      "title": "«Ese comprobante estaba por aquí»",
+      "body": "Guardar un documento sirve si después puedes encontrarlo.",
+      "points": [
+        "Usa un criterio de archivo.",
+        "Relaciona la operación.",
+        "Conserva el respaldo."
+      ],
+      "cta": "¿Cómo los encuentran en tu negocio?"
+    },
+    "evening": {
+      "title": "Revisa la operación antes de facturar",
+      "body": "Consulta el detalle de productos y cantidades de la cuenta.",
+      "cta": "Conoce este paso en una demo"
+    }
+  },
+  {
+    "id": "ecf",
+    "asset": "cuenta",
+    "pattern": "e-cf|ecf|facturación|facturacion",
+    "morning": {
+      "title": "Antes de elegir facturación",
+      "body": "Define qué necesita emitir y revisar tu restaurante.",
+      "points": [
+        "Describe tu operación.",
+        "Reúne tus preguntas.",
+        "Confirma plan y requisitos."
+      ],
+      "cta": "Anota tu duda principal"
+    },
+    "evening": {
+      "title": "Aclara tus dudas sobre e-CF",
+      "body": "Consulta requisitos, plan y configuración antes de definir el alcance.",
+      "cta": "Escríbenos para evaluar tu caso"
+    }
+  },
+  {
+    "id": "archivos",
+    "asset": "comtabilidad",
+    "pattern": "final.xlsx|hoja|herramienta|repite",
+    "morning": {
+      "title": "Final. Ahora sí. Versión siete.",
+      "body": "Si nadie sabe cuál archivo usar, toca acordar una referencia.",
+      "points": [
+        "Define dónde consultar.",
+        "Asigna un responsable.",
+        "Distingue la versión actual."
+      ],
+      "cta": "¿Te suena familiar?"
+    },
+    "evening": {
+      "title": "Explora una administración organizada",
+      "body": "Revisa los módulos de ComandPOS según las tareas que realiza tu negocio.",
+      "cta": "Cuéntanos qué tarea quieres revisar"
+    }
+  },
+  {
+    "id": "pago",
+    "asset": "cuenta",
+    "pattern": "método.*pago|metodo.*pago|dividir|división",
+    "morning": {
+      "title": "«Vamos a pagar por separado»",
+      "body": "Aclara cómo desea pagar el cliente antes de cerrar.",
+      "points": [
+        "Confirma qué corresponde.",
+        "Revisa el detalle.",
+        "Acuerda la forma de pago."
+      ],
+      "cta": "¿Cómo lo manejan en tu salón?"
+    },
+    "evening": {
+      "title": "Consulta cómo dividir una cuenta",
+      "body": "Conoce la división de cuentas y los métodos de pago en una demo de ComandPOS.",
+      "cta": "Pide una demo de este recorrido"
+    }
+  },
+  {
+    "id": "estacion",
+    "asset": "cocina",
+    "pattern": "estación|estacion|destino.*pedido",
+    "morning": {
+      "title": "¿A dónde debe llegar ese pedido?",
+      "body": "Una comanda clara también necesita el destino correcto.",
+      "points": [
+        "Identifica la preparación.",
+        "Confirma la estación.",
+        "Revisa antes de enviar."
+      ],
+      "cta": "¿Qué revisa tu equipo al enviar?"
+    },
+    "evening": {
+      "title": "Del pedido a la pantalla de cocina",
+      "body": "Explora cómo se consultan las comandas y su estado en ComandPOS.",
+      "cta": "Conoce el recorrido del pedido"
+    }
+  },
+  {
+    "id": "pregunta",
+    "asset": "reporteBI",
+    "pattern": "indicador|decidir|resultado|reporte",
+    "morning": {
+      "title": "¿Qué quieres saber de ese número?",
+      "body": "Empieza por una pregunta concreta antes de abrir el reporte.",
+      "points": [
+        "Define la pregunta.",
+        "Elige los datos relacionados.",
+        "Verifica su alcance."
+      ],
+      "cta": "¿Qué pregunta harías hoy?"
+    },
+    "evening": {
+      "title": "Conoce qué muestra cada indicador",
+      "body": "Revisa los reportes disponibles sin confundir datos demostrativos con resultados propios.",
+      "cta": "Explora el panel con una demo"
+    }
+  },
+  {
+    "id": "descuento",
+    "asset": "cuenta",
+    "pattern": "descuento|cargo|condición",
+    "morning": {
+      "title": "Un descuento también se revisa",
+      "body": "Antes de cobrar, comprueba los ajustes de la cuenta.",
+      "points": [
+        "Revisa los productos.",
+        "Comprueba los ajustes.",
+        "Confirma el total."
+      ],
+      "cta": "¿Quién verifica ese último paso?"
+    },
+    "evening": {
+      "title": "El detalle ayuda a revisar el cobro",
+      "body": "Consulta los productos, cantidades y valores de la cuenta antes de continuar.",
+      "cta": "Conoce la cuenta de mesa"
+    }
+  }
+]

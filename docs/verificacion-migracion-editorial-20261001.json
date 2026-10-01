@@ -1,0 +1,23 @@
+{
+  "date": "2026-10-01T15:12:53.379Z",
+  "api": "passed",
+  "browser": "passed",
+  "render": "passed",
+  "editorial_stories": "13:00 and 18:00 rendered via frozen job runtime; pending review",
+  "handoff": "created; NLE import not exercised",
+  "job": "job_3a57a0fd-b0da-4ab5-899e-670fbec0811a",
+  "artifacts": "/private/tmp/studio-migration-integration",
+  "node_tests": 97,
+  "story_matrix_renders": 144,
+  "history_rows": 143,
+  "live_story_job": "job_7e451dea-bfa2-4779-b79f-74499431ae3e",
+  "live_story_status": "succeeded; review pending",
+  "real_publication_exercised": false,
+  "provider_check": {
+    "studio": true,
+    "instagram": "gcoderd",
+    "facebook": true,
+    "tiktok": true,
+    "publishes": false
+  }
+}

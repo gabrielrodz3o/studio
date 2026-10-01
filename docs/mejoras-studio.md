@@ -163,3 +163,8 @@ No hacen falta agentes para locks, cuotas, reintentos, programación o releases.
 **POSPONER/DESCARTAR:** integración de OpenCut main mientras el editor/exportación del candidato no estén conectados; aplicación completa AiToEarn/Postiz/waoowaoo; GPU y modelos LTX sin caso concreto; sustituir voz por Kokoro sin casting español; Remotion solo por popularidad; editor multicapa propio, SaaS/multitenancy/billing, clonación de voces, tendencias/atribución de ventas sin fuentes. Estas decisiones están cerradas para esta etapa, no son tareas pendientes indefinidas.
 
 **Punto exacto de continuación:** GST-017–026 tienen implementación y pruebas según `implementacion-mejoras-20261001.md`. No repetir presupuesto, recuperación, carruseles ni selector de tomas. La siguiente validación requiere una pieza real: escuchar las frases retenidas, corregir si es necesario y aprobar una versión concreta. Con muestras aprobadas, ampliar GST-025 a regresión audiovisual temporal y baseline visual. Importación XML en NLE, permisos efectivos/publicación real y métricas siguen pendientes de sus operaciones específicas. No hay procesos de trabajo prometidos en segundo plano.
+
+
+## GST-027 — Paridad editorial y calendario legado
+
+**Implementado y comprobado** en código, pruebas y producción de una historia pendiente de revisión. Migrados 72 temas, cuotas 60/25/15 y 40/30/20/10, feriados, fotografías con caché/reconsulta, 24 temas de historias y seis diseños, horarios diarios 13:00/18:00. Se mantienen releases humanos y publicador n8n. Evidencia y excepciones deliberadas: `migracion-editorial-completa-20261001.md`. No se marca publicación real como comprobada; no se publicó contenido de prueba.

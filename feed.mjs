@@ -21,7 +21,7 @@ export async function feedCatalog(root=ROOT){
 export function validateFeed(s,kind){
  if(s?.layout==='brand')return validateBrandFeed(s,kind)
  if(!s||typeof s!=='object'||Array.isArray(s))throw Error('Guion de imagen inválido')
- const keys=['template','evidence_claims','claim_ids','nombre','tipo','tema_id','titular','subtitulo','caption','cta','layout','foto_id','captura','slides']
+ const keys=['editorial','template','evidence_claims','claim_ids','nombre','tipo','tema_id','titular','subtitulo','caption','cta','layout','foto_id','captura','slides']
  if(Object.keys(s).some(k=>!keys.includes(k)))throw Error('Campo de imagen desconocido')
  if(!/^[a-z0-9][a-z0-9-]{0,79}$/.test(s.nombre))throw Error('Nombre inválido')
  if(!['imagen','carrusel','historia_social'].includes(kind)||s.tipo!==kind)throw Error('El tipo de pieza no coincide')
@@ -82,7 +82,7 @@ export async function executeFeed(job,dir){
  if((await readJSON(join(dir,'script.json'))).layout==='brand')return executeBrandFeed(job,dir)
  const s=validateFeed(await readJSON(join(dir,'script.json')),job.kind),photo=await readJSON(join(dir,'photo-review.json'))
  const ocr=await inspectPhoto(join(dir,'photo.jpg'))
- const c={texto_en_imagen:s.titular,ctaVisual:s.cta,tipo_contenido:'educativo',story:s.tipo==='historia_social',photo_file:join(dir,'photo.jpg'),product_asset:s.captura,design:{layout:s.layout,subline:s.subtitulo,commercial:!!s.captura}}
+ const c={texto_en_imagen:s.titular,ctaVisual:s.cta,tipo_contenido:s.editorial?.type||'educativo',story:s.tipo==='historia_social',photo_file:join(dir,'photo.jpg'),product_asset:s.captura,design:{layout:s.layout,subline:s.subtitulo,commercial:!!s.captura}}
  const pages=s.tipo!=='carrusel'?[null]:s.slides.map((p,i)=>({slideIndex:i+1,slideCount:s.slides.length,slideText:p.titulo,slideBody:p.texto}))
  const images=[]
  for(let i=0;i<pages.length;i++){

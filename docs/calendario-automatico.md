@@ -1,5 +1,7 @@
 # Calendario automático conectado a n8n
 
+> Documento de la primera entrega. El horario y la paridad editorial vigentes están en [Migración editorial completa](migracion-editorial-completa-20261001.md), incluidas las historias diarias 13:00 y 18:00.
+
 Implementación: 2026-10-01. Complementa la auditoría `automatizacion-estado-20261001.md`; no reactiva los publicadores anteriores.
 
 ## Recorrido
