@@ -146,10 +146,10 @@ Una advertencia se muestra para revisión; no se convierte en aprobación autom�
 Workflow independiente: **GCODE Studio - Publicación aprobada y resultados**,
 `XnDxoyTcnbawgPgY`. Revisa cada cinco minutos y recoge métricas aproximadamente cada seis
 horas por publicación. Reutiliza las cuentas existentes de Instagram `gcoderd`, Facebook
-`G code` y TikTok `g.code.rd`. Los workflows anteriores no se reemplazaron.
+`G code` y TikTok `g.code.rd`. Los dos workflows antiguos de publicación automática están pausados y conservados como respaldo.
 
 Para enviar: campaña activa → exportación final aprobada → asociar archivo/caption/fecha
-al calendario → **Programar entrega** (administrador). Solo entonces se copia el archivo
+al calendario → **Revisar publicación** (archivo, texto y cuenta) → **Programar entrega** (administrador). Solo entonces se copia el archivo
 aprobado al CDN público de n8n. Studio y su biblioteca mantienen el acceso privado.
 YouTube y cuentas de otras marcas requieren conexión; no se presentan como activas.
 TikTok no admite historias en este adaptador: usar imagen, carrusel o video de feed.
@@ -164,7 +164,7 @@ POST `/api/v1/deliveries/result`, POST `/api/v1/metrics`.
 La API no puede aprobar piezas ni programarlas: esas acciones corresponden al administrador.
 No hay autorización implícita para enviar mensajes a clientes ni crear campañas publicitarias.
 
-Validación: 27 pruebas de backend, navegador en escritorio/móvil, renders locales de clip,
+Validación inicial (anterior a la ampliación del 1-oct): 27 pruebas de backend, navegador en escritorio/móvil, renders locales de clip,
 texto y diseño de marca. El publicador se prueba con dobles de proveedor para no crear
 publicaciones de prueba en las cuentas reales; su comprobación de conexiones es de lectura.
 
@@ -202,3 +202,89 @@ su guion y su trabajo al reintentarse. No publica automáticamente ni ejecuta un
 por su cuenta: n8n puede iniciar la misma operación mediante la API privada.
 Las imágenes automáticas usan la identidad de la marca; los nuevos videos admiten
 fotos y clips de la biblioteca además de la composición tipográfica animada.
+
+
+## Ampliación del 1 de octubre de 2026
+
+### Flujo cotidiano
+
+1. Selecciona marca y campaña en **Crear**. **Proponer temas** usa funciones declaradas,
+   objetivo e historial de la misma marca, sin llamar al proveedor de IA. No usa tendencias externas.
+2. Escoge una propuesta o escribe tu idea. Puedes planificar cuatro briefs relacionados:
+   video, imagen, carrusel e historia. Son borradores adaptados, no cuatro exportaciones automáticas.
+3. Genera el guion cuando quieras usar IA. El contrato exige referencias a los hechos de marca;
+   las reglas bloquean promesas sensibles. La revisión humana sigue siendo necesaria.
+4. Edita escenas, texto, recursos y voz. La onda de audio permite recortar una toma; **Nueva toma**
+   solicita una variante explícita. El audio existente y las escenas sin cambios se reutilizan.
+5. Exporta y revisa el archivo completo, incluyendo pronunciación y subtítulos. Aprueba el archivo.
+6. En Calendario asocia archivo, texto, canal y fecha. **Revisar publicación** muestra exactamente
+   lo que se enviará. Resuelve comentarios y reconoce advertencias antes de aprobar esa versión.
+7. Activa la campaña y programa. n8n entrega exclusivamente las versiones aprobadas y registra
+   el recibo. Cambiar archivo, texto, cuenta, identidad o recursos invalida la aprobación anterior.
+
+### Producción, diseño y recuperación
+
+Se conservan los nueve estilos narrativos, con tres familias visuales: recorrido comercial original,
+historia ilustrada y composiciones de marca (papel claro/editorial oscuro). No son nueve motores
+independientes. Las composiciones genéricas adaptan jerarquía, diagramas y recursos al contenido;
+las plantillas históricas conservan su diseño y requieren inspección en formatos alternativos.
+
+Video: 9:16, 16:9, 1:1 y 4:5. Las previsualizaciones son de menor resolución y no pueden publicarse;
+4:5 usa 432×540 en preview y 1080×1350 en final. Las fuentes se sirven localmente.
+
+Cada trabajo nuevo congela código de renderizado, guion y recursos. Guarda etapas y segmentos.
+Un reintento crea un trabajo nuevo asociado al anterior; no repite solicitudes pagadas pendientes
+ni aprueba el nuevo resultado. Una escena reutiliza su segmento cuando coinciden contenido,
+marca, formato, fuentes, versión del renderer y contexto visual. Cambiar la duración puede afectar
+otras escenas con indicadores globales de progreso. La aprobación siempre corresponde al MP4 final.
+
+Los controles de voz comparan negaciones, números y condiciones sensibles además de alineación;
+una transcripción dudosa puede bloquear una frase correcta y necesita revisión. No equivalen a
+una evaluación humana de acento, intención o naturalidad.
+
+### Operación y costes
+
+**Operación y costes** separa reservas conservadoras de importes confirmados. Un importe sin factura
+no es un coste exacto. El administrador puede conciliar una reserva con su referencia de factura
+mediante `/api/budget/reconcile`. El detalle operativo muestra las últimas 250 reservas; el total
+presupuestario se calcula sobre el registro completo. Los recursos admiten procedencia, licencia,
+atribución y vencimiento; un permiso vencido impide aprobar una publicación que lo use.
+
+Los registros históricos conservan origen y fecha informada. `legacy_unverified` significa que el
+sistema anterior registró la publicación, pero la API no devolvió un enlace verificable; no se muestra
+como publicación confirmada. No se inventan ceros para métricas ausentes.
+
+### Automatización instalada
+
+- Productor: `sn74WWUHBFoW6pqS`, recibe plantilla o idea y devuelve un trabajo/borrador.
+- Borrador diario: `QDXjXalYBBP0Oaaf`, 09:00, America/Santo_Domingo, campaña ComandPOS.
+  Genera con voz dentro del presupuesto configurado; nunca aprueba ni programa por sí mismo.
+- Publicador: `XnDxoyTcnbawgPgY`, cada cinco minutos. Revisa cuenta y aprobación antes de enviar.
+- Antiguos `h40YN1b3Yq8G1wyK` y `zfV2MXux2ozQfflh`: pausados, no eliminados.
+
+Las credenciales de producción y publicación tienen alcances separados. Ninguna puede aprobar.
+Un envío incierto queda bloqueado para conciliación humana, incluso tras reiniciar.
+Los adaptadores de n8n están en `gcode-studio-integration/v2/`; su configuración privada no va a Git.
+
+### Verificación reproducible
+
+```sh
+npm ci
+npm test
+npm run test:alignment
+npm ci --prefix evaluations
+npm run test:editorial
+```
+
+Las pruebas audiovisuales completas requieren los recursos privados descritos en README.
+GitHub Actions ejecuta contratos, permisos, aprobaciones, recuperación y controles editoriales
+sin credenciales. Los 20 casos de Promptfoo son fixtures de regresión gratuitos; no demuestran
+por sí solos la calidad del proveedor. Su Node y dependencias están aislados de producción.
+
+La validación de esta ampliación incluye render real por escenas, reutilización de caché,
+voz original en 4:5, navegador de escritorio/móvil, una solicitud real de guion, producción a través
+de n8n y restauración aislada de un respaldo cifrado. No incluye publicaciones de prueba en redes.
+La comprobación real del primer envío público se hará con una pieza que el administrador apruebe.
+
+Remotion, BullMQ, WhisperX y un editor de montaje multipista quedan como evolución opcional;
+no son dependencias instaladas ni capacidades que esta versión prometa ofrecer.

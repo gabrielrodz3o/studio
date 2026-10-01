@@ -29,6 +29,7 @@ export function validar(sb) {
   for (const [i, e] of (Array.isArray(sb.escenas) ? sb.escenas : []).entries()) {
     const fail = s => errores.push(`Escena ${i + 1}: ${s}`)
     if (!e || typeof e !== 'object') { fail('inválida'); continue }
+    if(e.voice_take!=null&&(!Number.isInteger(e.voice_take)||e.voice_take<0||e.voice_take>20))fail('Toma de voz inválida');
     if(e.tipo==='media'){
       if(e.layout&&!['steps','question','cards','split','minimal'].includes(e.layout))fail('Diseño editorial inválido')
       for(const k of ['step','steps'])if(e[k]!=null&&(!Number.isInteger(e[k])||e[k]<1||e[k]>30))fail('Numeración inválida')

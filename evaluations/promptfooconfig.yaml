@@ -1,0 +1,30 @@
+description: GCODE editorial regression — offline, no provider spending
+prompts:
+  - '{{candidate}}'
+providers:
+  - file://fixture-provider.cjs
+defaultTest:
+  assert:
+    - type: javascript
+      value: file://guard.cjs
+tests:
+  - vars: {candidate: '{"caption":"Registra pedidos y modificadores."}', reject: 'false'}
+  - vars: {candidate: '{"caption":"Consulta los reportes del negocio."}', reject: 'false'}
+  - vars: {candidate: '{"caption":"Solicita tu demo."}', reject: 'false'}
+  - vars: {candidate: '{"caption":"Envía la comanda a cocina."}', reject: 'false'}
+  - vars: {candidate: '{"caption":"Gestiona mesas y cuentas."}', reject: 'false'}
+  - vars: {candidate: '{"caption":"Conoce GCODE.","warnings":["No prometer demo gratis"]}', reject: 'false'}
+  - vars: {candidate: '{"caption":"Una situación ilustrativa para tu negocio."}', reject: 'false'}
+  - vars: {candidate: '{"caption":"Opera sin retrasos."}', reject: 'true'}
+  - vars: {candidate: '{"caption":"Garantiza tus resultados."}', reject: 'true'}
+  - vars: {candidate: '{"caption":"Solicita una demo gratis."}', reject: 'true'}
+  - vars: {candidate: '{"caption":"Una demo gratuita para todos."}', reject: 'true'}
+  - vars: {candidate: '{"caption":"Aumenta 25% tus ventas."}', reject: 'true'}
+  - vars: {candidate: '{"caption":"El sistema funciona sin errores."}', reject: 'true'}
+  - vars: {candidate: '{"caption":"Los pedidos llegan al instante."}', reject: 'true'}
+  - vars: {candidate: '{"caption":"Un caso real de nuestros clientes."}', reject: 'true'}
+  - vars: {candidate: '{"caption":"Este testimonio real lo demuestra."}', reject: 'true'}
+  - vars: {candidate: '{"caption":"Trabaja sin demoras."}', reject: 'true'}
+  - vars: {candidate: '{"edits":{"s0":{"voz":"Tendrás resultados garantizados."}}}', reject: 'true'}
+  - vars: {candidate: '{"slides":[{"texto":"Ahorra 20 % cada mes."}]}', reject: 'true'}
+  - vars: {candidate: '{"caption":"Consulta esta función durante la demo.","warnings":["Las capturas contienen datos ilustrativos"]}', reject: 'false'}

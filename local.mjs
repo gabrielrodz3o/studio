@@ -1,3 +1,5 @@
+import {authorizeApi} from './api-scopes.mjs'
+import {campaignContext,proposals,deriveCampaign} from './planning.mjs'
 import { createServer } from 'node:http'
 import { createReadStream, readFileSync, unlinkSync } from 'node:fs'
 import { readFile, readdir, stat, writeFile, rename, mkdir, open, unlink } from 'node:fs/promises'
@@ -25,14 +27,17 @@ const marketing=await new Marketing(root).init()
 const versions=new Versions(root)
 const creative=new Creative(root)
 async function createPiece(input,key,actor){
+ if(input.piece_id){const p=marketing.data.pieces.find(p=>p.id===input.piece_id);if(!p||p.brand_id!==(input.brand_id||'comandpos')||p.campaign_id!==input.campaign_id||p.kind!==input.kind)throw problem(422,'La pieza no corresponde a la marca, campaña o formato')}
  if(input.produce!=null&&typeof input.produce!=='boolean')throw problem(422,'produce debe ser booleano')
- if(input.aspect!=null&&!['vertical','horizontal','square'].includes(input.aspect))throw problem(422,'Formato de salida inválido')
+ if(input.aspect!=null&&!['vertical','horizontal','square','portrait'].includes(input.aspect))throw problem(422,'Formato de salida inválido')
  if(input.produce&&input.kind==='video'&&input.allow_paid_voice!==true)throw problem(422,'Autoriza la generación de voz para producir el video')
  const result=await creative.create(input,key,actor)
  await versions.save(result.kind,result.script,actor)
  if(!input.produce)return result
- const request={brand_id:input.brand_id||'comandpos',kind:result.kind,script:result.script,...(result.kind==='video'?{voice:true,subtitles:true,allow_paid_voice:true,aspect:input.aspect||'vertical',max_budget_usd:2}:{})}
- const {job}=await store.create(request,'idea-render:'+result.id,'creative')
+ const request={brand_id:input.brand_id||'comandpos',kind:result.kind,script:result.script,creative_id:result.id,concept_id:result.concept_id,caption:result.caption,...(result.campaign_id?{campaign_id:result.campaign_id}:{}),...(result.kind==='video'?{voice:true,subtitles:true,allow_paid_voice:true,aspect:input.aspect||'vertical',max_budget_usd:2}:{})}
+ const {job}=await store.create(request,'idea-render:'+result.id,'creative');await creative.budget.attach('idea:'+result.id,job.id)
+ if(input.piece_id){const piece=marketing.data.pieces.find(p=>p.id===input.piece_id);if(!piece||piece.brand_id!==job.brand_id||piece.campaign_id!==result.campaign_id)throw problem(422,'La pieza no corresponde a esta campaña');await marketing.savePiece({...piece,job_id:job.id,caption:result.caption,creative_id:result.id},actor,store)}
+ else if(result.campaign_id&&!marketing.data.pieces.some(p=>p.creative_id===result.id)){await marketing.savePiece({campaign_id:result.campaign_id,concept_id:result.concept_id,creative_id:result.id,title:result.selection?.topic?.slice(0,160)||result.script.nombre,kind:result.kind,channel:'instagram',caption:result.caption,brief:input.idea||result.selection?.idea||'',job_id:job.id},actor,store)}
  return {...result,job}
 }
 const photos=new PhotoJobs(root)
@@ -54,6 +59,7 @@ const tokenFile=join(state,'api-token')
 let token=process.env.STUDIO_API_TOKEN
 if(!token){try{token=(await readFile(tokenFile,'utf8')).trim()}catch(e){if(e.code!=='ENOENT')throw e;token=randomBytes(32).toString('hex');await writeFile(tokenFile,token+'\n',{mode:0o600,flag:'wx'})}}
 if(token.length<32)throw Error('STUDIO_API_TOKEN debe tener al menos 32 caracteres')
+let apiClients;try{apiClients=JSON.parse(await readFile(join(state,'api-clients.json'),'utf8'))}catch(e){if(e.code!=='ENOENT')throw e}
 const store=await new JobStore({root,publications:id=>publicationsFor(marketing.data.deliveries,id)}).init()
 const mime={'.css':'text/css; charset=utf-8','.html':'text/html; charset=utf-8','.mjs':'text/javascript','.js':'text/javascript','.json':'application/json','.png':'image/png','.webp':'image/webp','.jpg':'image/jpeg','.ttf':'font/ttf','.mp3':'audio/mpeg','.wav':'audio/wav','.mp4':'video/mp4'}
 const digest=x=>createHash('sha256').update(x).digest()
@@ -98,8 +104,10 @@ const server=createServer(async(req,res)=>{
     if(path==='/login'&&req.method==='GET'){res.writeHead(200,{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-store'});return res.end(loginPage)}
     if(path==='/auth/login'&&req.method==='POST'){const result=await access.login(req,await body(req));res.setHeader('Set-Cookie',result.cookie);return json(200,result.user)}
     if(path.startsWith('/api/v1/')){
-      if(!authenticated(req))return json(401,{error:'Se requiere una clave de API válida'})
+      if(!authorizeApi(req.headers.authorization,path,req.method,token,apiClients))return json(401,{error:'Se requiere una clave de API válida'})
       if(req.headers.origin)throw problem(403,'La API de integración no acepta solicitudes de navegador; usa el editor')
+      if(path==='/api/v1/publications/import'&&req.method==='POST')return json(200,await marketing.importPublication(await body(req),'n8n',store))
+      const deliveryCheck=/^\/api\/v1\/deliveries\/([a-f0-9-]{36})\/verify$/.exec(path);if(deliveryCheck&&req.method==='GET')return json(200,marketing.validateDelivery(deliveryCheck[1],store))
       if(path==='/api/v1/marketing'&&req.method==='GET')return json(200,marketing.snapshot())
       if(path==='/api/v1/deliveries/claim'&&req.method==='POST')return json(200,await marketing.claim(await body(req),'n8n',store))
       if(path==='/api/v1/deliveries/result'&&req.method==='POST')return json(200,await marketing.result(await body(req),'n8n'))
@@ -130,9 +138,12 @@ const server=createServer(async(req,res)=>{
     if(path==='/auth/me'&&req.method==='GET')return json(200,actor)
     if(path==='/auth/logout'&&req.method==='POST'){access.sameOrigin(req);res.setHeader('Set-Cookie',access.logout(req));return json(200,{ok:true})}
     if(path==='/auth/account'&&req.method==='POST'){access.sameOrigin(req);return json(200,await access.change(actor,await body(req)))}
+    if(path==='/api/proposals'&&req.method==='GET'){const data=marketing.snapshot(),brand=marketing.brand(url.searchParams.get('brand')||'comandpos'),campaign=campaignContext(data,brand.id,url.searchParams.get('campaign'));return json(200,{proposals:proposals(data,brand,await creative.history(),campaign)})}
+    if(path==='/api/release-preview'&&req.method==='GET')return json(200,marketing.releasePreview(url.searchParams.get('piece_id'),store))
     if(path==='/api/marketing'&&req.method==='GET')return json(200,marketing.snapshot())
     const resource=/^\/api\/library\/([a-f0-9-]{36})$/.exec(path)
     if(resource&&['GET','HEAD'].includes(req.method))return await sendFile(req,res,marketing.asset(resource[1]).path)
+    if(path==='/api/operations'&&req.method==='GET'){access.require(req,['admin']);const budget=await creative.budget.summary(),jobs=store.list(),approved=marketing.data.releases.filter(r=>r.status==='approved');return json(200,{jobs:jobs.map(j=>({id:j.id,name:j.name,status:j.status,created_at:j.created_at,updated_at:j.updated_at,parent_job_id:j.parent_job_id,creative_id:j.creative_id,reserved_usd:budget.entries.filter(e=>e.job===j.id).reduce((n,e)=>n+e.reserved,0),confirmed_usd:budget.entries.filter(e=>e.job===j.id&&e.actual_usd!=null).reduce((n,e)=>n+e.actual_usd,0),cost_complete:budget.entries.some(e=>e.job===j.id)&&budget.entries.filter(e=>e.job===j.id).every(e=>e.actual_usd!=null)})),budget,approved_releases:approved.length,approval_minutes:approved.map(r=>{const j=jobs.find(j=>j.id===r.bundle.job_id);return j?(Date.parse(r.at)-Date.parse(j.created_at))/60000:null}).filter(x=>x!=null),pending_comments:marketing.data.comments.filter(c=>!c.resolved).length,uncertain_deliveries:marketing.data.deliveries.filter(d=>d.status==='uncertain').length})}
     if(path==='/api/budget'&&req.method==='GET'){access.require(req,['admin']);return json(200,await creative.budget.summary())}
     if(path==='/api/accounts'&&req.method==='GET'){access.require(req,['admin']);return json(200,access.users.map(u=>({username:u.username,role:u.role})))}
     if(path==='/api/versions'&&req.method==='GET')return json(200,await versions.list(url.searchParams.get('kind'),url.searchParams.get('name')))
@@ -140,11 +151,15 @@ const server=createServer(async(req,res)=>{
     if(req.method==='POST'){
       access.sameOrigin(req);access.require(req,['admin','editor'])
       if(path==='/api/marketing/brands'){access.require(req,['admin']);return json(200,await marketing.saveBrand(await body(req),actor.username))}
+      if(path==='/api/marketing/derivatives'){const d=await body(req),data=marketing.snapshot(),brand=marketing.brand(d.brand_id),campaign=campaignContext(data,brand.id,d.campaign_id);if(!campaign)throw problem(422,'Selecciona una campaña');const proposal=proposals(data,brand,await creative.history(),campaign).find(p=>p.id===d.proposal_id);if(!proposal)throw problem(422,'Propuesta no encontrada');const pieces=[];for(const draft of deriveCampaign(data,campaign,proposal)){const old=marketing.data.pieces.find(p=>p.campaign_id===campaign.id&&p.concept_id===proposal.id&&p.kind===draft.kind);pieces.push(old||await marketing.savePiece(draft,actor.username,store))}return json(200,{pieces})}
       if(path==='/api/marketing/campaigns')return json(200,await marketing.saveCampaign(await body(req),actor.username))
       if(path==='/api/marketing/pieces')return json(200,await marketing.savePiece(await body(req),actor.username,store))
       if(path==='/api/marketing/comments')return json(200,await marketing.addComment(await body(req),actor.username,store))
       if(path==='/api/marketing/comments/resolve')return json(200,await marketing.resolveComment(await body(req),actor.username))
       if(path==='/api/marketing/cancel-delivery'){access.require(req,['admin']);return json(200,await marketing.cancelDelivery(await body(req),actor.username))}
+      if(path==='/api/budget/reconcile'){access.require(req,['admin']);const d=await body(req);return json(200,await creative.budget.reconcile(d.id,d.actual_usd,d.receipt,actor.username))}
+      if(path==='/api/marketing/releases'){access.require(req,['admin']);return json(200,await marketing.approveRelease(await body(req),actor.username,store))}
+      if(path==='/api/marketing/publications/import'){access.require(req,['admin']);return json(200,await marketing.importPublication(await body(req),actor.username,store))}
       if(path==='/api/marketing/schedule'){access.require(req,['admin']);return json(200,await marketing.schedule(await body(req),actor.username,store))}
       if(path==='/api/marketing/metrics')return json(200,await marketing.addMetrics(await body(req),actor.username))
       if(path==='/api/marketing/assets'){const d=await body(req,85000000);return json(201,await marketing.upload(d,Buffer.from(d.base64||'','base64'),actor.username))}
@@ -178,6 +193,7 @@ const server=createServer(async(req,res)=>{
       return json(200,{estado:['queued','running'].includes(j.status)?'renderizando':j.status==='succeeded'?'listo':'error',log:(await store.log(j.id))||j.error||'',archivo:j.status==='succeeded'?`/api/centro/jobs/${j.id}/artifacts/video`:null,id:j.id})
     }
     if(path==='/api/lista')return json(200,{guiones:(await readdir(join(root,'storyboards'))).filter(f=>!f.startsWith('.')&&f.endsWith('.json')),voces:(await readdir(join(root,'casting'))).filter(f=>/^\d.*\.mp3$/.test(f)),videos:(await readdir(join(root,'salida'))).filter(f=>!f.startsWith('.')&&f.endsWith('.mp4'))})
+    const vendor=/^\/vendor\/wavesurfer\/([a-z0-9./-]+\.js)$/.exec(path);if(vendor&&!vendor[1].includes('..'))return await sendFile(req,res,join(root,'node_modules/wavesurfer.js/dist',vendor[1]));
     const route=decodeURIComponent(path==='/'?'/centro.html':path)
     if(!/^\/(styles\.mjs|create-ui\.js|history\.mjs|marketing.html|marketing-ui.js|editor-tools.js|media-scenes.js|ui\.css|ui\.js|home\.js|account\.html|create\.html|editor\.html|feed-editor\.html|centro\.html|studio\.html|validar\.mjs|n8n-style\.js|formats\.js|feed\/templates\/[^/]+\.json|feed\/photos\/[a-z0-9-]+\.(jpg|png)|assets\/[^/]+|storyboards\/[^/]+\.json|casting\/[^/]+\.mp3|salida\/[^/]+\.(mp4|json))$/.test(route)||basename(route).startsWith('.'))throw problem(404,'No disponible')
     const file=resolve(root,'.'+route);if(!file.startsWith(root+sep))throw problem(403,'Ruta inválida')

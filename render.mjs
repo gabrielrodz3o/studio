@@ -1,3 +1,6 @@
+import {sourceFingerprint,sceneKey,checkpoint,cachedScene} from './scene-cache.mjs'
+import {renameSync,existsSync} from 'node:fs'
+import {createHash} from 'node:crypto'
 // GCODE Studio: graba studio.html cuadro a cuadro con Chrome sin pantalla y lo monta con ffmpeg.
 // Uso:  node render.mjs storyboards/piloto-comandas.json          → salida/<nombre>.mp4
 //       node render.mjs storyboards/x.json --voz                  → con locución (kie, se cachea)
@@ -17,7 +20,7 @@ import { fileURLToPath } from 'node:url'
 const DIR = dirname(fileURLToPath(import.meta.url))
 const SOURCE=process.env.STUDIO_SOURCE_DIR||DIR
 const ASPECT=process.env.STUDIO_ASPECT||'vertical',PREVIEW=process.env.STUDIO_PREVIEW==='1'
-const [WIDTH,HEIGHT]=({vertical:[1080,1920],horizontal:[1920,1080],square:[1080,1080]})[ASPECT]
+const [WIDTH,HEIGHT]=({vertical:[1080,1920],horizontal:[1920,1080],square:[1080,1080],portrait:[1080,1350]})[ASPECT]
 const OUT = process.env.STUDIO_OUTPUT_DIR || join(DIR, 'salida')
 const FPS = PREVIEW?15:30
 const PORT = 0
@@ -32,26 +35,31 @@ const fotos = args.includes('--fotos') ? args[args.indexOf('--fotos') + 1].split
 const musica = args.includes('--musica') ? args[args.indexOf('--musica') + 1] : 'fondo-02.mp3'
 
 const ENTRA = 0.35, SALE = 0.5
-const voces = []
+const voces = [];const cacheStats={reused:0,rendered:0};await checkpoint(OUT,'preparing')
 if (conVoz) {
   const v = await perfil(sb.perfil_voz || 'n8n')
   for (const [i, e] of sb.escenas.entries()) {
+    await checkpoint(OUT,'voice',{scene:i+1,total:sb.escenas.length});
     if (!e.voz) { e.palabras=[]; continue }
     await new Promise((r) => setTimeout(r, 1500)) // kie limita la frecuencia
-    const original=e.audio_local?.texto===e.voz ? e.audio_local : null
-    let a = original ? {archivo:join(SOURCE,original.archivo),dur:await duracion(join(SOURCE,original.archivo)),id:original.archivo} : await voz(e.voz, v, { cacheOnly: args.includes('--solo-cache') })
+    const original=!e.voice_take&&e.audio_local?.texto===e.voz ? e.audio_local : null
+    let a = original ? {archivo:join(SOURCE,original.archivo),dur:await duracion(join(SOURCE,original.archivo)),id:original.archivo} : await voz(e.voz, v, { cacheOnly: args.includes('--solo-cache'),take:e.voice_take||0 })
+    const untrimmed=a;
     const trimStart=e.voz_recorte_inicio||0,trimEnd=e.voz_recorte_fin||a.dur;if(trimStart>=trimEnd||trimEnd>a.dur+.02)throw Error('Recorte de voz fuera del audio');
     if(trimStart||e.voz_recorte_fin){const clip=join(OUT,'voice-trim-'+i+'.wav');await run('ffmpeg',['-v','error','-y','-ss',String(trimStart),'-i',a.archivo,'-t',String(trimEnd-trimStart),clip]);a={...a,archivo:clip,dur:trimEnd-trimStart}}
     a.volume=e.voz_volumen??1;
     e.voz_inicio ??= ENTRA
     e.dur = Math.max(e.dur, +(e.voz_inicio + a.dur + (original ? .05 : SALE)).toFixed(2))
-    e.palabras = sb.subtitulos === true && e.manual_words && e.palabras?.map(w=>w.word).join(' ')===(e.voz||'').trim().split(/\s+/).join(' ') ? e.palabras : sb.subtitulos === true ? (original ? original.palabras.filter(w=>w.start>=trimStart&&w.end<=trimEnd+.05).map(w=>({...w,start:w.start-trimStart,end:w.end-trimStart})) : await subtitulos(e.voz,a)) : []
+    e.palabras = sb.subtitulos === true && e.manual_words && e.palabras?.map(w=>w.word).join(' ')===(e.voz||'').trim().split(/\s+/).join(' ') ? e.palabras : sb.subtitulos === true ? (original ? original.palabras.filter(w=>w.start>=trimStart&&w.end<=trimEnd+.05).map(w=>({...w,start:w.start-trimStart,end:w.end-trimStart})) : (await subtitulos(e.voz,untrimmed)).filter(w=>w.start>=trimStart&&w.end<=trimEnd+.05).map(w=>({...w,start:w.start-trimStart,end:w.end-trimStart}))) : []
     voces.push({ escena: i, ...a })
     console.log(`voz ${i + 1}: ${a.dur.toFixed(2)} s  «${e.voz}»`)
   }
   let t = 0; for (const [i, e] of sb.escenas.entries()) { const x = voces.find((q) => q.escena === i); if (x) x.t = t + (e.voz_inicio ?? ENTRA); t += e.dur }
 }
 if(!conVoz)for(const e of sb.escenas)e.palabras=[]
+// Quantize scene boundaries so cached segments and the audio clock use identical frames.
+let quantizedTime=0;for(const [i,e]of sb.escenas.entries()){e.dur=Math.ceil(e.dur*FPS)/FPS;const voice=voces.find(v=>v.escena===i);if(voice)voice.t=quantizedTime+(e.voz_inicio??ENTRA);quantizedTime+=e.dur}
+
 const perfilChrome = mkdtempSync(join(tmpdir(), 'gcode-studio-'))
 const chrome = spawn(CHROME, ['--headless=new', ...(process.env.STUDIO_CHROME_NO_SANDBOX==='1'?['--no-sandbox']:[]), `--remote-debugging-port=${PORT}`, `--user-data-dir=${perfilChrome}`,
   '--hide-scrollbars', '--allow-file-access-from-files', '--window-size=1080,1920', 'about:blank'], { stdio: 'ignore' })
@@ -74,7 +82,7 @@ const cdp = (method, params = {}) => new Promise((res, rej) => { const i = ++id;
 const js = async (expr) => { const r = await cdp('Runtime.evaluate', { expression: expr, awaitPromise: true, returnByValue: true }); if (r.exceptionDetails) throw new Error(r.exceptionDetails.exception?.description || r.exceptionDetails.text); return r.result.value }
 
 await cdp('Page.enable')
-await cdp('Emulation.setDeviceMetricsOverride', { width: WIDTH, height: HEIGHT, deviceScaleFactor: PREVIEW?.5:1, mobile: false })
+await cdp('Emulation.setDeviceMetricsOverride', { width: WIDTH, height: HEIGHT, deviceScaleFactor: PREVIEW?(ASPECT==='portrait'?.4:.5):1, mobile: false })
 await cdp('Page.navigate', { url: 'file://' + join(SOURCE, 'studio.html') })
 for (let i = 0; i < 100 && !(await js('typeof window.setOutputFormat==="function"').catch(() => false)); i++) await esperar(100)
 await js('Promise.all([document.fonts.load("900 40px Montserrat"),document.fonts.load("600 40px Montserrat")]).then(()=>true)')
@@ -99,17 +107,28 @@ if (fotos) {
   console.log('Fotos listas en', OUT)
 } else {
   const mudo = join(perfilChrome, 'video-mudo.mp4')
-  const ff = spawn('ffmpeg', ['-v', 'error', '-y', '-f', 'image2pipe', '-framerate', String(FPS), '-c:v', 'mjpeg', '-i', '-',
-    '-c:v', 'libx264', '-threads','1','-preset', PREVIEW?'ultrafast':'veryfast', '-crf', '18', '-pix_fmt', 'yuv420p', '-r', String(FPS), mudo], { stdio: ['pipe', 'inherit', 'inherit'] })
-  const n = Math.round(TOTAL * FPS)
-  for (let i = 0; i < n; i++) {
-    const ok = ff.stdin.write(await frame(i / FPS))
-    if (!ok) await new Promise((r) => ff.stdin.once('drain', r))
-    if (i % 60 === 0) process.stdout.write(`\r${Math.round((i / n) * 100)}%`)
+  const cacheDir=process.env.STUDIO_SCENE_CACHE||join(process.env.STUDIO_WORK_ROOT||DIR,'.studio-state','scene-cache');mkdirSync(cacheDir,{recursive:true});
+  const source=await sourceFingerprint(SOURCE),renderer=createHash('sha256').update(readFileSync(fileURLToPath(import.meta.url))).digest('hex');
+  const segments=[];let start=0;
+  for(const [sceneIndex,scene]of sb.escenas.entries()){
+    const frames=Math.round(scene.dur*FPS),key=sceneKey({scene,brand:sb.brand,evidence:sb.evidencia,source,aspect:ASPECT,fps:FPS,preview:PREVIEW,renderer,context:{index:sceneIndex,count:sb.escenas.length,...(scene.tipo==='comercial_n8n'?{start,total:TOTAL,hook:sb.escenas[0].titulo}:{})}});
+    let segment=await cachedScene(cacheDir,key,frames);
+    await checkpoint(OUT,'rendering',{scene:sceneIndex+1,total:sb.escenas.length,cache:cacheStats});
+    if(segment){cacheStats.reused++}else{
+      const temp=join(cacheDir,key+'.'+process.pid+'.tmp.mp4');
+      const ff=spawn('ffmpeg',['-v','error','-y','-f','image2pipe','-framerate',String(FPS),'-c:v','mjpeg','-i','-','-c:v','libx264','-threads','1','-preset',PREVIEW?'ultrafast':'veryfast','-crf','18','-pix_fmt','yuv420p','-r',String(FPS),temp],{stdio:['pipe','inherit','inherit']});
+      const done=new Promise((resolve,reject)=>{ff.on('error',reject);ff.on('close',code=>code===0?resolve():reject(Error('Falló la codificación de la escena')))});
+      done.catch(()=>{});ff.stdin.on('error',()=>{});
+      for(let f=0;f<frames;f++){if(!ff.stdin.write(await frame(start+f/FPS)))await new Promise((resolve,reject)=>{ff.stdin.once('drain',resolve);ff.stdin.once('error',reject)})}
+      ff.stdin.end();await done;segment=join(cacheDir,key+'.mp4');renameSync(temp,segment);
+      writeFileSync(join(cacheDir,key+'.json'),JSON.stringify({frames,at:new Date().toISOString()}));cacheStats.rendered++;
+    }
+    segments.push(segment);start+=scene.dur;console.log(Math.round(start/TOTAL*100)+'%');
   }
-  ff.stdin.end(); await new Promise((r, reject) => ff.on('close', code => code === 0 ? r() : reject(new Error('Falló la codificación de video'))))
+  const list=join(perfilChrome,'segments.txt');writeFileSync(list,segments.map(file=>"file '"+file.replaceAll("'","'\\''")+"'").join('\n'));
+  await run('ffmpeg',['-v','error','-y','-f','concat','-safe','0','-i',list,'-c','copy',mudo],{timeout:120000});
   console.log('\rvideo mudo listo')
-  await mezclar(mudo, TOTAL, SFX, voces)
+  await checkpoint(OUT,'mixing',{cache:cacheStats});await mezclar(mudo, TOTAL, SFX, voces);await checkpoint(OUT,'succeeded',{cache:cacheStats})
 }
 ws.close(); chrome.kill()
 
@@ -143,7 +162,7 @@ async function mezclar(mudo, dur, sfx, voces) {
     .on('close', (c) => (c ? rej(new Error('ffmpeg falló')) : res())))
   try{const check=await run('ffmpeg',['-hide_banner','-i',salida,'-af','silencedetect=noise=-45dB:d=1','-vf','blackdetect=d=0.5:pix_th=0.10','-f','null','-'],{timeout:120000,maxBuffer:2000000});const events=check.stderr.split('\n').filter(l=>/silence_duration:|black_duration:/.test(l));quality.warnings.push(...events.map(l=>l.trim()));}catch{quality.warnings.push('No se completó el análisis de silencio y cuadros negros')}
   quality.warnings=[...new Set(quality.warnings)];quality.status=quality.warnings.length?'review':'passed';
-  writeFileSync(salida.replace(/\.mp4$/, '.json'), JSON.stringify({ quality, guion: sb, duracion: dur, fps: FPS, voz: voces.length > 0, voces: voces.map(({ escena, dur, t, id }) => ({ escena, dur, t, id })), generado: new Date().toISOString() }, null, 2))
+  writeFileSync(salida.replace(/\.mp4$/, '.json'), JSON.stringify({ quality, cache:cacheStats, guion: sb, duracion: dur, fps: FPS, voz: voces.length > 0, voces: voces.map(({ escena, dur, t, id }) => ({ escena, dur, t, id })), generado: new Date().toISOString() }, null, 2))
   console.log('Listo:', salida)
 }
 

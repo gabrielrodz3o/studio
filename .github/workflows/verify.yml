@@ -1,0 +1,27 @@
+name: Verify Studio
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  contracts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - name: Contracts, approval, planning, queue and provider recovery
+        run: node --test access.test.mjs action-plan.test.mjs creative.test.mjs history.test.mjs jobs.test.mjs marketing.test.mjs publisher.test.mjs styles.test.mjs versions.test.mjs voz.test.mjs
+      - run: python3 -B -m unittest alinear_test.py
+  editorial:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.22.0'
+      - run: npm ci
+      - run: npm ci --prefix evaluations
+      - run: node evaluations/run.mjs

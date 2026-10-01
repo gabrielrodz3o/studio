@@ -1,0 +1,96 @@
+{
+  "started": "2026-09-30",
+  "scope": "Approved audit action plan; preserve human approval and do not publish test content",
+  "stages": [
+    {
+      "id": "release",
+      "status": "implemented_and_verified",
+      "tasks": [
+        "immutable publication approval",
+        "destination binding",
+        "legacy migration",
+        "delivery reconciliation"
+      ]
+    },
+    {
+      "id": "editorial",
+      "status": "implemented_and_verified",
+      "tasks": [
+        "Ajv contracts",
+        "campaign-aware ideas",
+        "evidence checks",
+        "Promptfoo evaluation suite"
+      ]
+    },
+    {
+      "id": "editing",
+      "status": "implemented_and_verified",
+      "tasks": [
+        "critical speech checks",
+        "WaveSurfer regions",
+        "incremental scene render",
+        "durable checkpoints",
+        "cost accounting"
+      ]
+    },
+    {
+      "id": "design",
+      "status": "implemented_and_verified",
+      "tasks": [
+        "three visual families",
+        "safe compositions across four ratios",
+        "brand design tokens",
+        "visual regression samples"
+      ]
+    },
+    {
+      "id": "campaigns",
+      "status": "implemented_and_verified",
+      "tasks": [
+        "concept and derivatives",
+        "history and metrics",
+        "asset rights provenance",
+        "operational dashboard"
+      ]
+    },
+    {
+      "id": "delivery",
+      "status": "final_verification_in_progress",
+      "tasks": [
+        "regression tests",
+        "browser checks",
+        "backup restoration",
+        "remote deployment",
+        "GitHub",
+        "final verification"
+      ]
+    }
+  ],
+  "completed": "2026-10-01",
+  "verification": {
+    "node_tests": 47,
+    "alignment_tests": 6,
+    "editorial_fixtures": 20,
+    "browser": "desktop 1440px and mobile 390px, local and deployed",
+    "real_render": "frozen runtime; initial 3 segments; replay 3 reused; changed scene 2 reused and 1 rendered",
+    "voice": "original cached narration rendered 4:5; no paid voice generated for deployment checks",
+    "live_draft": "provider returned 4 scenes with claim references; reserve USD 0.10, invoice cost not reconciled",
+    "n8n": "producer execution 389539 succeeded and downloaded preview; connections checked read-only",
+    "server_render": "job_200290b3-2286-4bb7-8c87-a26e3de133bf succeeded, preview, quality passed, pending human review",
+    "backup": "encrypted offsite copy; isolated restore verified users, brands and six media hashes",
+    "history": {
+      "unique_records": 202,
+      "confirmed": 174,
+      "legacy_unverified": 28,
+      "instagram_source_rows": 199,
+      "instagram_unique_ids": 174
+    },
+    "live_publications_in_tests": 0
+  },
+  "deferred": [
+    "First public delivery needs a human-approved real piece; no test publication was made",
+    "Remotion/BullMQ/WhisperX and multitrack editing remain optional future evaluation",
+    "Provider invoice reconciliation is manual; reserves are not claimed as exact costs",
+    "Historical Instagram IDs without verified links remain explicitly unverified"
+  ]
+}

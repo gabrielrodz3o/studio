@@ -7,6 +7,11 @@ mediante n8n.
 - Aplicación: https://studio.gcoderd.com (requiere acceso).
 - Guía de uso y despliegue: [LEEME.md](LEEME.md).
 - Integración de producción y entrega: [API](integraciones/API.md).
+- Estado y comprobaciones de la ampliación: [plan ejecutado](implementation-plan.json).
+
+La versión del 1-oct-2026 añade aprobación de archivo/texto/cuenta como una versión
+concreta, propuestas por campaña, render por escenas con caché, edición de voz y formato 4:5.
+n8n prepara un borrador diario; una persona conserva la aprobación y programación.
 
 ## Desarrollo
 

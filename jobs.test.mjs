@@ -9,7 +9,7 @@ const sample={nombre:'prueba',formato:'historia',voz:false,escenas:[{tipo:'trans
 const req={brand_id:'comandpos',kind:'video',template_id:'prueba'}
 const sleep=ms=>new Promise(r=>setTimeout(r,ms))
 async function ready(store,id){for(let i=0;i<200;i++){const j=store.get(id);if(!['queued','running'].includes(j.status))return j;await sleep(5)}throw Error('Timeout de prueba')}
-async function fixture(t,executor){const root=await mkdtemp(join(tmpdir(),'studio-jobs-'));await mkdir(join(root,'assets'));for(const f of ['studio.html','n8n-style.js','formats.js','media-scenes.js'])await writeFile(join(root,f),'test');await mkdir(join(root,'storyboards'));await writeFile(join(root,'storyboards/prueba.json'),JSON.stringify(sample));const store=await new JobStore({root,executor}).init();t.after(async()=>{await store.stop();await rm(root,{recursive:true,force:true})});return {root,store}}
+async function fixture(t,executor){const root=await mkdtemp(join(tmpdir(),'studio-jobs-'));await mkdir(join(root,'assets'));await writeFile(join(root,'assets/fondo-02.mp3'),'fixture');for(const f of ['render.mjs','voz.mjs','subtitulos.mjs','alinear.py','scene-cache.mjs','releases.mjs','validar.mjs','styles.mjs','budget.mjs','voz-perfil.json','voz-perfil-original.json','package-lock.json'])await writeFile(join(root,f),'fixture');for(const f of ['studio.html','n8n-style.js','formats.js','media-scenes.js'])await writeFile(join(root,f),'test');await mkdir(join(root,'storyboards'));await writeFile(join(root,'storyboards/prueba.json'),JSON.stringify(sample));const store=await new JobStore({root,executor}).init();t.after(async()=>{await store.stop();await rm(root,{recursive:true,force:true})});return {root,store}}
 const output={filename:'prueba.mp4',manifest_filename:'prueba.json',bytes:10,sha256:'test',duration:3,width:1080,height:1920}
 test('peticiones concurrentes con la misma clave producen un único trabajo',async t=>{
  let calls=0;const{store}=await fixture(t,async()=>{calls++;await sleep(20);return output})
@@ -26,7 +26,7 @@ test('guion y resultado quedan separados por trabajo; editar la plantilla no alt
  const replay=await store.create(req,'first');assert.equal(replay.job.id,a.job.id)
  const b=await store.create(req,'second');await ready(store,b.job.id)
  assert.notEqual(store.artifactPath(a.job.id,'video'),store.artifactPath(b.job.id,'video'))
- const old=JSON.parse(await readFile(join(store.dir,a.job.id,'script.json'),'utf8'));assert.equal(old.escenas[0].texto,'Una idea')
+ const old=JSON.parse(await readFile(join(store.dir,a.job.id,'script.json'),'utf8'));assert.equal(old.escenas[0].texto,'Una idea');await writeFile(join(root,'render.mjs'),'changed runtime');assert.equal(await readFile(join(store.dir,a.job.id,'source/render.mjs'),'utf8'),'fixture');assert.ok(JSON.parse(await readFile(join(store.dir,a.job.id,'runtime.json'),'utf8'))['render.mjs'])
 })
 test('fallos se conservan y no se vuelven a ejecutar por repetir la misma petición',async t=>{
  let calls=0;const{store}=await fixture(t,async()=>{calls++;throw Error('Proveedor pendiente')})

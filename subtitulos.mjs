@@ -8,8 +8,8 @@ import {fileURLToPath} from 'node:url'
 const run=promisify(execFile),DIR=dirname(fileURLToPath(import.meta.url))
 export async function subtitulos(texto,audio){
  const bytes=await readFile(audio.archivo)
- const id=createHash('sha256').update(bytes).update(texto).digest('hex').slice(0,20)
- const base=join(DIR,'voz','sub-'+id),cache=base+'.words.json'
+ const id=createHash('sha256').update('alignment-v2:').update(bytes).update(texto).digest('hex').slice(0,20)
+ const base=join(process.env.STUDIO_WORK_ROOT||DIR,'voz','sub-'+id),cache=base+'.words.json'
  try{return JSON.parse(await readFile(cache,'utf8')).words}catch(e){if(e.code!=='ENOENT')throw e}
  const model=process.env.WHISPER_MODEL||join(homedir(),'.cache/whisper/ggml-small.bin')
  await access(model).catch(()=>{throw Error('Falta el modelo local de transcripción. Configura WHISPER_MODEL.')})

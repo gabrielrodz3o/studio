@@ -1,0 +1,1 @@
+module.exports=async(output,context)=>{const {editorialIssues}=await import('../editorial.mjs');const issues=editorialIssues(JSON.parse(output));const shouldReject=context.vars.reject==='true';return {pass:(issues.length>0)===shouldReject,score:(issues.length>0)===shouldReject?1:0,reason:issues.join('; ')||'Sin afirmaciones críticas detectadas'}}

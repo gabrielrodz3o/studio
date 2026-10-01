@@ -11,7 +11,8 @@ import { fileURLToPath } from 'node:url'
 
 const run = promisify(execFile)
 const DIR = dirname(fileURLToPath(import.meta.url))
-const CACHE = join(DIR, 'voz')
+const WORK = process.env.STUDIO_WORK_ROOT || DIR
+const CACHE = join(WORK, 'voz')
 const API = 'https://api.kie.ai/api/v1/jobs'
 const dormir = (ms) => new Promise((r) => setTimeout(r, ms))
 const existe = (f) => access(f).then(() => true, () => false)
@@ -23,7 +24,7 @@ export async function perfil(nombre = 'n8n') {
 
 async function clave() {
   if (process.env.KIE_API_KEY) return process.env.KIE_API_KEY.trim()
-  return (await readFile(join(DIR, '..', 'tutoriales', 'clave-kie.txt'), 'utf8')).trim()
+  return (await readFile(join(WORK, '..', 'tutoriales', 'clave-kie.txt'), 'utf8')).trim()
 }
 
 async function pedir(url, opts, key) {
@@ -48,15 +49,17 @@ export async function duracion(f) {
 }
 
 // Máximo tres tareas por frase, incluso al reiniciar el proceso. No reenvía POST ambiguos.
-export async function voz(texto, v, { cacheOnly = false } = {}) {
+export async function voz(texto, v, { cacheOnly = false, take = 0 } = {}) {
+  if(!Number.isInteger(take)||take<0||take>20)throw Error('Toma de voz inválida');
   await mkdir(CACHE, { recursive: true })
   // Conserva la clave anterior para aprovechar los audios ya pagados.
-  const id = createHash('sha256').update(JSON.stringify([texto, v.model, v.voice_name, v.audio_profile, v.sample_context, v.style, v.pace, ...(v.model==='google/gemini-3-1-flash-tts'?[v.temperature??.6,v.accent??null]:[])])).digest('hex').slice(0, 16)
+  const id = createHash('sha256').update(JSON.stringify([texto, v.model, v.voice_name, v.audio_profile, v.sample_context, v.style, v.pace, ...(take?[{take}]:[]), ...(v.model==='google/gemini-3-1-flash-tts'?[v.temperature??.6,v.accent??null]:[])])).digest('hex').slice(0, 16)
   const limpio = join(CACHE, id + '.wav')
   if (await existe(limpio)) return { archivo: limpio, dur: await duracion(limpio), id }
   if (cacheOnly) throw new Error(`Falta audio en caché: «${texto}». Quita --solo-cache para usar kie.ai.`)
   const lock = join(CACHE, id + '.lock')
-  try { await mkdir(lock) } catch { throw new Error(`La frase ${id} está bloqueada por otra ejecución. Revisa el proceso antes de quitar ${lock}.`) }
+  try { await mkdir(lock) } catch { let owner;try{owner=JSON.parse(await readFile(join(lock,'owner.json'),'utf8'))}catch{}if(!owner||owner.pid===process.pid)throw Error('La frase está bloqueada; revisa el proceso antes de reanudar');let alive=true;try{process.kill(owner.pid,0)}catch(e){if(e.code==='ESRCH')alive=false}if(alive)throw Error('La frase está siendo procesada por otra ejecución');await rm(lock,{recursive:true});await mkdir(lock) }
+  await guardar(join(lock,'owner.json'),{pid:process.pid,at:new Date().toISOString()})
   try {
     const key = await clave()
     const registro = join(CACHE, id + '.tarea.json')
@@ -64,7 +67,7 @@ export async function voz(texto, v, { cacheOnly = false } = {}) {
     for (;;) {
       if (!tarea || tarea.reintentar) {
         const intento = (tarea?.intento ?? 0) + 1
-        if(process.env.STUDIO_JOB_ID)await new Budget(join(DIR,'.studio-state')).reserve('voice:'+id+':'+intento,Number(process.env.STUDIO_VOICE_RESERVE||0.25),'voz',process.env.STUDIO_JOB_ID,Number(process.env.STUDIO_JOB_BUDGET||2))
+        if(process.env.STUDIO_JOB_ID)await new Budget(join(WORK,'.studio-state')).reserve('voice:'+id+':'+intento,Number(process.env.STUDIO_VOICE_RESERVE||0.25),'voz',process.env.STUDIO_JOB_ID,Number(process.env.STUDIO_JOB_BUDGET||2))
         // Se escribe antes del POST: si se pierde la respuesta, no se repite a ciegas.
         tarea = { texto, voz: v.voice_name, intento, estado: 'creando', creada: new Date().toISOString() }
         await guardar(registro, tarea)

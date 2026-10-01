@@ -1,5 +1,13 @@
 {
   "dependencies": {
-    "sharp": "0.35.5"
+    "ajv": "8.20.0",
+    "sharp": "0.35.5",
+    "wavesurfer.js": "8.0.1"
+  },
+  "private": true,
+  "scripts": {
+    "test": "node --test *.test.mjs",
+    "test:alignment": "python3 -B -m unittest alinear_test.py",
+    "test:editorial": "node evaluations/run.mjs"
   }
 }

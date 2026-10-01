@@ -1,10 +1,30 @@
 """Align approved spelling to locally recognized speech; preserve detected time anchors."""
-import json, sys, unicodedata, difflib
+import json, sys, unicodedata, difflib, re
+from collections import Counter
+
+ALIGNMENT_VERSION = 2
+
+def verify_meaning(text, segments):
+    """Do not manufacture negations, numbers or product names from fuzzy matches."""
+    heard = ' '.join(s['text'] for s in segments)
+    critical = {'no', 'nunca', 'sin', 'tampoco', 'jamas', 'gratis', 'gratuita'}
+    expected = Counter(norm(w) for w in text.split() if norm(w) in critical)
+    observed = Counter(norm(w) for w in heard.split() if norm(w) in critical)
+    if expected != observed:
+        raise ValueError('Revisión de voz: cambió una negación o condición comercial. Escucha y corrige la locución.')
+    # Ambiguous digit/word substitutions require review instead of silently passing.
+    numbers = lambda s: re.findall(r'\d+(?:[.,]\d+)*', s)
+    if numbers(text) != numbers(heard):
+        raise ValueError('Revisión de voz: las cantidades no coinciden con el guion.')
+    for name in ['comandpos', 'gcode']:
+        if name in norm(text) and name not in norm(heard):
+            raise ValueError('Revisión de voz: confirma la pronunciación del nombre de la marca.')
 
 def norm(s):
     return ''.join(c for c in unicodedata.normalize('NFD', s.lower()) if c.isalnum())
 
 def align(text, segments, duration):
+    verify_meaning(text, segments)
     expected=text.split()
     target=''.join(norm(w) for w in expected)
     observed=''; times=[]
@@ -35,7 +55,7 @@ def align(text, segments, duration):
         end=max(start,min(duration,end))
         words.append({'word':w,'start':round(start,3),'end':round(end,3)})
         pos+=size
-    return {'words':words,'coincidencia':round(match.ratio(),3),'metodo':'whisper-local-con-texto-del-guion'}
+    return {'words':words,'coincidencia':round(match.ratio(),3),'metodo':'whisper-local-con-texto-del-guion','alignment_version':ALIGNMENT_VERSION,'critical_words_checked':True}
 
 if __name__=='__main__':
     data=json.load(open(sys.argv[1])); transcription=json.load(open(sys.argv[2]))

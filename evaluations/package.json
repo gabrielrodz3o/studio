@@ -1,0 +1,11 @@
+{
+  "private": true,
+  "description": "Offline editorial regression and opt-in provider comparisons",
+  "devDependencies": {
+    "node": "22.22.0",
+    "promptfoo": "0.123.1"
+  },
+  "scripts": {
+    "test": "node run.mjs"
+  }
+}

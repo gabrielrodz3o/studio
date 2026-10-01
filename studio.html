@@ -193,7 +193,7 @@ function titular(lineas,y,t,t0=0,size=96,color=C.navy,acento=C.orange){return li
 // ── Guion gráfico (el Studio lo recibe en JSON; aquí va el piloto) ───────
 // ── Guion gráfico: llega en JSON desde storyboards/ (cargar) ─────────────
 let SCENES=[],TOTAL=0,SFX=[],CURRENT_STORY={};
-function cargar(sb){CURRENT_STORY=sb;let acc=0;SCENES=sb.escenas.map(e=>{const s={...e,palabras:sb.subtitulos===true&&e.palabras?.map(w=>w.word).join(' ')===(e.voz||'').trim().split(/\s+/).join(' ')?e.palabras:[],t0:acc};acc+=e.dur;return s;});TOTAL=acc;
+function cargar(sb){CURRENT_STORY=sb;let acc=0;SCENES=sb.escenas.map(e=>{const s={...e,palabras:sb.subtitulos===true&&(e.voz_recorte_inicio||e.voz_recorte_fin||e.palabras?.map(w=>w.word).join(' ')===(e.voz||'').trim().split(/\s+/).join(' '))?e.palabras:[],t0:acc};acc+=e.dur;return s;});TOTAL=acc;
  // Sonidos sincronizados que el renderizador mezcla con la música.
  SFX=[];SCENES.forEach(s=>{if(s.tipo==='caos_acumulado')(s.frases||[]).forEach((_,i)=>SFX.push(['pop',s.t0+.5+i*.75]));
   if(s.tipo==='tablet_comanda')SFX.push(['tap',s.t0+1.0],['tap',s.t0+1.8],['tap',s.t0+2.9]);

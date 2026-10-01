@@ -18,7 +18,7 @@ privada 10.108.0.5 → 10.108.0.3 ni de la Mac. El workflow está activo, sin pu
 `Descargar borrador`: ejecución 389126 (imagen nueva) y 389128 (video reutilizado).
 
 Workflow creado: [GCODE Studio - Producir multimedia privada](https://n8n.gcoderd.com/workflow/sn74WWUHBFoW6pqS).
-No modifica `h40YN1b3Yq8G1wyK` ni publica en redes. La configuración instalada y credenciales
+El productor no publica en redes. Desde el 1-oct-2026, `h40YN1b3Yq8G1wyK` está pausado y se conserva como respaldo. La configuración instalada y credenciales
 asociadas se registran en `/home/node/.n8n/gcode-studio-integration/` dentro de n8n.
 
 ## Contrato
@@ -161,3 +161,37 @@ se conservan `historia`, `comercial`, `consejo`. `style: "auto"` requiere `auto:
 que se consulta mediante las rutas existentes hasta completarse. La voz tiene un
 límite de US$2 y el guion reserva US$0.10. La publicación sigue requiriendo revisión
 y programación. Reintenta una respuesta perdida con la misma clave y el mismo cuerpo.
+
+
+## Contratos y aprobaciones — 1-oct-2026
+
+La generación usa Ajv y rechaza campos desconocidos. Para `/api/v1/jobs` se requiere exactamente
+uno de `template_id` o `script`. Video admite `aspect`: `vertical`, `horizontal`, `square`,
+`portrait`; `preview:true` produce un borrador que no puede programarse. Se conservan
+`campaign_id`, `concept_id`, `creative_id`, `parent_job_id` y `caption` cuando corresponden.
+
+La credencial de productor tiene `read,produce,import`; la del publicador tiene
+`read,publish,metrics,import`. Se almacenan hashes en `api-clients.json`. Ninguna permite
+aprobar archivos, aprobar publicaciones o programar. Eso exige sesión humana de administrador.
+
+La aprobación del trabajo verifica el archivo. Una aprobación adicional de publicación congela
+el hash del archivo, caption final (incluida declaración de voz IA), cuenta de destino, marca,
+portada y procedencia de recursos. Instagram/Facebook Stories no reciben caption separado en
+este adaptador; debe estar compuesto dentro de la imagen. Cambios posteriores invalidan el release.
+
+- `GET /api/v1/deliveries/{id}/verify`: devuelve release y trabajo solo mientras coinciden con
+  la aprobación. El publicador lo consulta antes de cargar medios y justo antes del envío.
+- `POST /api/v1/publications/import`: registra historia, no publica. Campos: `source` (`legacy`
+  o `manual`), `brand_id`, `channel`, `post_id`, `url`, `published_at`, `caption`. Dedupe por canal/ID.
+  `source:legacy,verification:unavailable` permite guardar un registro sin URL con estado
+  `legacy_unverified`; una importación posterior con URL confirmada lo concilia.
+
+Rutas de interfaz autenticada: `/api/proposals?brand=…&campaign=…`,
+`POST /api/marketing/derivatives`, `GET /api/release-preview?piece_id=…`,
+`POST /api/marketing/releases`, `GET /api/operations`, `POST /api/budget/reconcile`.
+Consulta `local.mjs` para el contrato exacto de cada cuerpo; no son endpoints Bearer de n8n.
+
+El workflow productor decide entre `/api/v1/ideas` (idea o `auto:true`) y `/api/v1/jobs`.
+Para ideas fuerza `produce:true`, preserva la clave de idempotencia y no reintenta a ciegas
+una llamada de pago. El borrador diario usa una clave por fecha y marca. Un timeout se investiga
+consultando el trabajo existente antes de repetir solicitudes.

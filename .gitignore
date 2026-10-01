@@ -51,3 +51,5 @@ feed/templates/*
 !storyboards/base-solucion.json
 !storyboards/base-comparativa.json
 !storyboards/base-marca.json
+evaluations/results*
+evaluations/.promptfoo/
