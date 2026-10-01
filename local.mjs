@@ -1,3 +1,4 @@
+import {Automation} from './automation.mjs'
 import {voiceTakes,perfil as voiceProfile} from './voz.mjs'
 import {voiceReviews,reviewFile,acceptVoiceReview} from './voice-reviews.mjs'
 import {createHandoff} from './handoff.mjs'
@@ -43,7 +44,7 @@ async function createPiece(input,key,actor){
  const request={...(input.budget_group?{budget_group:input.budget_group}:{}),brand_id:input.brand_id||'comandpos',kind:result.kind,script:result.script,creative_id:result.id,concept_id:result.concept_id,caption:result.caption,...(result.campaign_id?{campaign_id:result.campaign_id}:{}),...(result.kind==='video'?{voice:true,subtitles:true,allow_paid_voice:true,aspect:input.aspect||'vertical',max_budget_usd:2}:{})}
  const {job}=await store.create(request,'idea-render:'+result.id,'creative')
  if(input.piece_id){const piece=marketing.data.pieces.find(p=>p.id===input.piece_id);if(!piece||piece.brand_id!==job.brand_id||piece.campaign_id!==result.campaign_id)throw problem(422,'La pieza no corresponde a esta campaña');await marketing.savePiece({...piece,job_id:job.id,caption:result.caption,creative_id:result.id},actor,store)}
- else if(result.campaign_id&&!marketing.data.pieces.some(p=>p.creative_id===result.id)){await marketing.savePiece({campaign_id:result.campaign_id,concept_id:result.concept_id,creative_id:result.id,title:result.selection?.topic?.slice(0,160)||result.script.nombre,kind:result.kind,channel:'instagram',caption:result.caption,brief:input.idea||result.selection?.idea||'',job_id:job.id},actor,store)}
+ else if(actor!=='automation'&&result.campaign_id&&!marketing.data.pieces.some(p=>p.creative_id===result.id)){await marketing.savePiece({campaign_id:result.campaign_id,concept_id:result.concept_id,creative_id:result.id,title:result.selection?.topic?.slice(0,160)||result.script.nombre,kind:result.kind,channel:'instagram',caption:result.caption,brief:input.idea||result.selection?.idea||'',job_id:job.id},actor,store)}
  return {...result,job}
 }
 const photos=new PhotoJobs(root)
@@ -68,6 +69,7 @@ if(token.length<32)throw Error('STUDIO_API_TOKEN debe tener al menos 32 caracter
 let apiClients;try{apiClients=JSON.parse(await readFile(join(state,'api-clients.json'),'utf8'))}catch(e){if(e.code!=='ENOENT')throw e}
 const store=await new JobStore({root,publications:id=>publicationsFor(marketing.data.deliveries,id)}).init()
 const batches=await new Batches(root,{produce:createPiece,budget:creative.budget,store,linkJob:async(pieceId,jobId,actor)=>{const p=marketing.data.pieces.find(p=>p.id===pieceId);if(!p)throw problem(404,'Pieza no encontrada');await marketing.savePiece({...p,job_id:jobId},actor,store)}}).init();
+const automation=await new Automation(root,{marketing,store,produce:createPiece}).init();
 const mime={'.gz':'application/gzip','.css':'text/css; charset=utf-8','.html':'text/html; charset=utf-8','.mjs':'text/javascript','.js':'text/javascript','.json':'application/json','.png':'image/png','.webp':'image/webp','.jpg':'image/jpeg','.ttf':'font/ttf','.mp3':'audio/mpeg','.wav':'audio/wav','.mp4':'video/mp4'}
 const digest=x=>createHash('sha256').update(x).digest()
 function authenticated(req){return timingSafeEqual(digest(req.headers.authorization||''),digest('Bearer '+token))}
@@ -113,6 +115,10 @@ const server=createServer(async(req,res)=>{
     if(path.startsWith('/api/v1/')){
       if(!authorizeApi(req.headers.authorization,path,req.method,token,apiClients))return json(401,{error:'Se requiere una clave de API válida'})
       if(req.headers.origin)throw problem(403,'La API de integración no acepta solicitudes de navegador; usa el editor')
+      if(path==='/api/v1/automation'&&req.method==='GET')return json(200,automation.snapshot());
+      if(path==='/api/v1/automation/tick'&&req.method==='POST'){const d=await body(req);return json(202,automation.kick({generate:d.generate!==false}))}
+      if(path==='/api/v1/automation/config'&&req.method==='POST')return json(200,await automation.configure(await body(req),'n8n-automation'));
+      if(path==='/api/v1/automation/recover'&&req.method==='POST'){const d=await body(req);return json(202,await automation.recover(d.id,{allowPaid:d.allow_paid===true}))}
       if(path==='/api/v1/publications/import'&&req.method==='POST')return json(200,await marketing.importPublication(await body(req),'n8n',store))
       const deliveryCheck=/^\/api\/v1\/deliveries\/([a-f0-9-]{36})\/verify$/.exec(path);if(deliveryCheck&&req.method==='GET')return json(200,marketing.validateDelivery(deliveryCheck[1],store))
       if(path==='/api/v1/marketing'&&req.method==='GET')return json(200,marketing.snapshot())
@@ -146,9 +152,10 @@ const server=createServer(async(req,res)=>{
     if(path==='/auth/logout'&&req.method==='POST'){access.sameOrigin(req);res.setHeader('Set-Cookie',access.logout(req));return json(200,{ok:true})}
     if(path==='/auth/account'&&req.method==='POST'){access.sameOrigin(req);return json(200,await access.change(actor,await body(req)))}
     const handoff=/^\/api\/handoff\/(job_[a-f0-9-]{36})$/.exec(path);if(handoff&&req.method==='GET'){store.get(handoff[1]);res.setHeader('Content-Disposition','attachment; filename="gcode-project.tar.gz"');return await sendFile(req,res,join(store.dir,handoff[1],'handoff.tar.gz'))}
+    if(path==='/api/automation'&&req.method==='GET')return json(200,automation.snapshot());
     if(path==='/api/batches'&&req.method==='GET')return json(200,{batches:batches.list(),quote:batchQuote});
     if(path==='/api/proposals'&&req.method==='GET'){const data=marketing.snapshot(),brand=marketing.brand(url.searchParams.get('brand')||'comandpos'),campaign=campaignContext(data,brand.id,url.searchParams.get('campaign'));return json(200,{proposals:proposals(data,brand,await creative.history(),campaign)})}
-    if(path==='/api/release-preview'&&req.method==='GET')return json(200,marketing.releasePreview(url.searchParams.get('piece_id'),store))
+    if(path==='/api/release-preview'&&req.method==='GET'){const id=url.searchParams.get('piece_id'),p=marketing.data.pieces.find(p=>p.id===id);return json(200,{...marketing.releasePreview(id,store),automatic_schedule:!!p?.automation_slot&&automation.data.config.enabled&&p.campaign_id===automation.data.config.campaign_id})}
     if(path==='/api/marketing'&&req.method==='GET')return json(200,marketing.snapshot())
     const resource=/^\/api\/library\/([a-f0-9-]{36})$/.exec(path)
     if(resource&&['GET','HEAD'].includes(req.method))return await sendFile(req,res,marketing.asset(resource[1]).path)
@@ -164,6 +171,10 @@ const server=createServer(async(req,res)=>{
     if(path==='/api/version'&&req.method==='GET')return json(200,await versions.get(url.searchParams.get('kind'),url.searchParams.get('name'),url.searchParams.get('id')))
     if(req.method==='POST'){
       access.sameOrigin(req);access.require(req,['admin','editor'])
+      if(path==='/api/automation/config'){access.require(req,['admin']);return json(200,await automation.configure(await body(req),actor.username))}
+      if(path==='/api/automation/resume')return json(202,await automation.resume((await body(req)).id));
+      if(path==='/api/automation/recover'){const d=await body(req);return json(202,await automation.recover(d.id,{allowPaid:d.allow_paid===true}))}
+      if(path==='/api/automation/tick'){access.require(req,['admin']);return json(202,automation.kick({generate:false}))}
       if(path==='/api/creative/correct'){const d=await body(req);const recovery=await creative.correct(d.id,d.revision,d.content,actor.username);const result=await creative.create(recovery.input,recovery.key,actor.username);await versions.save(result.kind,result.script,actor.username);return json(200,{name:result.script.nombre,kind:result.kind})}
       if(path==='/api/voice-reviews/accept'){const d=await body(req);const out=await acceptVoiceReview(root,d.key,d,actor.username);await access.audit(actor.username,'voice_review_accepted',{key:d.key});return json(200,out)}
       if(path==='/api/voice/takes'){const d=await body(req);if(typeof d.text!=='string'||!d.text.trim()||d.text.length>500)throw problem(422,'Texto inválido');return json(200,{takes:await voiceTakes(d.text,await voiceProfile(d.profile||'n8n'))})}
@@ -183,7 +194,7 @@ const server=createServer(async(req,res)=>{
       if(path==='/api/marketing/cancel-delivery'){access.require(req,['admin']);return json(200,await marketing.cancelDelivery(await body(req),actor.username))}
       if(path==='/api/marketing/reconcile-delivery'){access.require(req,['admin']);return json(200,await marketing.reconcileDelivery(await body(req),actor.username))}
       if(path==='/api/budget/reconcile'){access.require(req,['admin']);const d=await body(req);return json(200,await creative.budget.reconcile(d.id,d.actual_usd,d.receipt,actor.username))}
-      if(path==='/api/marketing/releases'){access.require(req,['admin']);return json(200,await marketing.approveRelease(await body(req),actor.username,store))}
+      if(path==='/api/marketing/releases'){access.require(req,['admin']);return json(200,await automation.approvePublication(await body(req),actor.username))}
       if(path==='/api/marketing/publications/import'){access.require(req,['admin']);return json(200,await marketing.importPublication(await body(req),actor.username,store))}
       if(path==='/api/marketing/schedule'){access.require(req,['admin']);return json(200,await marketing.schedule(await body(req),actor.username,store))}
       if(path==='/api/marketing/metrics')return json(200,await marketing.addMetrics(await body(req),actor.username))
@@ -220,11 +231,11 @@ const server=createServer(async(req,res)=>{
     if(path==='/api/lista')return json(200,{guiones:(await readdir(join(root,'storyboards'))).filter(f=>!f.startsWith('.')&&f.endsWith('.json')),voces:(await readdir(join(root,'casting'))).filter(f=>/^\d.*\.mp3$/.test(f)),videos:(await readdir(join(root,'salida'))).filter(f=>!f.startsWith('.')&&f.endsWith('.mp4'))})
     const vendor=/^\/vendor\/wavesurfer\/([a-z0-9./-]+\.js)$/.exec(path);if(vendor&&!vendor[1].includes('..'))return await sendFile(req,res,join(root,'node_modules/wavesurfer.js/dist',vendor[1]));
     const route=decodeURIComponent(path==='/'?'/centro.html':path)
-    if(!/^\/(carousel-ui\.js|operations-ui\.js|design\.mjs|captions\.mjs|visual-runtime\.js|version-diff\.mjs|styles\.mjs|create-ui\.js|history\.mjs|marketing.html|marketing-ui.js|editor-tools.js|media-scenes.js|ui\.css|ui\.js|home\.js|account\.html|create\.html|editor\.html|feed-editor\.html|centro\.html|studio\.html|validar\.mjs|n8n-style\.js|formats\.js|feed\/templates\/[^/]+\.json|feed\/photos\/[a-z0-9-]+\.(jpg|png)|assets\/[^/]+|storyboards\/[^/]+\.json|casting\/[^/]+\.mp3|salida\/[^/]+\.(mp4|json))$/.test(route)||basename(route).startsWith('.'))throw problem(404,'No disponible')
+    if(!/^\/(automation-ui\.js|carousel-ui\.js|operations-ui\.js|design\.mjs|captions\.mjs|visual-runtime\.js|version-diff\.mjs|styles\.mjs|create-ui\.js|history\.mjs|marketing.html|marketing-ui.js|editor-tools.js|media-scenes.js|ui\.css|ui\.js|home\.js|account\.html|create\.html|editor\.html|feed-editor\.html|centro\.html|studio\.html|validar\.mjs|n8n-style\.js|formats\.js|feed\/templates\/[^/]+\.json|feed\/photos\/[a-z0-9-]+\.(jpg|png)|assets\/[^/]+|storyboards\/[^/]+\.json|casting\/[^/]+\.mp3|salida\/[^/]+\.(mp4|json))$/.test(route)||basename(route).startsWith('.'))throw problem(404,'No disponible')
     const file=resolve(root,'.'+route);if(!file.startsWith(root+sep))throw problem(403,'Ruta inválida')
     return await sendFile(req,res,file)
   }catch(e){if(!res.headersSent)json(e.status||(e.code==='ENOENT'?404:400),{error:e.message});else res.destroy()}
 })
 server.listen(port,process.env.STUDIO_BIND_HOST||'127.0.0.1',()=>console.log(`Centro multimedia: http://127.0.0.1:${port}/centro.html\nEditor: http://127.0.0.1:${port}\nAPI v1 habilitada; clave guardada en .studio-state/api-token (no se muestra).`))
-async function shutdown(){server.close();await store.stop();process.exit(0)}
+async function shutdown(){server.close();await automation.running;await store.stop();process.exit(0)}
 process.once('SIGTERM',shutdown);process.once('SIGINT',shutdown)

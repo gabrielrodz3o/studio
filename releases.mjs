@@ -17,7 +17,7 @@ export function publicationBundle(piece, job, brand, account) {
   const captionSupported=!(['facebook','instagram'].includes(piece.channel)&&piece.kind==='historia_social');if(!captionSupported)caption='';
   if(caption.length>2200)throw Error('El texto final con su declaración supera 2200 caracteres')
   return {schema_version:1,piece_id:piece.id,job_id:job.id,brand_id:piece.brand_id,
-    brand_hash:hash(brand),channel:piece.channel,account,kind:piece.kind,caption,caption_supported:captionSupported,
+    ...(piece.automation_slot?{scheduled_at:piece.scheduled_at}:{}),brand_hash:hash(brand),channel:piece.channel,account,kind:piece.kind,caption,caption_supported:captionSupported,
     files,resources:job.resources||[],cover_sha256:job.artifact?.cover_sha256 || null,ai_voice:aiVoice}
 }
 export function sameBundle(release, bundle) {return release?.status === 'approved' && release.hash === hash(bundle)}

@@ -1,0 +1,68 @@
+{
+  "at": "2026-10-01T14:49:59.662288+00:00",
+  "node_tests": {
+    "passed": 88,
+    "failed": 0
+  },
+  "integration": {
+    "date": "2026-10-01T14:49:18.065Z",
+    "api": "passed",
+    "browser": "passed",
+    "render": "passed",
+    "handoff": "created; NLE import not exercised",
+    "job": "job_40ddd44f-6aa5-4e48-ab74-9d944b7f1f3d",
+    "artifacts": "/private/tmp/studio-automation-integration"
+  },
+  "provider_connectivity": {
+    "studio": true,
+    "instagram": "gcoderd",
+    "facebook": true,
+    "tiktok": true,
+    "publishes": false
+  },
+  "recovered_job": "job_b3b5ae4c-a1fb-4938-b1c9-52a431d1f408",
+  "recovery_reserved_usd": 0,
+  "recovery_status": "voice_review_required; fourth voice not cached",
+  "workflow_id": "QDXjXalYBBP0Oaaf",
+  "workflow_active": true,
+  "approval": "human; no real publication approved by this task",
+  "source_sha256": {
+    "automation.mjs": "2899b5b9a2de02f10d1f76a9b87905729f82a254c0c502d98bd06ac1690619ae",
+    "automation-ui.js": "23f3d847518e9194b66b0953dffe5a85f5b5ed2b05c8941f88834719a60774a1",
+    "automation.test.mjs": "19a8a657f27529bc52bd65a10ff9e356928dd51d988e2e798b50590eea220785",
+    "api-scopes.mjs": "9f7172032438ece23cee892b1b0a1ffc87068fdf8c7ff1fe60721d56aca27f1f",
+    "jobs.mjs": "58f79c81840a46487d1e5acafac5954fe8ccc674c4bf40bdf8054a80be71dc91",
+    "jobs.test.mjs": "9aca6534dd2f4d5fe4ec142733831e81d295f06a3ec72a8d824bf975a422fb6b",
+    "local.mjs": "29f0f196e130247282325e8c8442717c1cb4f495c8eea739cd20686f856b618b",
+    "marketing.mjs": "9fdb3af7d06c40d7fc1a05f3f5a313a86aceab567e3882805f3202c28333159a",
+    "marketing-ui.js": "9c2984927b17e95297ac79f88018ee633819dfb8544e856a6d5ba5c98b7c261c",
+    "operations-ui.js": "d8fa27c68b0c5d37234eeda0c175a655a0c3cd9e4eec7e932a73f50791d31af0",
+    "creative.mjs": "83820bac7e78a0a924e9742ea973d86de05960cce738155e94dfc71f7842a400",
+    "planning.mjs": "14c51720ebdfd432b2d0dac263fc725dd8f8147ad7a8089c244c577d3031d317",
+    "releases.mjs": "3eca4a321409a12006b42751a54e1418f28ba59ae7ea9be55bb2e2fd1435cc4d",
+    "scripts/verify-implementation.mjs": "8a1934d955917006d5aa91cd7ec1822e5ce8a561e1642e80102e9d0755dd478c",
+    "deploy/update-code.sh": "57a8da375aaffa81489329b465bff026802dde97a3ca163b3e035a440fcaff8b",
+    "deploy/automation-tick.cjs": "e4104bca62fd31b6b437a303772785f9fbf274699407eef0fa079c0403246206",
+    "deploy/install-automation-calendar.cjs": "0076893c94d7269786ac41848dfd7631f570c6ec7fe415c55d3989060d91928a",
+    "docs/automatizacion-estado-20261001.md": "fda47a9448d06cdcf9d543cc5defb7b5405f0108324166a9ce82dea99d56b764",
+    "docs/calendario-automatico.md": "94e19e14d5dc0afd8000c2a451f0953bf8d0fcd9a9b1d7bbbd8bc994386a7f69"
+  },
+  "deployment": {
+    "status": "healthy",
+    "rollback": "gcode-studio:before-20261001T145007Z",
+    "container_files_verified": 18,
+    "hash_mismatches": 0,
+    "unauthenticated_calendar": 401,
+    "calendar_execution": {
+      "id": "390808",
+      "status": "success",
+      "startedAt": "2026-10-01T14:50:10.038Z"
+    },
+    "publisher_execution": {
+      "id": "390810",
+      "status": "success",
+      "startedAt": "2026-10-01T14:50:36.020Z"
+    },
+    "legacy_workflows_active": false
+  }
+}

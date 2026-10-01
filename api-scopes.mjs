@@ -2,6 +2,7 @@ import {createHash,timingSafeEqual} from 'node:crypto'
 const digest=x=>createHash('sha256').update(x).digest()
 export function requiredScope(path,method){
   if(method==='GET'||method==='HEAD')return 'read'
+  if(path.startsWith('/api/v1/automation/'))return 'automation'
   if(path==='/api/v1/publications/import')return 'import'
   if(path==='/api/v1/metrics')return 'metrics'
   if(path.startsWith('/api/v1/deliveries/'))return 'publish'

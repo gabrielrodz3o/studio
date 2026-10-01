@@ -9,6 +9,9 @@ check_queue() {
 python3 - <<'PY'
 import json
 from pathlib import Path
+calendar=Path('data/state/automation/state.json')
+if calendar.exists() and any(s.get('status')=='requesting' for s in json.loads(calendar.read_text()).get('slots',[])):
+ raise SystemExit('Calendar generation active; deploy after it finishes.')
 for p in Path('data/state/jobs').glob('job_*/job.json'):
  if json.loads(p.read_text()).get('status') in ('running','queued'):
   raise SystemExit('Active production; deploy after the queue drains.')
