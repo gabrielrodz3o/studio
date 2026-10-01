@@ -150,9 +150,10 @@ const server=createServer(async(req,res)=>{
     }
     if(req.headers.host!==new URL(origin).host)throw problem(403,'Host no autorizado')
     const actor=access.user(req)
-    if(!actor){if(req.method==='GET'&&!path.startsWith('/api/')){res.writeHead(302,{Location:'/login','Cache-Control':'no-store'});return res.end()}throw problem(401,'Inicia sesión')}
+    if(!actor){if(req.method==='GET'&&!path.startsWith('/api/')){res.writeHead(302,{Location:'/login?next='+encodeURIComponent(path+url.search),'Cache-Control':'no-store'});return res.end()}throw problem(401,'Inicia sesión')}
+    const renewedCookie=await access.refresh(req);if(renewedCookie)res.setHeader('Set-Cookie',renewedCookie);
     if(path==='/auth/me'&&req.method==='GET')return json(200,actor)
-    if(path==='/auth/logout'&&req.method==='POST'){access.sameOrigin(req);res.setHeader('Set-Cookie',access.logout(req));return json(200,{ok:true})}
+    if(path==='/auth/logout'&&req.method==='POST'){access.sameOrigin(req);res.setHeader('Set-Cookie',await access.logout(req));return json(200,{ok:true})}
     if(path==='/auth/account'&&req.method==='POST'){access.sameOrigin(req);return json(200,await access.change(actor,await body(req)))}
     const handoff=/^\/api\/handoff\/(job_[a-f0-9-]{36})$/.exec(path);if(handoff&&req.method==='GET'){store.get(handoff[1]);res.setHeader('Content-Disposition','attachment; filename="gcode-project.tar.gz"');return await sendFile(req,res,join(store.dir,handoff[1],'handoff.tar.gz'))}
     if(path==='/api/automation'&&req.method==='GET')return json(200,automation.snapshot());
@@ -234,7 +235,7 @@ const server=createServer(async(req,res)=>{
     if(path==='/api/lista')return json(200,{guiones:(await readdir(join(root,'storyboards'))).filter(f=>!f.startsWith('.')&&f.endsWith('.json')),voces:(await readdir(join(root,'casting'))).filter(f=>/^\d.*\.mp3$/.test(f)),videos:(await readdir(join(root,'salida'))).filter(f=>!f.startsWith('.')&&f.endsWith('.mp4'))})
     const vendor=/^\/vendor\/wavesurfer\/([a-z0-9./-]+\.js)$/.exec(path);if(vendor&&!vendor[1].includes('..'))return await sendFile(req,res,join(root,'node_modules/wavesurfer.js/dist',vendor[1]));
     const route=decodeURIComponent(path==='/'?'/centro.html':path)
-    if(!/^\/(automation-ui\.js|carousel-ui\.js|operations-ui\.js|design\.mjs|captions\.mjs|visual-runtime\.js|version-diff\.mjs|styles\.mjs|create-ui\.js|history\.mjs|marketing.html|marketing-ui.js|editor-tools.js|media-scenes.js|ui\.css|ui\.js|home\.js|account\.html|create\.html|editor\.html|feed-editor\.html|centro\.html|studio\.html|validar\.mjs|n8n-style\.js|formats\.js|feed\/templates\/[^/]+\.json|feed\/photos\/[a-z0-9-]+\.(jpg|png)|assets\/[^/]+|storyboards\/[^/]+\.json|casting\/[^/]+\.mp3|salida\/[^/]+\.(mp4|json))$/.test(route)||basename(route).startsWith('.'))throw problem(404,'No disponible')
+    if(!/^\/(project-drafts\.js|automation-ui\.js|carousel-ui\.js|operations-ui\.js|design\.mjs|captions\.mjs|visual-runtime\.js|version-diff\.mjs|styles\.mjs|create-ui\.js|history\.mjs|marketing.html|marketing-ui.js|editor-tools.js|media-scenes.js|ui\.css|ui\.js|home\.js|account\.html|create\.html|editor\.html|feed-editor\.html|centro\.html|studio\.html|validar\.mjs|n8n-style\.js|formats\.js|feed\/templates\/[^/]+\.json|feed\/photos\/[a-z0-9-]+\.(jpg|png)|assets\/[^/]+|storyboards\/[^/]+\.json|casting\/[^/]+\.mp3|salida\/[^/]+\.(mp4|json))$/.test(route)||basename(route).startsWith('.'))throw problem(404,'No disponible')
     const file=resolve(root,'.'+route);if(!file.startsWith(root+sep))throw problem(403,'Ruta inválida')
     return await sendFile(req,res,file)
   }catch(e){if(!res.headersSent)json(e.status||(e.code==='ENOENT'?404:400),{error:e.message});else res.destroy()}

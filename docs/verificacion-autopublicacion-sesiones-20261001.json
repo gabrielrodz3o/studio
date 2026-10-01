@@ -1,0 +1,20 @@
+{
+  "date": "2026-10-01T15:22:55.703Z",
+  "api": "passed",
+  "browser": "passed",
+  "render": "passed",
+  "editorial_stories": "13:00 and 18:00 rendered via frozen job runtime; pending review",
+  "handoff": "created; NLE import not exercised",
+  "job": "job_5c471806-805e-4e2b-969c-78b66b5dcc72",
+  "artifacts": "/private/tmp/studio-autopublish-session-integration",
+  "node_tests": 101,
+  "publication_mode": "automatic",
+  "auto_release_channels": [
+    "instagram",
+    "facebook"
+  ],
+  "scheduled_story": "2026-10-01T17:00:00Z",
+  "rollback_image": "gcode-studio:before-20261001T152409Z",
+  "session_tests": "restart, renewal, logout, password change, inactivity",
+  "draft_test": "browser recovery and explicit save"
+}

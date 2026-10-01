@@ -1,5 +1,7 @@
 # Migración editorial de n8n a Studio — 1 de octubre de 2026
 
+> Cambio posterior autorizado: el calendario puede publicar sin aprobación manual. Ver `publicacion-automatica-y-sesiones-20261001.md`.
+
 ## Alcance contrastado con el servidor
 
 Se inspeccionaron los nodos de decisiones, cuotas, limpieza, dirección visual, horarios y conexiones del workflow `h40YN1b3Yq8G1wyK`, y los motores y catálogos de `rbn4mKfY8pGoHBsN` (13:00) y `X5RXeY2ZKvUvwyq5` (18:00). Las fuentes privadas se consultaron por SSH, sin copiar credenciales. No se usa el documento anterior como prueba de paridad.

@@ -1,0 +1,10 @@
+// Browser-local recovery only. A recovered draft still needs explicit Save/Render.
+(async()=>{
+const response=await fetch('/auth/me');if(!response.ok)return;const user=await response.json();const prefix='studio-draft:'+user.username+':';let pending=null,timer;
+const notice=document.createElement('div');notice.className='draft-recovery';notice.setAttribute('role','status');document.querySelector('main')?.prepend(notice);
+function key(s){return prefix+s.nombre}
+function read(k){try{return JSON.parse(sessionStorage.getItem(k)||'null')}catch{return null}}
+function recoverPrompt(saved,k){pending=k;notice.replaceChildren();const label=document.createElement('span');label.textContent='Hay cambios sin guardar de '+new Date(saved.at).toLocaleString()+'. ';const restore=document.createElement('button');restore.textContent='Recuperar borrador';restore.onclick=async()=>{try{await window.studioEditor.set(saved.script);pending=null;notice.textContent='Borrador recuperado. Guarda los cambios cuando lo revises.'}catch(e){notice.textContent=e.message}};const discard=document.createElement('button');discard.textContent='Descartar borrador local';discard.onclick=()=>{sessionStorage.removeItem(k);pending=null;notice.textContent='Se mantiene la versión del servidor.'};notice.append(label,restore,discard)}
+function capture(){const editor=window.studioEditor;if(!editor)return;const {script,dirty}=editor.get(),k=key(script),saved=read(k);if(!dirty){if(saved&&JSON.stringify(saved.script)!==JSON.stringify(script)&&pending!==k)recoverPrompt(saved,k);return}if(pending===k)return;try{sessionStorage.setItem(k,JSON.stringify({at:new Date().toISOString(),script}))}catch{notice.textContent='No se pudo guardar el borrador en este navegador. Guarda los cambios en Studio.'}}
+window.addEventListener('studio-change',()=>{clearTimeout(timer);timer=setTimeout(capture,80)});window.addEventListener('pagehide',capture);window.addEventListener('studio-saved',e=>{sessionStorage.removeItem(prefix+e.detail.name);pending=null;notice.textContent='Cambios guardados en Studio.'});capture();
+})().catch(()=>{});
