@@ -126,6 +126,7 @@ const server=createServer(async(req,res)=>{
       if(path==='/api/v1/automation'&&req.method==='GET')return json(200,automation.snapshot());
       if(path==='/api/v1/automation/tick'&&req.method==='POST'){const d=await body(req);return json(202,automation.kick({generate:d.generate!==false}))}
       if(path==='/api/v1/automation/config'&&req.method==='POST')return json(200,await automation.configure(await body(req),'n8n-automation'));
+      if(path==='/api/v1/automation/video-now'&&req.method==='POST'){const result=await automation.requestVideoNow(await body(req),'n8n-owner-request');return json(202,{...result,...automation.kick({generate:true})})}
       if(path==='/api/v1/automation/recover'&&req.method==='POST'){const d=await body(req);return json(202,await automation.recover(d.id,{allowPaid:d.allow_paid===true}))}
       if(path==='/api/v1/publications/import'&&req.method==='POST')return json(200,await marketing.importPublication(await body(req),'n8n',store))
       const deliveryCheck=/^\/api\/v1\/deliveries\/([a-f0-9-]{36})\/verify$/.exec(path);if(deliveryCheck&&req.method==='GET')return json(200,marketing.validateDelivery(deliveryCheck[1],store))

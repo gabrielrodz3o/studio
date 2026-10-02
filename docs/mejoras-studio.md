@@ -414,3 +414,10 @@ Estado GST-033: YA RESUELTO dentro del alcance de analítica pagada de gasto, im
 Implementado en `storage.mjs` (`diskUsage`), ruta administrativa GET `/api/storage/usage` en `local.mjs`, menú lateral compartido `ui.js`/`ui.css`. Capacidad real mediante statfs del volumen `.studio-state`: total, ocupado, disponible y reservado. No mide únicamente archivos Studio, no suma discos ajenos y no expone rutas del servidor. Visible a administradores; actualiza cada 60 s mientras la pestaña está visible y manualmente. Timeout/error muestra «Espacio no disponible», nunca disco vacío.
 
 Aviso con menos de 5 GiB disponibles o al menos 85% no disponible; crítico con menos de 2 GiB o 95%. Barra accesible, colores y texto, menú desplazable en pantallas pequeñas. No elimina archivos ni modifica caché. Pruebas de aritmética, bloques reservados, umbrales y fallo de sistema; smoke API y barra en navegador aislado con escritorio/móvil.
+
+
+## GST-035 — Horario del Reel diario y solicitud inmediata
+
+Configuración persistente `daily_video_schedule`: effective_date, production_time, publish_time, validación HH:MM y producción anterior a publicación. Desde 2026-10-03 se solicita 04:00/07:00 America/Santo_Domingo para Facebook/TikTok; conserva horarios del feed e historias, Instagram del lunes a las 08:00 y fechas históricas. El calendario y la UI usan la configuración vigente.
+
+Solicitud administrativa de automatización POST `/api/v1/automation/video-now` con confirmed true: usa identidad idempotente del Reel del día, comprueba ausencia de entregas, no repite trabajos fallidos/inciertos y guarda autorización para publicar cuando esté listo. Ciclo admite esta producción adelantada; solo al superar calidad fija envío dos minutos después y actualiza las piezas mediante el servicio existente, con aprobación por la política autorizada y registro de actor. Sobrevive reinicios mediante estado persistente; no elude controles ni mezcla permisos Ads. n8n consulta y publica cada cinco minutos, por lo que 07:00 es la hora programada y el envío efectivo puede demorarse hasta el siguiente ciclo.
