@@ -8,7 +8,7 @@ import {voiceTakes,perfil as voiceProfile} from './voz.mjs'
 import {voiceReviews,reviewFile,acceptVoiceReview} from './voice-reviews.mjs'
 import {createHandoff} from './handoff.mjs'
 import {Batches,batchQuote} from './batches.mjs'
-import {inspectCache,cleanCache,protectedCacheKeys} from './storage.mjs'
+import {inspectCache,cleanCache,protectedCacheKeys,diskUsage} from './storage.mjs'
 import {capability} from './capabilities.mjs'
 import {authorizeApi} from './api-scopes.mjs'
 import {campaignContext,proposals,deriveCampaign} from './planning.mjs'
@@ -175,6 +175,7 @@ const server=createServer(async(req,res)=>{
     if(path==='/api/operations'&&req.method==='GET'){access.require(req,['admin']);const budget=await creative.budget.summary(),jobs=store.list(),approved=marketing.data.releases.filter(r=>r.status==='approved');return json(200,{jobs:jobs.map(j=>({id:j.id,name:j.name,status:j.status,created_at:j.created_at,updated_at:j.updated_at,parent_job_id:j.parent_job_id,creative_id:j.creative_id,reserved_usd:budget.jobs[j.id]?.reserved||0,confirmed_usd:budget.jobs[j.id]?.actual||0,cost_complete:!budget.jobs[j.id]||budget.jobs[j.id].unconfirmed===0})),budget,approved_releases:approved.length,approval_minutes:approved.map(r=>{const j=jobs.find(j=>j.id===r.bundle.job_id);return j?(Date.parse(r.at)-Date.parse(j.created_at))/60000:null}).filter(x=>x!=null),pending_comments:marketing.data.comments.filter(c=>!c.resolved).length,uncertain_deliveries:marketing.data.deliveries.filter(d=>d.status==='uncertain').length})}
     if(path==='/api/budget'&&req.method==='GET'){access.require(req,['admin']);return json(200,await creative.budget.summary({offset:Number(url.searchParams.get('offset'))||0}))}
     if(path==='/api/capabilities'&&req.method==='GET')return json(200,capability(Object.fromEntries(url.searchParams),marketing.data.accounts));
+    if(path==='/api/storage/usage'&&req.method==='GET'){access.require(req,['admin']);try{return json(200,await diskUsage(join(root,'.studio-state')))}catch{throw problem(503,'No se pudo consultar el espacio del disco')}}
     if(path==='/api/storage'&&req.method==='GET'){access.require(req,['admin']);return json(200,await inspectCache(root,{protectedKeys:await protectedCacheKeys(store)}))}
     if(path==='/api/accounts'&&req.method==='GET'){access.require(req,['admin']);return json(200,access.users.map(u=>({username:u.username,role:u.role})))}
     if(path==='/api/versions'&&req.method==='GET')return json(200,await versions.list(url.searchParams.get('kind'),url.searchParams.get('name')))

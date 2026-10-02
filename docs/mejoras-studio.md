@@ -407,3 +407,10 @@ Límites: no hay desglose real por ubicación Facebook/Instagram ni conversiones
 - Persisten cero operaciones de creación Ads y escrituras deshabilitadas. Sincronizador n8n de lectura conservado. La rotación del token previamente compartido sigue pendiente y no se presenta como resuelta.
 
 Estado GST-033: YA RESUELTO dentro del alcance de analítica pagada de gasto, impresiones y clics, filtros mensuales, comparación, gráficos y exportación. Desglose por ubicación, conversiones/ROAS y reconciliación automática de creatividades históricas permanecen fuera de esta entrega.
+
+
+## GST-034 — Barra de espacio del servidor
+
+Implementado en `storage.mjs` (`diskUsage`), ruta administrativa GET `/api/storage/usage` en `local.mjs`, menú lateral compartido `ui.js`/`ui.css`. Capacidad real mediante statfs del volumen `.studio-state`: total, ocupado, disponible y reservado. No mide únicamente archivos Studio, no suma discos ajenos y no expone rutas del servidor. Visible a administradores; actualiza cada 60 s mientras la pestaña está visible y manualmente. Timeout/error muestra «Espacio no disponible», nunca disco vacío.
+
+Aviso con menos de 5 GiB disponibles o al menos 85% no disponible; crítico con menos de 2 GiB o 95%. Barra accesible, colores y texto, menú desplazable en pantallas pequeñas. No elimina archivos ni modifica caché. Pruebas de aritmética, bloques reservados, umbrales y fallo de sistema; smoke API y barra en navegador aislado con escritorio/móvil.
