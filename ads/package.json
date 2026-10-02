@@ -1,0 +1,6 @@
+{
+  "private": true,
+  "dependencies": {
+    "facebook-nodejs-business-sdk": "24.0.1"
+  }
+}

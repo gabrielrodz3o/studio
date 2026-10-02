@@ -1,3 +1,6 @@
+import {AdsStore} from './ads/store.mjs'
+import {adsRoute} from './ads/routes.mjs'
+import {adsPrincipal} from './api-scopes.mjs'
 import {prepareEditorialPhoto} from './editorial-render.mjs'
 import {EditorialCalendar,editorialScript} from './editorial-calendar.mjs'
 import {Automation} from './automation.mjs'
@@ -71,6 +74,7 @@ if(!token){try{token=(await readFile(tokenFile,'utf8')).trim()}catch(e){if(e.cod
 if(token.length<32)throw Error('STUDIO_API_TOKEN debe tener al menos 32 caracteres')
 let apiClients;try{apiClients=JSON.parse(await readFile(join(state,'api-clients.json'),'utf8'))}catch(e){if(e.code!=='ENOENT')throw e}
 const store=await new JobStore({root,publications:id=>publicationsFor(marketing.data.deliveries,id)}).init()
+const ads=await new AdsStore(root,{brands:()=>marketing.data.brands,capture:async id=>{const p=marketing.releasePreview(id,store);if(p.comments.length)throw problem(409,'Resuelve los comentarios editoriales');return {...p.bundle,campaign_id:marketing.data.pieces.find(x=>x.id===id)?.campaign_id}},artifact:async(id,kind,sha256)=>({path:store.artifactPath(id,kind),sha256})}).init();
 const batches=await new Batches(root,{produce:createPiece,budget:creative.budget,store,linkJob:async(pieceId,jobId,actor)=>{const p=marketing.data.pieces.find(p=>p.id===pieceId);if(!p)throw problem(404,'Pieza no encontrada');await marketing.savePiece({...p,job_id:jobId},actor,store)}}).init();
 const automation=await new Automation(root,{marketing,store,produce:createPiece,editorial:await new EditorialCalendar(root).init()}).init();
 const mime={'.gz':'application/gzip','.css':'text/css; charset=utf-8','.html':'text/html; charset=utf-8','.mjs':'text/javascript','.js':'text/javascript','.json':'application/json','.png':'image/png','.webp':'image/webp','.jpg':'image/jpeg','.ttf':'font/ttf','.mp3':'audio/mpeg','.wav':'audio/wav','.mp4':'video/mp4'}
@@ -118,6 +122,7 @@ const server=createServer(async(req,res)=>{
     if(path.startsWith('/api/v1/')){
       if(!authorizeApi(req.headers.authorization,path,req.method,token,apiClients))return json(401,{error:'Se requiere una clave de API válida'})
       if(req.headers.origin)throw problem(403,'La API de integración no acepta solicitudes de navegador; usa el editor')
+      if(path==='/api/v1/ads'||path.startsWith('/api/v1/ads/')){const principal=adsPrincipal(req.headers.authorization,apiClients);if(!principal)throw problem(403,'Configura una clave Ads específica');return json(200,await adsRoute(ads,{path:path.slice('/api/v1/ads'.length),method:req.method,input:req.method==='POST'?await body(req):{},actor:principal}))}
       if(path==='/api/v1/automation'&&req.method==='GET')return json(200,automation.snapshot());
       if(path==='/api/v1/automation/tick'&&req.method==='POST'){const d=await body(req);return json(202,automation.kick({generate:d.generate!==false}))}
       if(path==='/api/v1/automation/config'&&req.method==='POST')return json(200,await automation.configure(await body(req),'n8n-automation'));
@@ -155,6 +160,7 @@ const server=createServer(async(req,res)=>{
     if(path==='/auth/me'&&req.method==='GET')return json(200,actor)
     if(path==='/auth/logout'&&req.method==='POST'){access.sameOrigin(req);res.setHeader('Set-Cookie',await access.logout(req));return json(200,{ok:true})}
     if(path==='/auth/account'&&req.method==='POST'){access.sameOrigin(req);return json(200,await access.change(actor,await body(req)))}
+    if(path==='/api/ads'||path.startsWith('/api/ads/')){if(req.method!=='GET')access.sameOrigin(req);return json(200,await adsRoute(ads,{path:path.slice('/api/ads'.length),method:req.method,input:req.method==='POST'?await body(req):{},actor}))}
     const handoff=/^\/api\/handoff\/(job_[a-f0-9-]{36})$/.exec(path);if(handoff&&req.method==='GET'){store.get(handoff[1]);res.setHeader('Content-Disposition','attachment; filename="gcode-project.tar.gz"');return await sendFile(req,res,join(store.dir,handoff[1],'handoff.tar.gz'))}
     if(path==='/api/automation'&&req.method==='GET')return json(200,automation.snapshot());
     if(path==='/api/batches'&&req.method==='GET')return json(200,{batches:batches.list(),quote:batchQuote});
@@ -236,11 +242,11 @@ const server=createServer(async(req,res)=>{
     if(path==='/api/lista')return json(200,{guiones:(await readdir(join(root,'storyboards'))).filter(f=>!f.startsWith('.')&&f.endsWith('.json')),voces:(await readdir(join(root,'casting'))).filter(f=>/^\d.*\.mp3$/.test(f)),videos:(await readdir(join(root,'salida'))).filter(f=>!f.startsWith('.')&&f.endsWith('.mp4'))})
     const vendor=/^\/vendor\/wavesurfer\/([a-z0-9./-]+\.js)$/.exec(path);if(vendor&&!vendor[1].includes('..'))return await sendFile(req,res,join(root,'node_modules/wavesurfer.js/dist',vendor[1]));
     const route=decodeURIComponent(path==='/'?'/centro.html':path)
-    if(!/^\/(project-drafts\.js|automation-ui\.js|carousel-ui\.js|operations-ui\.js|design\.mjs|captions\.mjs|visual-runtime\.js|version-diff\.mjs|styles\.mjs|create-ui\.js|history\.mjs|marketing.html|marketing-ui.js|editor-tools.js|media-scenes.js|ui\.css|ui\.js|home\.js|account\.html|create\.html|editor\.html|feed-editor\.html|centro\.html|studio\.html|validar\.mjs|n8n-style\.js|formats\.js|feed\/templates\/[^/]+\.json|feed\/photos\/[a-z0-9-]+\.(jpg|png)|assets\/[^/]+|storyboards\/[^/]+\.json|casting\/[^/]+\.mp3|salida\/[^/]+\.(mp4|json))$/.test(route)||basename(route).startsWith('.'))throw problem(404,'No disponible')
+    if(!/^\/(ads.html|ads-ui.js|ads.css|project-drafts\.js|automation-ui\.js|carousel-ui\.js|operations-ui\.js|design\.mjs|captions\.mjs|visual-runtime\.js|version-diff\.mjs|styles\.mjs|create-ui\.js|history\.mjs|marketing.html|marketing-ui.js|editor-tools.js|media-scenes.js|ui\.css|ui\.js|home\.js|account\.html|create\.html|editor\.html|feed-editor\.html|centro\.html|studio\.html|validar\.mjs|n8n-style\.js|formats\.js|feed\/templates\/[^/]+\.json|feed\/photos\/[a-z0-9-]+\.(jpg|png)|assets\/[^/]+|storyboards\/[^/]+\.json|casting\/[^/]+\.mp3|salida\/[^/]+\.(mp4|json))$/.test(route)||basename(route).startsWith('.'))throw problem(404,'No disponible')
     const file=resolve(root,'.'+route);if(!file.startsWith(root+sep))throw problem(403,'Ruta inválida')
     return await sendFile(req,res,file)
   }catch(e){if(!res.headersSent)json(e.status||(e.code==='ENOENT'?404:400),{error:e.message});else res.destroy()}
 })
 server.listen(port,process.env.STUDIO_BIND_HOST||'127.0.0.1',()=>console.log(`Centro multimedia: http://127.0.0.1:${port}/centro.html\nEditor: http://127.0.0.1:${port}\nAPI v1 habilitada; clave guardada en .studio-state/api-token (no se muestra).`))
-async function shutdown(){server.close();await automation.running;await store.stop();process.exit(0)}
+async function shutdown(){server.close();await automation.running;await ads.serial;await store.stop();process.exit(0)}
 process.once('SIGTERM',shutdown);process.once('SIGINT',shutdown)

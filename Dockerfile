@@ -5,6 +5,8 @@ RUN git clone --depth 1 --branch v1.7.6 https://github.com/ggml-org/whisper.cpp.
 WORKDIR /app
 COPY package*.json ./
 RUN npm ci --omit=dev
+COPY ads/package*.json ./ads/
+RUN npm ci --prefix ads --omit=dev --ignore-scripts
 COPY . .
 RUN mkdir -p /app/.studio-state /app/voz /app/models /app/salida /home/node/.cache && chown -R node:node /app /home/node/.cache
 USER node

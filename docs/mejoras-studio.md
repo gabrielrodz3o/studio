@@ -172,3 +172,152 @@ No hacen falta agentes para locks, cuotas, reintentos, programación o releases.
 ## Seguimiento editorial — 1 octubre 2026
 
 CONT-01 a CONT-08: implementación y pruebas en [mejoras-contenido-20261001.md](mejoras-contenido-20261001.md). Evidencia inicial en [auditoria-contenido-editorial-20261001.md](auditoria-contenido-editorial-20261001.md). La verificación de nuevas funciones/capturas y la medición de resultados comerciales siguen siendo trabajo continuo; no se confunden con los cambios técnicos implementados.
+
+## Publicidad pagada — revisión actual, 1 octubre 2026 RD / 2 octubre UTC
+
+Base `8cdba42`. Esta sección sustituye únicamente el borrador de investigación Ads y conserva el historial anterior. Evidencia detallada, commits, módulos y licencias: [benchmark actualizado](benchmark-github.md#auditoría-meta-ads--tiktok-ads--corte-1-octubre-2026-rd--2-octubre-utc).
+
+**Investigación:** estructura, código relevante, comparación y consultas de lectura terminadas dentro del acceso disponible. **Implementación Ads:** no iniciada. **Validación de la app privada y piloto Ads real:** pendiente. Las pruebas de Studio ejecutadas en esta pasada dieron 124/124 Node y 6/6 Python; no son pruebas de Marketing API ni evaluación de calidad de voz.
+
+### Checklist de capacidades: conservar antes de añadir
+
+| Capacidad | Estado actual | Decisión / evidencia |
+|---|---|---|
+| Marcas, recursos, claims y campañas editoriales | YA RESUELTO | MANTENER `marketing.mjs saveBrand/saveCampaign`, `content-policy.mjs`. No duplicar catálogo con otro Studio. |
+| Nueve estilos, voz, subtítulos y edición de partes | YA RESUELTO | MANTENER `styles.mjs`, `voz.mjs`, `editor-tools.js`, `versions.mjs`. No implementar de nuevo por un benchmark. |
+| Caché y coste de generación | YA RESUELTO | MANTENER `scene-cache.mjs`, `budget.mjs`; el coste IA no es gasto Ads. |
+| Release editorial vinculado a contenido/cuenta | YA RESUELTO | MANTENER `releases.mjs publicationBundle`, `marketing.approveRelease/approvedRelease`. |
+| Publicación orgánica, recibos y prevención de duplicados | YA RESUELTO | MANTENER `deploy/studio-publisher.cjs`, `marketing.claim/result/reconcileDelivery`; hay publicación real y también importación histórica separadas. |
+| Autorización orgánica automática | YA RESUELTO | MANTENER `automation.authorizeAutomatic`, sin heredarlo para Ads. El usuario ya autorizó esa modalidad orgánica. |
+| Recuperación de feed y portadas | YA RESUELTO | `automation.replacementForFeed`, `cover.test.mjs`, `publisher.test.mjs`; no repetir estos cambios. |
+| Sesiones persistentes / roles | YA RESUELTO para uso actual | MANTENER `access.mjs`. MEJORAR acciones específicas y allowlist publicitaria, no reconstruir login. |
+| Metadatos de cuenta y capacidades Ads | FALTA VERIFICADA en modelo/rutas revisados | GST-028. Conexiones externas concretas: NO VERIFICADO. |
+| Pieza/versión vinculada a jerarquía de Ads | FALTA VERIFICADA | GST-029. Una campaña editorial no equivale a una campaña de Meta. |
+| Autorización de gasto y activación independiente | FALTA VERIFICADA | GST-030. Aprobación editorial existente es reutilizable pero insuficiente para autorizar gasto. |
+| Crear/reconciliar anuncios por API | FALTA VERIFICADA en transporte/workflows revisados | GST-031; se propone, no se ejecuta. |
+| Métricas pagadas con moneda/período/atribución | FALTA VERIFICADA | GST-032; métricas orgánicas actuales sí existen. |
+| Permisos/modo/activos de app Meta 25485026691133696 | NO VERIFICADO | Panel no accesible. Identidad Instagram comprobada no prueba Marketing API. |
+| Cuenta/desarrollador/permisos TikTok Ads | NO VERIFICADO | Cuenta Buffer orgánica no basta. Evaluar después del piloto Meta. |
+| Nuevo gestor integral o agente activador de gasto | NO CONVIENE | Duplicaría procesos y autoridad; SDK + funciones y n8n son suficientes inicialmente. |
+
+### Prioridades y supuestos de planificación
+
+Supuesto de estimación, **no dato observado**: un desarrollador, un responsable que aprueba presupuesto, una cuenta publicitaria propia inicial, volumen bajo (hasta diez borradores semanales), infraestructura actual. Esfuerzos en días de desarrollo orientativos, sin tiempos de revisión de plataformas ni gestión de permisos. No hay tarifas verificadas para presupuestar servicios nuevos; el piloto de lectura no activa gasto publicitario, pero consume infraestructura, mantenimiento y cuota API. No estimar ahorros/ventas sin baseline.
+
+| ID | Estado capacidad / tipo de decisión | Impacto esperado | Esfuerzo | Coste operativo / prioridad |
+|---|---|---|---|---|
+| GST-028 | FALTA VERIFICADA; INTEGRAR + MEJORAR | Visibilidad real de cuentas/permisos sin abrir escritura | 1–3 días tras acceso | Lecturas acotadas, renovación operativa de credencial; P0, primero |
+| GST-032 | FALTA VERIFICADA; INSPIRARSE + construir contrato | Resultados comparables sin mezclar gasto/monedas/atribución | 2–4 días | Almacenamiento y consultas periódicas limitadas; P1, junto al piloto |
+| GST-029 | FALTA VERIFICADA; MEJORAR + ADAPTAR patrón | Reutilizar creativo aprobado y atribuir anuncio a versión | 2–3 días | Estado/artefactos existentes; P1, antes de crear |
+| GST-030 | FALTA VERIFICADA; MEJORAR | Control explícito de presupuesto y de cambios | 3–5 días | Operaciones humanas de revisión; P0 antes de cualquier escritura Ads |
+| GST-031 | FALTA VERIFICADA; INTEGRAR + INSPIRARSE | Recuperación por fase sin anuncios duplicados | 3–5 días | Lecturas de conciliación; gasto solo tras activación autorizada futura; P1 después de 028–030 |
+
+### GST-028 — Conexión Ads de lectura y permisos por cuenta
+
+**Estado de investigación:** [x] estructura/documentación; [x] código relevante; [x] comparación; [ ] prueba de integración real. **Implementación:** [ ] pendiente.
+
+**Problema comprobado →** `capabilities.mjs` representa transportes orgánicos; `api-scopes.mjs` da a GET/HEAD el scope `read`; cuentas Facebook/TikTok vivas son canales Buffer. No existe registro verificado de cuenta Ads/permisos/moneda/zona. Los scopes de la credencial Instagram no pudieron introspectarse y su app de origen no está confirmada.
+
+**Cambio →** crear `ad_connections` con plataforma, referencia segura de credencial, allowlist de cuentas, marca permitida, nombre/moneda/zona/estado, capacidades comprobadas y fecha de comprobación. Separar `ads.read`, `ads.draft` y `ads.activate` en backend; no hacer que la clave de publicación orgánica los herede. Validar IDs solicitados contra autorización del servidor. Exponer estado y errores sin secretos.
+
+**Componentes →** SDK oficial Meta Node como dependencia futura; cursor y objetos `AdAccount`. Pruebas de redacción inspiradas en Pipeboard; no copiar su servidor BUSL ni conectarlo a credenciales. Instancia SDK por conexión; debug y crash reporter apagados. Scopes mínimos apropiados: lectura, sin permiso de escritura preventivo.
+
+**Módulos afectados →** `api-scopes.mjs`, `access.mjs`, `capabilities.mjs`, rutas de `local.mjs`; nuevos `ads/connections.mjs`, `ads/meta.mjs` y vista Conexiones. Nombres de nuevos archivos son propuesta, no archivos existentes. Almacenar secretos mediante configuración privada de integración, no en JSON exportable de marketing.
+
+**Dependencias/riesgos →** ID `act_…`, `ads_read` y asignación efectiva en app existente; nivel de acceso por confirmar. La app y Business indicados no acreditan permisos. Logs/URLs/errores del SDK pueden revelar tokens si no se interceptan. El hallazgo Telegram requiere rotación posterior autorizada y migración a credencial n8n; no reutilizar URLs secretas.
+
+**Aceptación →** usuario/clave de solo lectura puede consultar únicamente cuenta y marca autorizadas; manipular ID devuelve 403 antes de red; no hay POST/PATCH/DELETE, incluso ante excepciones; fixtures de 401/403/429, paginación, respuesta malformada y expiración; tokens ausentes de logs/exportación/errores. Conexión real muestra ID/moneda/zona/fecha y evidencia del permiso; hasta entonces estado NO VERIFICADO.
+
+### GST-029 — Relación anuncio–campaña–pieza–versión y derechos pagados
+
+**Investigación:** [x] estructura; [x] código; [x] comparación; [ ] prueba práctica. **Implementación:** [ ] pendiente.
+
+**Problema comprobado →** `marketing.saveCampaign` es editorial y `publicationBundle` es orgánico. No hay modelo de relación campaign/adset/ad/creative de proveedor con la versión concreta, ni decisión explícita de uso publicitario de los recursos.
+
+**Cambio →** añadir borrador Ads relacionado con campaign interna, brand, piece, job/version/hash, texto, destino y cuenta, sin alterar el registro editorial. Identidad externa compuesta `(plataforma, cuenta, tipo, id)`: nunca suponer que todos los IDs pertenecen a la misma plataforma o que un Buffer channel es ad account. Conservar snapshot de marca/recursos y procedencia. Poder enlazar publicación orgánica con recibo verificable para evaluar anuncio de post existente, sin asumir que URL concede autorización.
+
+**Componente →** adaptar patrón MIT de snapshot y checkpoints de Leadrouter (`delivery/models.py`, `publishCampaign.js`), conservando `releases.mjs` propio. No portar SQLAlchemy/React. Verificar derechos de música/voz/imagen para Ads; las licencias de código no los otorgan. Spark Ads necesitará autorización oficial de contenido.
+
+**Módulos →** `marketing.mjs`, `releases.mjs`, UI campaña/pieza en `local.mjs`, nuevos contratos `ads/drafts.mjs`; solo referencias a artefactos ya existentes, no nueva generación por defecto.
+
+**Dependencias/riesgos →** GST-028, identidad/cuenta correctas, esquema versionado y backfill opcional de relaciones sin inferirlas desde nombres. Un post puede originar varios anuncios; no sobrescribir la entrega orgánica con el ID del anuncio.
+
+**Aceptación →** mismo creativo puede alimentar dos anuncios con cuentas/plataformas explícitas y métricas separadas; editar pieza genera otra versión y deja inmutable el snapshot anterior; recurso expirado o no autorizado para Ads bloquea preparación; historial orgánico permanece idéntico; ninguna llamada de creación ocurre en guardar borrador.
+
+### GST-030 — Aprobación editorial y autorización de gasto separadas
+
+**Investigación:** [x] estructura; [x] código; [x] comparación; [ ] prueba práctica. **Implementación:** [ ] pendiente.
+
+**Problema comprobado →** `budget.mjs` controla generación; `automation.authorizeAutomatic` permite publicar orgánico por política del dueño. Ninguna de las dos cosas autoriza inversión en medios. `release` actual no vincula presupuesto/destino/segmentación/configuración de Ads.
+
+**Cambio →** autorización de gasto explícita del dueño con hash de cuenta, campaña/configuración, versión de creativo y copy, URL de destino, identidad, objetivo, segmentación, placements, moneda, presupuesto (diario o total), fechas y límites aprobados. Conservar importe en unidad exacta del proveedor, sin float ni regla universal de multiplicar por 100; zona horaria de la cuenta, timestamps normalizados. No inventar mínimos, impuestos, comisiones ni reglas financieras. Separar estados editorial_approved, spend_authorized, remote_paused y activation_authorized.
+
+**Componente →** extensión propia de `publicationBundle` y revocación; validación de dinero/zona horaria de Leadrouter como referencia MIT, con fixtures de nuestras cuentas. PAUSED predeterminado de SDK/MCP es una configuración, no prueba de aprobación. La activación seguirá siendo una acción humana explícita en una fase futura.
+
+**Módulos →** `releases.mjs`, `access.mjs`, `api-scopes.mjs`, nuevo `ads/authorizations.mjs`, vista revisión Ads y audit. Auditoría Ads debe conservar hash de configuración, actor, transición, IDs y resultado remoto; el log actual actor/acción limitado a 2000 entradas no sustituye ese historial.
+
+**Dependencias/riesgos →** GST-028/029, acuerdos reales del dueño sobre límites. Cambiar presupuesto, destino, fechas, creatividad o segmentación revoca autorización. No prometer que un límite local detiene instantáneamente gasto que Meta ya está entregando; esa fase necesita reconciliación y controles remotos.
+
+**Aceptación →** aprobar el video o habilitar orgánico automático nunca permite gastar; cambios enumerados invalidan autorización; editor no activa por URL/API; solicitud manipulada con monto/cuenta distintos falla; creación propuesta resulta pausada y confirmada por lectura en todos los niveles aplicables; activación imposible sin autorización exacta vigente. Tests usan transporte simulado, no campañas reales.
+
+### GST-031 — Operaciones Ads durables, creación pausada y reconciliación
+
+**Investigación:** [x] estructura; [x] código; [x] comparación; [ ] integración. **Implementación:** [ ] pendiente; fase de escritura solo propuesta.
+
+**Problema comprobado →** existe excelente base de claim/uncertain orgánica, pero no operaciones por fases de campaña/adset/creative/ad. Repetir una llamada tras timeout puede duplicar objeto o inversión.
+
+**Cambio →** adaptadores `ads/meta.mjs` y futuro `ads/tiktok.mjs`, ledger de operación por clave estable y hash, persistencia antes/después de cada llamada, checkpoint de ID remoto, request/trace ID saneado, leases y resultado uncertain. Reutilizar conceptos de `marketing.claim/result/reconcileDelivery`; n8n invoca operaciones por ID, no reconstruye payload ni autoriza presupuesto. Nunca prometer idempotencia del proveedor donde no está documentada. Si no puede conciliar de forma inequívoca, detener y pedir revisión.
+
+**Componentes →** SDK Meta Node para API; patrón `enqueue/fail_job/recovery` de Leadrouter y actividades no reintentables de Postiz, implementados con código propio. TikTok: SDK oficial como especificación; evaluar cliente selectivo Promobase solo tras validar auth, método, envelopes y licencia. El reporte integrado TikTok revisado en Leadrouter usa POST frente a GET oficial: no copiarlo.
+
+**Módulos →** nuevos `ads/operations.mjs`, adaptadores, endpoint de lectura de progreso en `local.mjs`, notificaciones/atención; scheduler n8n futuro solo después de aprobación de esta fase. Conservar `deploy/studio-publisher.cjs` para orgánico. No introducir Temporal, Redis ni otro gestor sin necesidad medida.
+
+**Dependencias/riesgos →** GST-028/029/030; tests de fallos por fase. Reintentos GET con backoff y límites; POST no se repite automáticamente tras respuesta incierta. Persistencia transaccional acotada debe evaluarse si habrá varios writers; JSON serializado no es lock distribuido. Cancelación local no borra objetos remotos ni garantiza que una solicitud en vuelo no termine.
+
+**Aceptación →** diez invocaciones idénticas producen una operación local; corte después de respuesta antes de checkpoint queda uncertain y no reenvía; recuperar ID de campaña/adset no crea otro; payload distinto con misma clave da conflicto; 429/5xx/read timeout clasificados; estados remoto/local se reconcilian; todos los objetos de la fase de creación quedan pausados y el ensayo no activa nada. Simulación integral primero; creación real requiere autorización posterior.
+
+### GST-032 — Métricas pagadas con contrato y conciliación
+
+**Investigación:** [x] estructura; [x] código; [x] comparación; [ ] lectura Ads real. **Implementación:** [ ] pendiente.
+
+**Problema comprobado →** `marketing.addMetrics` guarda entrega, timestamp, fuente y métricas; no período, moneda, ventana de atribución o nivel publicitario. Hay dos fuentes legadas de insights Instagram además del publicador. Sumarlas sin procedencia puede duplicar observaciones.
+
+**Cambio →** colección separada `paid_metric_snapshots`: plataforma/cuenta/campaign/adset/ad, nivel, fecha inicial/final, timezone, moneda, ventana/configuración de atribución, fetched_at, versión API, desglose, definición de métrica, estado de cobertura, valores y referencia de creativo cuando verificable. Upsert por dimensiones/ventana/configuración; conservar revisiones por datos tardíos. Mostrar orgánico/pagado por separado; sin ventas/ROAS si faltan conversiones/ingresos.
+
+**Componentes →** Insights del SDK Meta y ReportingApi oficial TikTok; patrón Leadrouter analytics de moneda, madurez, conflictos, creativos no vinculados y duplicación. Pipeboard sirve para contrato de parámetros/cursor, no para incorporar MCP. No copiar endpoint Nalarin que suma floats y etiqueta USD fijo. Separar monedas; no sumar reach como usuarios únicos; calcular ratios desde numerador/denominador comparables.
+
+**Módulos →** nuevo `ads/metrics.mjs`, vista resultados por canal/tipo en UI, rutas de lectura; `marketing.mjs` solo vínculo, no meter gasto en `addMetrics`; n8n futuro dispara sync acotado y devuelve IDs/estado. Inventariar fuentes de insights actuales para no importar el mismo resultado dos veces.
+
+**Dependencias/riesgos →** GST-028 y cuenta habilitada; GST-029 para atribuir a pieza, aunque anuncios ajenos a Studio pueden importarse como no vinculados. Definir período/ventana idénticos al comparar Ads Manager. Datos tardíos o falta de permisos deben mostrarse como cobertura incompleta, no cero. API/infraestructura sin precio inventado; medir consultas/duración/volumen.
+
+**Aceptación →** fixture con USD y DOP no devuelve total combinado; reimportación no duplica gasto; distinta ventana produce otra observación identificada; valor ausente sigue null/no disponible; anuncio sin pieza no inventa vínculo; siete días completos coinciden con reporte oficial bajo iguales parámetros o muestran diferencia explicada. Un token solo lector nunca crea/modifica anuncios al actualizar resultados.
+
+### Secuencia de ejecución propuesta y qué queda fuera
+
+**Inmediato:** completar acceso no secreto a app/cuenta, atender exposición de credencial antigua mediante rotación autorizada, ejecutar GST-028 y parte de lectura de GST-032 cuando se autorice implementación. No cambiar la app ni generar credenciales durante la auditoría. Empezar con fixtures permite avanzar sin token, pero no demostrar acceso real.
+
+**Siguiente etapa:** GST-029 y GST-030; luego GST-031 exclusivamente creación pausada, previa autorización. Métricas y anuncios existentes pueden leerse antes de crear nada. No migrar el calendario orgánico.
+
+**Evolución posterior:** TikTok Ads cuando existan advertiser_id y permisos verificados; Spark Ads solo con autorización de contenido; análisis comparativo de creativos cuando haya suficientes observaciones comparables. Posponer optimización automática de presupuestos, asignación causal, agentes de compra, dashboards multiempresa públicos, gestor integral paralelo y migración de stack.
+
+**Ideas nuevas fundamentadas:** desactivar telemetría de escritura del SDK en un lector; separar la identidad de cuenta orgánica/Buffer/Ads; mostrar madurez y cobertura de métricas en vez de rankings prematuros; conservar creative fingerprint entre orgánico y pago sin confundir recibos; exigir permiso de uso pagado del audio; contratos de prueba que detecten método HTTP incorrecto y mezcla de monedas.
+
+**Medición:** tiempo humano para conectar/verificar cuenta, proporción de lecturas conciliadas, cobertura de anuncios con creativo verificable, cambios que revocan autorización, operaciones uncertain resueltas sin duplicación, llamadas por sync, duración/fallos y trabajo humano por campaña. Medir antes/después; no hay datos para prometer porcentajes ni aumento de ventas.
+
+**Siguiente paso exacto:** el dueño consulta en la app 25485026691133696 si Marketing API/caso de uso y `ads_read` están disponibles/aprobados, qué modo/nivel figuran y qué cuenta `act_…` está asignada. Compartir solo esos datos no secretos o habilitar acceso al navegador. Después implementar GST-028 con mocks y bloqueo de escritura, y validar el piloto real con una cuenta. No hay trabajo pendiente prometido en segundo plano.
+
+## Implementación Ads posterior a la auditoría — 2 octubre 2026 UTC
+
+El usuario autorizó implementar después del análisis. GST-028–032 tienen ahora código en `ads/`, rutas en `local.mjs`, permisos en `api-scopes.mjs`, interfaz `ads.html`/`ads-ui.js` y pruebas `ads.test.mjs`. Las secciones anteriores conservan el estado al momento de la auditoría; este apartado es el estado más reciente.
+
+| Tarea | Estado actualizado | Límite explícito |
+|---|---|---|
+| GST-028 | MEJORABLE: lector Meta/TikTok y control de cuenta/rol implementados | Acceso real de app/cuenta NO VERIFICADO; no hay token publicitario configurado ni ID aportado. |
+| GST-029 | YA RESUELTO en el alcance de imagen/video individual | Snapshot/versiones/historial y revisión de derechos pagados; no carrusel Ads ni Spark Ads. |
+| GST-030 | YA RESUELTO en el contrato de tráfico web con presupuesto total | Editorial/gasto separados; cambios invalidan aprobación; activación explícita. No categorías especiales ni inversión automática. |
+| GST-031 | MEJORABLE: ledger, creación pausada, activación/pausa y recuperación implementados y ensayados con fixtures | Escrituras reales deshabilitadas por defecto; validación remota pendiente. No se crearon anuncios. |
+| GST-032 | MEJORABLE: consultas, snapshots, filtros y sincronizador n8n implementados | Conciliación de cifras con Ads Manager pendiente. No atribución causal/ventas ni ventanas inventadas. |
+
+Operación, configuración, rollback y criterios pendientes: [ads-operacion.md](ads-operacion.md). SDK npm disponible: 24.0.1, aislado del renderer; no asumir que la versión de GitHub 26.0.2 del benchmark está publicada en npm. La implementación mantiene n8n orgánico, su política de aprobación y sus credenciales existentes.
+
+Validación de la implementación: 151 pruebas Node aprobadas, 6 Python y prueba de interfaz escritorio/móvil sin errores. Credencial n8n Ads aislada, solo lectura/sync; producción rechaza activación con ella. Workflow lector `HeVqpgMYx4sKHuxE` activo y ejecutor comprobado en modo idle. Las pruebas Meta/TikTok con cuenta real siguen **NO VERIFICADAS**, no se sustituyen por fixtures ni por un despliegue saludable. No se crearon campañas ni se incurrió en gasto.
