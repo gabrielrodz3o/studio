@@ -22,6 +22,7 @@ try{
  await cdp('Page.reload');await new Promise(r=>setTimeout(r,1800));
  await evaluate("document.getElementById('report-month').value='2026-09';document.getElementById('report-month').dispatchEvent(new Event('change'))");
  if(!(await evaluate("document.getElementById('report-kpis').innerText.includes('697.50')")))throw Error('Exact reporting KPI failed: '+await evaluate("document.getElementById('report-kpis').innerText"));
+ if(!(await evaluate("document.getElementById('monthly-expenses').innerText.includes('697.50')")))throw Error('Monthly expense summary failed');
  if(await evaluate("document.querySelectorAll('#trend-chart svg').length")!==1)throw Error('Trend missing');
  if(await evaluate("document.querySelectorAll('#metric-rows tr').length")!==2)throw Error('Campaign grouping failed');
  await evaluate("document.getElementById('report-campaign').value='10';document.getElementById('report-campaign').dispatchEvent(new Event('change'))");
@@ -37,5 +38,5 @@ try{
  await evaluate("document.getElementById('report-kpis').scrollIntoView({block:'start'})");
  const image=await cdp('Page.captureScreenshot',{format:'png'});await writeFile('/private/tmp/gcode-ads-desktop.png',Buffer.from(image.data,'base64'));
  await cdp('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});await new Promise(r=>setTimeout(r,200));if(await evaluate('document.documentElement.scrollWidth>window.innerWidth+2'))throw Error('Mobile horizontal overflow');await evaluate("document.getElementById('report-kpis').scrollIntoView({block:'start'})");const mobile=await cdp('Page.captureScreenshot',{format:'png'});await writeFile('/private/tmp/gcode-ads-mobile.png',Buffer.from(mobile.data,'base64'));
- if(runtime.length)throw Error('Browser errors: '+runtime.join(','));console.log(JSON.stringify({http:true,csrf_blocked:true,read_only_default:true,desktop:true,mobile:true,tabs:true,charts:true,filters:true,comparison_import:true,synthetic_fixture:true,runtime_errors:runtime.length}));
+ if(runtime.length)throw Error('Browser errors: '+runtime.join(','));console.log(JSON.stringify({http:true,csrf_blocked:true,read_only_default:true,desktop:true,mobile:true,tabs:true,charts:true,monthly_expenses:true,filters:true,comparison_import:true,synthetic_fixture:true,runtime_errors:runtime.length}));
 }finally{ws?.close();chrome?.kill();app.kill();await new Promise(r=>setTimeout(r,400));await rm(dir,{recursive:true,force:true,maxRetries:10,retryDelay:100})}

@@ -173,3 +173,8 @@ Límites: no hay desglose real por ubicación Facebook/Instagram ni conversiones
 - Persisten cero operaciones de creación Ads y escrituras deshabilitadas. Sincronizador n8n de lectura conservado. La rotación del token previamente compartido sigue pendiente y no se presenta como resuelta.
 
 Estado GST-033: YA RESUELTO dentro del alcance de analítica pagada de gasto, impresiones y clics, filtros mensuales, comparación, gráficos y exportación. Desglose por ubicación, conversiones/ROAS y reconciliación automática de creatividades históricas permanecen fuera de esta entrega.
+
+
+### Gastos mensuales visibles — 2 octubre 2026 UTC
+
+La pantalla Publicidad muestra gastos por mes de la cuenta completa, hasta 12 meses importados, con moneda, cobertura y marca provisional/parcial. Las tarjetas permiten abrir el mes. No usan filtros de campaña (se indica explícitamente), no confunden datos faltantes con cero y no representan facturas ni cargos de tarjeta. El indicador, gráfico y tabla usan ahora la etiqueta Gasto publicitario. Importes calculados desde métricas existentes, no valores hardcodeados.
