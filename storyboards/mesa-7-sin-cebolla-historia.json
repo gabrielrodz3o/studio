@@ -1,0 +1,168 @@
+{
+  "nombre": "mesa-7-sin-cebolla-historia",
+  "formato": "historia",
+  "perfil_voz": "n8n",
+  "voz": true,
+  "subtitulos": true,
+  "editorial": {
+    "topic": "mesa7-modificadores-historia-20261002",
+    "title": "Mesa 7: sin cebolla",
+    "asset": "cocina",
+    "cta": "Pide tu demo",
+    "points": [
+      "Consulta los productos y modificadores de la comanda.",
+      "Revisa el detalle del pedido antes de preparar."
+    ],
+    "source": "Captura local verificada de cocina",
+    "commercial": true
+  },
+  "evidencia": {
+    "label": "Comandas en cocina",
+    "crop": [
+      0,
+      60,
+      815,
+      550
+    ],
+    "detail": [
+      825,
+      100,
+      400,
+      600
+    ],
+    "focus": [
+      0,
+      0,
+      400,
+      470
+    ],
+    "labels": [
+      "Productos y modificadores",
+      "Detalle de la comanda"
+    ],
+    "claims": [
+      "La pantalla muestra productos, cantidades y modificadores de las comandas.",
+      "Las comandas se organizan por su estado visible."
+    ],
+    "key": "cocina",
+    "imagen": "assets/editorial-fc0890bf87d39db9bf62.webp",
+    "ancho": 1626,
+    "alto": 859,
+    "steps": [
+      "Plantea una pregunta",
+      "Consulta la pantalla",
+      ""
+    ],
+    "benefit": "",
+    "source_sha256": "fc0890bf87d39db9bf62b4e60c85f581fbcbb8f29f798bb50b901a343e601f7f",
+    "source": "Captura local: feed/brand/cocina.webp"
+  },
+  "escenas": [
+    {
+      "tipo": "gancho_local",
+      "dur": 5.5,
+      "rotulo": "Mesa 7: sin cebolla",
+      "sub": "Un pedido. Un detalle importante.",
+      "voz": "En la mesa siete pidieron un mofongo, pero con un detalle: sin cebolla.",
+      "claim_ids": [
+        "kitchen-visible"
+      ]
+    },
+    {
+      "tipo": "caos_acumulado",
+      "dur": 5,
+      "rotulo": "La hora pico no espera.",
+      "frases": [
+        "¡Mesa 7, sin cebolla!",
+        "¿Lo vio cocina?"
+      ],
+      "voz": "En plena hora pico, ese detalle no debería quedarse solamente de palabra.",
+      "claim_ids": [
+        "kitchen-visible"
+      ]
+    },
+    {
+      "tipo": "producto_paso",
+      "dur": 5,
+      "titulo": "El pedido tiene detalles",
+      "etiqueta": "CAPTURA REAL",
+      "step": 1,
+      "steps": 2,
+      "imagen": "assets/editorial-fc0890bf87d39db9bf62.webp",
+      "ancho": 1626,
+      "alto": 859,
+      "recorte": [
+        0,
+        60,
+        815,
+        550
+      ],
+      "voz": "En ComandPOS puedes consultar los productos y modificadores de las comandas.",
+      "claim_ids": [
+        "kitchen-visible"
+      ]
+    },
+    {
+      "tipo": "producto_paso",
+      "dur": 4.5,
+      "titulo": "Consulta la comanda en cocina",
+      "etiqueta": "CAPTURA REAL",
+      "step": 2,
+      "steps": 2,
+      "imagen": "assets/editorial-fc0890bf87d39db9bf62.webp",
+      "ancho": 1626,
+      "alto": 859,
+      "recorte": [
+        825,
+        100,
+        400,
+        600
+      ],
+      "voz": "Revisa el detalle en cocina antes de preparar el pedido.",
+      "claim_ids": [
+        "kitchen-visible"
+      ]
+    },
+    {
+      "tipo": "remate",
+      "dur": 4,
+      "sin_reparto": true,
+      "lineas": [
+        "Confirma el pedido.",
+        "*Revisa sus indicaciones.*"
+      ],
+      "voz": "La recomendación: confirma el pedido y sus indicaciones.",
+      "claim_ids": [
+        "kitchen-visible"
+      ]
+    },
+    {
+      "tipo": "cierre",
+      "dur": 4,
+      "cta": "Pide tu demo",
+      "whatsapp": "+1 849 540 6093",
+      "web": "comandpos.com",
+      "voz": "Conoce ComandPOS. Solicita tu demo.",
+      "claim_ids": [
+        "kitchen-visible"
+      ]
+    }
+  ],
+  "cover_time": 1.5,
+  "brand_id": "comandpos",
+  "brand": {
+    "name": "ComandPOS by GCODE",
+    "primary": "#14233b",
+    "accent": "#ff6b35"
+  },
+  "evidence_claims": [
+    {
+      "id": "kitchen-visible",
+      "text": "La pantalla muestra productos, cantidades y modificadores de las comandas.",
+      "source": "Captura local: feed/brand/cocina.webp",
+      "verified": true,
+      "reviewed_by": "codex-visual-review",
+      "reviewed_at": "2026-10-02T13:13:26.172Z"
+    }
+  ]
+}

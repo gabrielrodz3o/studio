@@ -188,7 +188,7 @@ function grafica(t,{titulo='Lo más vendido esta semana',barras=[]}){
 
 // ── Rótulo grande final ─────────────────────────────────────────────────
 function titular(lineas,y,t,t0=0,size=96,color=C.navy,acento=C.orange){return lineas.map((l,i)=>{const k=eo(p(t,t0+i*.18,t0+i*.18+.45));
-  return G(T(l.replace(/\*/g,''),540,y+i*size*1.12,size,l.includes('*')?acento:color,900,'text-anchor="middle"'),`translate(0,${(1-k)*50})`,k);}).join('');}
+  const clean=l.replace(/\*/g,''),ctx=titular.ctx||(titular.ctx=document.createElement('canvas').getContext('2d'));ctx.font=`900 ${size}px Montserrat`;const fitted=Math.min(size,size*920/Math.max(1,ctx.measureText(clean).width));return G(T(clean,540,y+i*size*1.12,fitted,l.includes('*')?acento:color,900,'text-anchor="middle"'),`translate(0,${(1-k)*50})`,k);}).join('');}
 
 // ── Guion gráfico (el Studio lo recibe en JSON; aquí va el piloto) ───────
 // ── Guion gráfico: llega en JSON desde storyboards/ (cargar) ─────────────
@@ -231,6 +231,21 @@ function comercialCaptura(c,x,y,w,h,t,order=0){
  `<svg x="${x}" y="${y}" width="${w}" height="${h}" viewBox="${cx} ${cy} ${cw} ${ch}" preserveAspectRatio="xMidYMid meet" overflow="hidden"><image href="${c.imagen}" width="${c.ancho}" height="${c.alto}"/></svg>`,
  `translate(${dx},${dy+(1-k)*35}) scale(${z}) translate(${-dx},${-dy})`,k);
 }
+// Paper product walkthrough: preserve real pixels and reveal one observation per shot.
+function productoPaso(s,t){
+ const k=eo(p(t,0,.65)),accent=C.orange;
+ let v=R(0,0,W,H,'#F4EDDC')+G(Paper(66,198,948,118,'#FFFFFF',51),`rotate(-1 540 250)`);
+ v+=T(`COMANDPOS · ${String(s.step).padStart(2,'0')} / ${String(s.steps).padStart(2,'0')}`,104,270,31,C.navy,800);
+ v+=comercialTexto(s.titulo,84,420,890,66,C.navy,900);
+ const [cx,cy,cw,ch]=s.recorte,y=620,boxH=700;
+ v+=G(R(72,y-62,936,boxH+110,'#FFFFFF',28,'filter="url(#sombra)"')+
+ T('app.comandpos.com',106,y-19,25,'#556070',700)+
+ `<svg x="94" y="${y}" width="892" height="${boxH}" viewBox="${cx} ${cy} ${cw} ${ch}" preserveAspectRatio="xMidYMid meet" overflow="hidden"><defs><clipPath id="product-crop-${s.step}"><rect x="${cx}" y="${cy}" width="${cw}" height="${ch}"/></clipPath></defs><image clip-path="url(#product-crop-${s.step})" href="${s.imagen}" width="${s.ancho}" height="${s.alto}"/></svg>`,
+ `translate(0,${(1-k)*45})`,k);
+ v+=R(86,1386,908,6,'#DCD5C6')+R(86,1386,908*clamp(t/s.dur),6,accent);
+ v+=T('CAPTURA REAL · DATOS DE EJEMPLO',86,1440,23,'#586373',700);
+ return v;
+}
 function comercialEscena(s,t){
  let html=comercialBase(s,t);
  if(s.tipo==='comercial_doble'){
@@ -256,8 +271,8 @@ async function preparar(sb){
 }
 window.preparar=preparar;
 
-function escena(s,t){const d=s.dur;if(s.tipo==='comercial_n8n')return window.renderN8n(CURRENT_STORY,SCENES,SCENES.indexOf(s),t);if(s.tipo.startsWith("comercial_"))return comercialEscena(s,t);switch(s.tipo){
- case 'gancho_local':{const z=lerp(1.12,1,eo(p(t,0,d)));return G(local(t),`translate(540,1100) scale(${z}) translate(-540,-1100)`)+ramon(lerp(1300,830,eo(p(t,.2,1.1))),1090,1.3,'preocupado',t)+rotulo(s.rotulo,t)+G(Paper(50,230,520,80,C.orange,5)+T(s.sub,80,284,40,'#FFF',800),'',eo(p(t,.8,1.2)));}
+function escena(s,t){const d=s.dur;if(s.tipo==='producto_paso')return productoPaso(s,t);if(s.tipo==='comercial_n8n')return window.renderN8n(CURRENT_STORY,SCENES,SCENES.indexOf(s),t);if(s.tipo.startsWith("comercial_"))return comercialEscena(s,t);switch(s.tipo){
+ case 'gancho_local':{const z=lerp(1.12,1,eo(p(t,0,d)));return G(local(t),`translate(540,1100) scale(${z}) translate(-540,-1100)`)+ramon(lerp(1300,830,eo(p(t,.2,1.1))),1090,1.3,'preocupado',t)+rotulo(s.rotulo,t)+G(Paper(50,230,930,80,C.orange,5)+T(s.sub,80,284,Math.min(40,850/(Math.max(1,s.sub.length)*.67)),'#FFF',800),'',eo(p(t,.8,1.2)));}
  case 'caos_acumulado':{const shake=t>2.6?Math.sin(t*60)*4:0;return G(local(t),`translate(${shake},0)`)+ramon(830,1090,1.3,'preocupado',t,{brazo:'arriba'})+comandas(t,s.frases)+rotulo(s.rotulo,t,4);}
  case 'transicion':{const k=eio(p(t,0,.7));const y=lerp(H+80,-40,k);return local(t)+`<polygon points="${torn(-40,y,1160,H+200,31,26)}" fill="${C.navy}"/>`+G(titular(wrapTxt(s.texto,18).map(l=>l.replace('ComandPOS.','*ComandPOS.*')),860,t,.45,88,'#FFFFFF'),'',1);}
  case 'tablet_comanda':{const z=lerp(1.06,1,eo(p(t,0,1)));return R(0,0,W,H,C.navy)+G(tablet(t,s),`translate(540,1150) scale(${z}) translate(-540,-1150)`)+sello('ENVIADA A COCINA',540,1500,t,3.05,C.orange)+rotulo(s.rotulo,t,6);}
@@ -265,7 +280,7 @@ function escena(s,t){const d=s.dur;if(s.tipo==='comercial_n8n')return window.ren
  case 'caja_cuadra':return caja(t,s)+rotulo(s.rotulo,t,8);
  case 'inventario_alerta':{const z=lerp(1.05,1,eo(p(t,0,1)));return G(inventario(t,s),`translate(540,1100) scale(${z}) translate(-540,-1100)`)+rotulo(s.rotulo,t,9);}
  case 'grafica_ventas':return grafica(t,s)+rotulo(s.rotulo,t,10);
- case 'remate':return local(t,{noche:false})+ramon(lerp(520,560,p(t,0,d)),1060,1.35,'feliz',t,{objeto:'tablet'})+moto(t)+titular(s.lineas,300,t,.1,100);
+ case 'remate':return local(t,{noche:false})+ramon(lerp(520,560,p(t,0,d)),1060,1.35,'feliz',t,{objeto:'tablet'})+(s.sin_reparto?'':moto(t))+titular(s.lineas,300,t,.1,100);
  case 'cierre':{const k=eo(p(t,0,.5));let v=R(0,0,W,H,C.navy)+[...Array(30)].map((_,i)=>{const r=rng(i+50);return `<circle cx="${r()*1080}" cy="${(r()*1920+t*40*(1+r()))%1920}" r="${3+r()*4}" fill="${[C.orange,C.cyan,'#FFFFFF'][i%3]}" opacity=".35"/>`;}).join('');
   v+=G(Paper(140,520,800,280,'#FFFFFF',41)+`<image href="assets/logo.png" x="170" y="570" width="740" height="215"/>`,`translate(0,${(1-k)*60})`,k);
   v+=titular([s.cta],1000,t,.35,104,'#FFFFFF');

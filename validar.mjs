@@ -1,6 +1,6 @@
 import {validateDesign,validateTemplate} from './design.mjs'
 import {styles} from './styles.mjs'
-export const tipos = ['media','gancho_local', 'caos_acumulado', 'transicion', 'tablet_comanda', 'pantalla_cocina', 'caja_cuadra', 'inventario_alerta', 'grafica_ventas', 'remate', 'cierre', 'comercial_doble', 'comercial_foco', 'comercial_cierre', 'comercial_n8n']
+export const tipos = ['media','producto_paso','gancho_local', 'caos_acumulado', 'transicion', 'tablet_comanda', 'pantalla_cocina', 'caja_cuadra', 'inventario_alerta', 'grafica_ventas', 'remate', 'cierre', 'comercial_doble', 'comercial_foco', 'comercial_cierre', 'comercial_n8n']
 export const formatos = Object.fromEntries(Object.entries(styles).map(([id,s])=>[id,s.name]))
 export function validar(sb) {
   if (!sb || typeof sb !== 'object') throw new Error('Guion inválido')
@@ -56,12 +56,12 @@ export function validar(sb) {
     for (const words of [e.palabras,e.audio_local?.palabras]) if (words != null) {
       if (!Array.isArray(words) || words.some((w,i)=>!w || typeof w.word!=='string' || !Number.isFinite(w.start) || !Number.isFinite(w.end) || w.start<0 || w.end<w.start || (i>0 && w.start<words[i-1].start))) fail('tiempos de subtítulos inválidos')
     }
-    if (typeof e.tipo === 'string' && e.tipo.startsWith('comercial_')) {
+    if (typeof e.tipo === 'string' && (e.tipo.startsWith('comercial_')||e.tipo==='producto_paso')) {
       for (const key of ['titulo', 'etiqueta']) if (typeof e[key] !== 'string' || !e[key].trim() || e[key].length > 64) fail(`${key}: texto de hasta 64 caracteres`)
       for (const key of ['texto', 'nota']) if (e[key] != null && (typeof e[key] !== 'string' || e[key].length > 100)) fail(`${key}: texto de hasta 100 caracteres`)
       if (e.tipo === 'comercial_cierre') for (const key of ['cta', 'whatsapp', 'web']) if (typeof e[key] !== 'string' || !e[key].trim() || e[key].length > 40) fail(`falta ${key} o es demasiado largo`)
       if (e.tipo === 'comercial_doble' && (!Array.isArray(e.capturas) || e.capturas.length !== 2)) fail('se necesitan dos capturas')
-      const capturas = e.tipo === 'comercial_doble' && Array.isArray(e.capturas) ? e.capturas : e.tipo === 'comercial_foco' ? [e] : []
+      const capturas = e.tipo === 'comercial_doble' && Array.isArray(e.capturas) ? e.capturas : ['comercial_foco','producto_paso'].includes(e.tipo) ? [e] : []
       for (const c of capturas) {
         if (!c || !/^assets\/[a-zA-Z0-9_-]+\.(png|jpg|webp)$/.test(c.imagen || '')) { fail('captura: usa una imagen local de assets'); continue }
         if (!(c.ancho > 0 && c.alto > 0)) fail('faltan dimensiones de la captura')
@@ -69,6 +69,7 @@ export function validar(sb) {
         if (c.etiqueta != null && (typeof c.etiqueta !== 'string' || c.etiqueta.length > 64)) fail('etiqueta de captura inválida')
       }
     }
+    if(e.tipo==='producto_paso'&&(!Number.isInteger(e.step)||!Number.isInteger(e.steps)||e.step<1||e.step>e.steps||e.steps>20))fail('Paso de producto inválido');
     if (!Number.isFinite(e.dur) || e.dur < 1 || e.dur > 30) fail('duración entre 1 y 30 s')
     for (const key of requeridos[e.tipo] || []) if (typeof e[key] !== 'string' || !e[key].trim()) fail(`falta ${key}`)
     for (const key of ['rotulo', 'sub', 'texto', 'cta', 'voz']) if (e[key] != null && (typeof e[key] !== 'string' || e[key].length > (key === 'voz' ? 450 : 100))) fail(`${key} demasiado largo o inválido`)
