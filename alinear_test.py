@@ -21,4 +21,18 @@ class TimingTest(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'cantidades'):
             align('El total es 150 pesos', [{'text':'El total es 1500 pesos','offsets':{'from':0,'to':2500}}],3)
 
+    def test_small_table_identifier_word_and_digit_are_equivalent(self):
+        result=align('En la mesa siete, sin cebolla.', [{'text':'En la mesa 7, sin cebolla.','offsets':{'from':0,'to':2500}}],3)
+        self.assertTrue(result['critical_words_checked'])
+        self.assertFalse(result['human_review'])
+
+    def test_changed_identifier_still_blocks(self):
+        for observed in ['En la mesa 17, sin cebolla.', 'En la mesa ocho, sin cebolla.']:
+            with self.subTest(observed=observed), self.assertRaisesRegex(ValueError, 'cantidades'):
+                align('En la mesa siete, sin cebolla.', [{'text':observed,'offsets':{'from':0,'to':2500}}],3)
+
+    def test_amount_words_are_not_silently_interpreted(self):
+        with self.assertRaisesRegex(ValueError, 'cantidades'):
+            align('Cuesta siete pesos.', [{'text':'Cuesta 7 pesos.','offsets':{'from':0,'to':2500}}],3)
+
 if __name__=='__main__':unittest.main()

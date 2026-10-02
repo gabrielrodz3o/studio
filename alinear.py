@@ -2,7 +2,14 @@
 import json, sys, unicodedata, difflib, re
 from collections import Counter
 
-ALIGNMENT_VERSION = 2
+ALIGNMENT_VERSION = 3
+
+def numeric_signature(text):
+    # Unambiguous small identifiers only; do not interpret prices or compound amounts.
+    digits = dict(zip('cero uno dos tres cuatro cinco seis siete ocho nueve diez'.split(), map(str, range(11))))
+    text = re.sub(r'\b(mesa|pedido|comanda|paso)\s+(' + '|'.join(digits) + r')\b',
+                  lambda m: m.group(1) + ' ' + digits[m.group(2).lower()], text, flags=re.I)
+    return re.findall(r'\d+(?:[.,]\d+)*', text)
 
 def verify_meaning(text, segments):
     """Do not manufacture negations, numbers or product names from fuzzy matches."""
@@ -13,8 +20,7 @@ def verify_meaning(text, segments):
     if expected != observed:
         raise ValueError('Revisión de voz: cambió una negación o condición comercial. Escucha y corrige la locución.')
     # Ambiguous digit/word substitutions require review instead of silently passing.
-    numbers = lambda s: re.findall(r'\d+(?:[.,]\d+)*', s)
-    if numbers(text) != numbers(heard):
+    if numeric_signature(text) != numeric_signature(heard):
         raise ValueError('Revisión de voz: las cantidades no coinciden con el guion.')
     for name in ['comandpos', 'gcode']:
         if name in norm(text) and name not in norm(heard):
