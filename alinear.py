@@ -2,7 +2,7 @@
 import json, sys, unicodedata, difflib, re
 from collections import Counter
 
-ALIGNMENT_VERSION = 3
+ALIGNMENT_VERSION = 4
 
 def numeric_signature(text):
     # Unambiguous small identifiers only; do not interpret prices or compound amounts.
@@ -22,8 +22,11 @@ def verify_meaning(text, segments):
     # Ambiguous digit/word substitutions require review instead of silently passing.
     if numeric_signature(text) != numeric_signature(heard):
         raise ValueError('Revisión de voz: las cantidades no coinciden con el guion.')
+    # Whisper sometimes spells the same spoken name with English "command".
+    # This exact lexical alias is not a fuzzy match ("Command Pass" stays blocked).
+    brand_heard = re.sub(r'\bcommand[\s-]*pos\b', 'ComandPOS', heard, flags=re.I)
     for name in ['comandpos', 'gcode']:
-        if name in norm(text) and name not in norm(heard):
+        if name in norm(text) and name not in norm(brand_heard):
             raise ValueError('Revisión de voz: confirma la pronunciación del nombre de la marca.')
 
 def norm(s):

@@ -35,4 +35,16 @@ class TimingTest(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'cantidades'):
             align('Cuesta siete pesos.', [{'text':'Cuesta 7 pesos.','offsets':{'from':0,'to':2500}}],3)
 
+    def test_exact_brand_transcription_alias_retains_critical_checks(self):
+        r=align('Consulta ComandPOS sin demora.', [{'text':'Consulta Command-Pos sin demora.','offsets':{'from':0,'to':2500}}],3)
+        self.assertTrue(r['critical_words_checked'])
+        self.assertFalse(r['human_review'])
+        with self.assertRaisesRegex(ValueError, 'negación'):
+            align('Consulta ComandPOS sin demora.', [{'text':'Consulta Command-Pos con demora.','offsets':{'from':0,'to':2500}}],3)
+
+    def test_other_brand_pronunciations_still_require_review(self):
+        for name in ['Command Pass', 'Comandos', 'Command Postal']:
+            with self.subTest(name=name), self.assertRaisesRegex(ValueError, 'marca'):
+                align('Consulta ComandPOS.', [{'text':'Consulta '+name+'.','offsets':{'from':0,'to':2500}}],3)
+
 if __name__=='__main__':unittest.main()

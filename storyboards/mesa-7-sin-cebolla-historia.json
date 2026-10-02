@@ -84,7 +84,7 @@
     {
       "tipo": "producto_paso",
       "dur": 5,
-      "titulo": "El pedido tiene detalles",
+      "titulo": "Del pedido a la cocina",
       "etiqueta": "CAPTURA REAL",
       "step": 1,
       "steps": 2,
@@ -97,7 +97,7 @@
         815,
         550
       ],
-      "voz": "En ComandPOS puedes consultar los productos y modificadores de las comandas.",
+      "voz": "Cuando tomas un pedido en ComandPOS, este se registra y se envía directamente a la cocina para que lo preparen.",
       "claim_ids": [
         "kitchen-visible"
       ]
@@ -118,20 +118,20 @@
         400,
         600
       ],
-      "voz": "Revisa el detalle en cocina antes de preparar el pedido.",
+      "voz": "El personal puede consultar en ComandPOS las comandas que ya fueron enviadas a cocina para mantener el control.",
       "claim_ids": [
         "kitchen-visible"
       ]
     },
     {
       "tipo": "remate",
-      "dur": 4,
+      "dur": 2.8,
       "sin_reparto": true,
       "lineas": [
         "Confirma el pedido.",
         "*Revisa sus indicaciones.*"
       ],
-      "voz": "La recomendación: confirma el pedido y sus indicaciones.",
+      "voz": "",
       "claim_ids": [
         "kitchen-visible"
       ]
@@ -142,7 +142,7 @@
       "cta": "Pide tu demo",
       "whatsapp": "+1 849 540 6093",
       "web": "comandpos.com",
-      "voz": "Conoce ComandPOS. Solicita tu demo.",
+      "voz": "Para conocer más sobre cómo enviar comandas a cocina con ComandPOS, solicita tu demo llamando al número que ves en pantalla.",
       "claim_ids": [
         "kitchen-visible"
       ]
