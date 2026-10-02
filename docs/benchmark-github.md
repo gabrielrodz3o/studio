@@ -242,3 +242,30 @@ No se recomienda migrar toda la base. JSON serializado sirve para el lector inic
 ### Nota posterior de implementación — 2 octubre 2026 UTC
 
 Tras autorización se añadieron contratos y adaptadores propios, usando los patrones anteriores. El SDK Meta inspeccionado en GitHub era 26.0.2, pero npm publicó como disponible 24.0.1 al instalar: esa es la dependencia fijada, con Graph v24.0 y prueba del cursor real sobre transporte simulado. Se aisló en `ads/package.json` para preservar los manifiestos del renderizador. No se importaron aplicaciones completas ni código de Postiz/Pipeboard. Avance y limitaciones en la sección más reciente de `mejoras-studio.md` y en `ads-operacion.md`.
+
+
+### Verificación posterior de acceso Meta — 1 octubre 2026, 22:49 AST
+
+GST-028 / GST-032: investigación de panel **comprobada** en Brave existente. App GCODERD n8n tiene Marketing API y ads_read/ads_management con acceso estándar; portfolio G code contiene la cuenta 680943103845369 y el usuario humano tiene acceso total. Usuario de sistema gcoderd-api existe, pero su lista de tres activos no incluye cuenta publicitaria. **Conexión API Studio todavía NO VERIFICADA**: no confundir el login humano con una credencial integrada. No se modificaron permisos ni se generaron tokens. Detalles y continuación concreta en [ads-operacion.md](ads-operacion.md#verificación-en-brave--1-octubre-2026-2249-ast). Se requiere autorización específica antes de asignar activo/generar credencial, según las instrucciones del usuario para acceso a Meta. No añade una nueva tarea duplicada ni marca GST-028 como terminado.
+
+
+### Intento autorizado de conexión — 2026-10-01T22:55-04:00
+
+El usuario autorizó asignar lectura y provisionar la credencial necesaria. En la cuenta 680943103845369 se seleccionó solamente gcoderd-api y el permiso **Ver rendimiento**; se comprobó que los otros tres interruptores estaban desactivados antes de enviar Asignar. Meta respondió: «Esta cuenta está bloqueada. No pudimos completar la acción. Detectamos actividad sospechosa en tu cuenta…». **Asignación NO confirmada**; no se considera implementada. El navegador regresó a Meta Business Suite `/latest/home`. No se generaron tokens, no se guardó una conexión sin validar, no se crearon campañas y no se hizo gasto.
+
+Continuación exacta: el dueño completa el control de seguridad oficial de Facebook; luego releer activos asignados de gcoderd-api antes de repetir la asignación (evitar suponer que no se guardó), provisionar credencial ads_read de forma privada, registrar cuenta/marca en Studio y validar metadatos e insights con consultas de lectura. GST-028 y GST-032 siguen pendientes de validación real. El bloqueo proviene de Meta, no del sistema de aprobación de herramientas.
+
+
+### Conexión real Meta Ads verificada — 2026-10-01T23:34-04:00
+
+Se obtuvo la credencial del formulario oficial «Se creó el token» de la sesión autorizada, en memoria, y se trasladó mediante stdin por SSH al almacén privado `/root/gcode-studio/data/state/ads/credentials.json`, propietario 1000 y modo 0600. No se incluyó el valor en código, documentación ni archivos locales. El usuario también la compartió en el chat: **rotación pendiente**. La consulta oficial `me/permissions` confirma ads_read, pero también ads_management y otros permisos amplios; no describir esta credencial como de privilegios mínimos. No se revocaron otras credenciales del usuario de sistema para evitar interrumpir integraciones.
+
+Comprobaciones ejecutadas:
+- GET oficial Graph v24.0 de act_680943103845369: cuenta activa, USD, America/Santo_Domingo. Permiso ads_read concedido. No se comprobó vencimiento ni se infirió app emisora del token.
+- Adaptador real de Studio, solo GET: 22 campañas, 41 conjuntos, 156 anuncios, todas las paginaciones completas. Métricas 2026-09-24 a 2026-09-30: 46 filas diarias. Estos recuentos no indican campañas nuevas ni todas activas.
+- Conexión creada por sesión admin mediante API Studio: `a348c00e-7070-4265-890b-6da3c2bbeeee`, marca comandpos (supuesto explícito comunicado al dueño), auto_sync true, estado verified.
+- Ejecución real de `/home/node/.n8n/gcode-studio-integration/v2/ads-sync.cjs`: synced, complete true, writes false; sync `a26507f8-9717-44aa-8aaf-4e91d810b60a`. Persistencia comprobada: 46 métricas, cero operaciones de creación, escrituras deshabilitadas.
+- UI real después de recargar /ads.html: Lectura comprobada, USD, zona horaria correcta, inventario de 156 anuncios y consulta completa. El filtro predeterminado de UI presenta un subconjunto por fechas; no confundirlo con las 46 filas persistidas.
+- Workflow `HeVqpgMYx4sKHuxE` activo, disparador cada hora; ejecutor conserva límite mínimo de seis horas entre consultas por cuenta. Probado el ejecutor directamente, no se esperó un disparo horario.
+
+GST-028 y GST-032: integración real de lectura/sincronización comprobada; no representa habilitación de escritura publicitaria. Pendientes: sustituir/revocar precisamente la credencial expuesta con permisos mínimos, comprobar vencimiento, cotejar importes y atribución contra Ads Manager con idéntico período. El emparejamiento automático entre anuncios históricos y piezas de Studio no está acreditado. TikTok Ads no se conectó en esta operación. No se modificó publicación orgánica.
