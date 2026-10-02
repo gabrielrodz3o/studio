@@ -286,7 +286,7 @@ function escena(s,t){const d=s.dur;if(s.tipo==='producto_paso')return productoPa
   v+=titular([s.cta],1000,t,.35,104,'#FFFFFF');
   const b=back(p(t,.7,1.1)),pulse=1+.03*Math.sin(t*6);v+=G(R(-400,-70,800,140,'#25D366',70,'filter="url(#sombra)"')+T('WhatsApp '+s.whatsapp,0,16,44,'#FFF',900,'text-anchor="middle"'),`translate(540,1210) scale(${b*pulse})`,clamp(b));
   v+=G(T(s.web,540,1370,40,'#B8C7DA',700,'text-anchor="middle"'),'',eo(p(t,1,1.4)));
-  v+=G(T('El sistema para tu restaurante.',540,1480,40,'#FFFFFF',700,'text-anchor="middle"'),'',eo(p(t,1.2,1.6)));v+=T('Caso ilustrativo · datos de ejemplo',540,1840,24,'#7F93AB',600,'text-anchor="middle"');return v;}
+  return v;}
  }return '';}
 function moto(t){const x=((t*420)%1600)-300;return G(`<circle cx="-60" cy="60" r="34" fill="#222"/><circle cx="70" cy="60" r="34" fill="#222"/>`+R(-80,0,150,44,C.orange,16)+R(-10,-80,70,80,C.orange,10)+T('ComandPOS',-2,-30,14,'#FFF',800)+`<circle cx="-50" cy="-40" r="26" fill="${C.navy}"/>`,`translate(${x},1600)`);}
 function wrapTxt(s,n){const out=[];for(const w of s.split(' ')){if(out.length&&(out.at(-1)+' '+w).length<=n)out[out.length-1]+=' '+w;else out.push(w);}return out;}
