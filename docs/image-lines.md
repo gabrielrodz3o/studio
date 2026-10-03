@@ -42,3 +42,16 @@ Total estimado US$0.252045, reserva preventiva US$2.25 (no gasto real). Exactame
 QA visual encontró superposición del degradado del encabezado sobre las cabezas en B/C. Originales completos: corrección local con escala proporcional y espacio protegido, conservando imagen anterior en previous_outputs y marcando su recurso superseded_by. Sin nueva llamada generativa. Nueva composición predeterminada para futuras generaciones; la primera imagen A conserva su encuadre correcto. Recuperación idempotente adicional comprobada.
 
 Navegador real contra producción: escritorio 1440 px y móvil 390 px; línea seleccionada, tres referencias visibles, sin overflow ni excepciones JS. También abrieron Crear, Recursos y el editor de feed anterior. Suite general 183 pruebas aprobadas; prueba adicional de recomposición comprueba historial, superseded_by y cero llamadas extra. Las pruebas no implican publicación ni gasto adicional.
+
+Verificación final de producción: despliegue `d1cd60b`, rollback `gcode-studio:before-20261003T172155Z`. Recomposición B/C realizada desde la API; tres trabajos succeeded y tres salidas vigentes en biblioteca. Cada PNG responde HTTP 200 con image/png; acceso anónimo 401; mutación con origen ajeno 403. Repetir la solicitud A con su misma clave devolvió el mismo trabajo terminado: siguen exactamente tres generaciones. Revisión visual final de las tres: textos íntegros, logo auténtico, rostros sin obstrucción tras ajuste, fotografía y jerarquía coherentes. Mejora futura opcional: integrar capturas auténticas del producto para demostrar funcionalidad además del contexto humano.
+
+Enlaces privados de producción:
+- Línea: https://studio.gcoderd.com/images.html?line=nueva-direccion-visual
+- A: https://studio.gcoderd.com/images.html?job=img_1017b4a6-e621-4982-b2e9-8b667f8357d2
+- B: https://studio.gcoderd.com/images.html?job=img_fb689f3b-3bea-4f8b-a1a3-df0cd8e3e20b
+- C: https://studio.gcoderd.com/images.html?job=img_dc1db7cc-47ca-4a3e-8eaa-52e19518e53b
+- PNG A: /api/library/12eb078c-c760-4fbb-abe6-c1ee27bab685
+- PNG B: /api/library/72743f16-98ac-44de-abb5-f7a0d0b7bf84
+- PNG C: /api/library/373025df-fc72-473b-8d35-a77a22fb1bd1
+
+Limitación: la configuración admite varias marcas y líneas y se probó su aislamiento; estas tres pruebas pagadas usan únicamente ComandPOS, con hechos existentes en su perfil. No se afirma validación visual de otras marcas ni conciliación de factura. La generación anterior se verificó mediante pruebas de regresión y apertura de su editor; no se pagó una generación adicional del proveedor anterior.
