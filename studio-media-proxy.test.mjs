@@ -1,27 +1,8 @@
-import test from 'node:test';
-import assert from 'node:assert/strict';
-import {readFileSync} from 'node:fs';
-import vm from 'node:vm';
-
-const source=readFileSync(new URL('./deploy/studio-media-proxy.cjs',import.meta.url),'utf8');
-function request(url,{status=200,type='application/octet-stream',method='GET'}={}){
- let handler,target,response;
- const http={createServer(fn){handler=fn;return {on(){},listen(){}}},request(options,callback){target=options.hostname;callback({statusCode:status,headers:{'content-type':type},pipe(){},on(event,fn){if(event==='data')fn(Buffer.from('video'));if(event==='end')fn()}});return {on(){},destroy(){}}}};
- vm.runInNewContext(source,{require:()=>http,URL,process:{env:{}}});
- handler({url,method,headers:{},on(){},pipe(){}},{writeHead(code,headers){response={code,...headers}},on(){},end(){},destroy(){}});
- return {target,response};
-}
-const stem='/webhook/cdn?f=studio-1c9e1ac1-302a-4efd-a61f-8057ad59a9a4-0';
-test('Studio exports use existing n8n media service with correct MIME',()=>{
- for(const [ext,mime] of [['jpg','image/jpeg'],['mp4','video/mp4']]){
-  const r=request(stem+'.'+ext);assert.equal(r.target,'n8n');assert.equal(r.response['content-type'],mime);
- }
- const head=request(stem+'.mp4',{status:206,method:'HEAD'});assert.equal(head.response['content-type'],'video/mp4');assert.equal(head.response['content-length'],'5');
-});
-test('media routing preserves unrelated services and rejects malformed names',()=>{
- for(const path of ['/webhook/cdn?f=legacy.jpg','/webhook/cdn?f=studio-../../secret.jpg','/media/gr_324a70ef6e7d6b80b940938c.mp4','/trendlore/tiktok/status'])assert.equal(request(path).target,'trendlore-worker');
- assert.equal(request('/rest/settings').target,'n8n');
-});
-test('upstream failures retain error status and content type',()=>{
- const r=request(stem+'.mp4',{status:503,type:'application/json'});assert.equal(r.response.code,503);assert.equal(r.response['content-type'],'application/json');
-});
+import test from 'node:test';import assert from 'node:assert/strict';
+import {mkdtemp,writeFile,symlink,rm} from 'node:fs/promises';import {join} from 'node:path';import {tmpdir} from 'node:os';import {createServer} from 'node:http';import {once} from 'node:events';import {createRequire} from 'node:module';
+const {createMediaProxy}=createRequire(import.meta.url)('./deploy/studio-media-proxy.cjs');
+async function setup(t){const root=await mkdtemp(join(tmpdir(),'studio-proxy-'));let hits=0;const upstream=createServer((q,r)=>{hits++;r.end('upstream')});upstream.listen(0,'127.0.0.1');await once(upstream,'listening');const url='http://127.0.0.1:'+upstream.address().port;const proxy=createMediaProxy({backend:url,worker:url,cdnRoot:root});proxy.listen(0,'127.0.0.1');await once(proxy,'listening');t.after(async()=>{proxy.closeAllConnections();upstream.closeAllConnections();await Promise.all([new Promise(r=>proxy.close(r)),new Promise(r=>upstream.close(r))]);await rm(root,{recursive:true,force:true})});return {root,url:'http://127.0.0.1:'+proxy.address().port,hits:()=>hits}}
+const name='studio-1c9e1ac1-302a-4efd-a61f-8057ad59a9a4-0';
+test('Studio exports are served without executing n8n, including HEAD and byte ranges',async t=>{const f=await setup(t);for(const ext of ['jpg','mp4']){await writeFile(join(f.root,name+'.'+ext),'0123456789');const url=f.url+'/webhook/cdn?f='+name+'.'+ext;const r=await fetch(url);assert.equal(r.status,200);assert.equal(r.headers.get('content-type'),ext==='jpg'?'image/jpeg':'video/mp4');assert.equal(await r.text(),'0123456789');const head=await fetch(url,{method:'HEAD'});assert.equal(head.headers.get('content-length'),'10');assert.equal(await head.text(),'');for(const [range,expected]of [['bytes=2-4','234'],['bytes=-3','789'],['bytes=8-','89']]){const partial=await fetch(url,{headers:{range}});assert.equal(partial.status,206);assert.equal(await partial.text(),expected)}for(const range of ['bytes=30-','bytes=-0','bytes=0-1,4-5','bytes=5-2'])assert.equal((await fetch(url,{headers:{range}})).status,416)}assert.equal(f.hits(),0)});
+test('missing exports and symlinks never fall back to the n8n webhook',async t=>{const f=await setup(t),url=f.url+'/webhook/cdn?f='+name+'.jpg';assert.equal((await fetch(url)).status,404);await writeFile(join(f.root,'private'),'secret');await symlink(join(f.root,'private'),join(f.root,name+'.jpg'));const r=await fetch(url);assert.equal(r.status,404);assert.equal((await r.text()).includes('secret'),false);assert.equal(f.hits(),0)});
+test('unrelated n8n and legacy media routes remain proxied',async t=>{const f=await setup(t);for(const path of ['/rest/settings','/webhook/cdn?f=legacy.jpg','/media/gr_324a70ef6e7d6b80b940938c.mp4','/trendlore/tiktok/status','/webhook/cdn?f=studio-../../secret.jpg'])assert.equal(await(await fetch(f.url+path)).text(),'upstream');assert.equal(f.hits(),5)});
