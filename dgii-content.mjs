@@ -1,0 +1,52 @@
+export const DGII_SOURCE='https://dgii.gov.do/publicacionesOficiales/avisosInformativos/Documents/2026/06-26.pdf';
+export const DGII_END='2026-11-15';
+export const DGII_GROUP='Pequeños, micros y no clasificados';
+// Operational preparation tips, not claims that ComandPOS is a certified e-CF provider.
+const topics=[
+['Pedido, cuenta y factura','Registra el pedido completo','Confirma cantidades y modificadores','Revisa la cuenta antes de cobrar'],
+['Planifica el arranque','Reserva tiempo para preparar el cambio','Acuerda un calendario con tu equipo','Incluye pruebas antes de operar'],
+['Antes de dividir la cuenta','Confirma qué consume cada persona','Revisa importes con el cliente','Consulta el comprobante que corresponde'],
+['Habla con tu contador','Revisa tu clasificación tributaria','Aclara qué comprobantes necesitas','Anota los requisitos de tu negocio'],
+['Prepárate para la hora pico','Repasa el proceso con caja','Practica antes del turno más concurrido','Define quién atiende las dudas'],
+['Revisa tu menú','Confirma productos y precios','Consulta el tratamiento de impuestos','Retira los productos fuera de venta'],
+['Cuando hay una devolución','Conserva la referencia de la venta','Documenta el motivo de la corrección','Consulta el procedimiento con tu contador'],
+['Entrena a tu equipo','Asigna responsabilidades en caja','Practica con ejemplos de atención','Documenta las dudas del personal'],
+['Pedidos para llevar','Registra cada pedido completo','Confirma los datos antes del despacho','Revisa la cuenta con el cliente'],
+['Datos del cliente','Solicita los datos necesarios','Confirma su escritura con el cliente','Evita transcribirlos de memoria'],
+['Pregunta antes de cobrar','Aclara qué necesita el cliente','Verifica los datos proporcionados','Revisa todo antes de finalizar'],
+['Correcciones con respaldo','Identifica el documento original','Explica el motivo del cambio','Conserva el historial de la operación'],
+['Un precio merece revisión','Compara el menú y el sistema','Confirma descuentos autorizados','Revisa los cambios con caja'],
+['Tu calendario de trabajo','Consulta tiempos con tu proveedor','Reserva espacio para capacitar','Deja margen para resolver dudas'],
+['Del papel al proceso','Ordena tus pasos de atención','Define qué información se registra','Prueba el recorrido con el equipo'],
+['Revisa tus equipos','Comprueba la conexión del negocio','Revisa energía y carga de equipos','Acuerda un plan de continuidad'],
+['Una cuenta clara','Revisa productos y cantidades','Confirma los descuentos aplicados','Consulta dudas fiscales con tu contador'],
+['Nombra un responsable','Asigna seguimiento al proyecto','Centraliza preguntas y respuestas','Coordina a soporte y contabilidad'],
+['Prepara tus reportes','Identifica los reportes que utilizas','Acuerda la revisión con contabilidad','Conserva los documentos de respaldo'],
+['Prueba antes de operar','Coordina pruebas con tu proveedor','Usa el entorno de prueba indicado','Anota errores y valida las correcciones'],
+['Cada negocio tiene su proceso','Revisa cómo tomas los pedidos','Identifica tus puntos de cobro','Adapta la capacitación a tus turnos'],
+['Repasa el cierre','Revisa ventas y medios de pago','Investiga diferencias con respaldo','Consulta los reportes con tu equipo'],
+['Conecta a tus responsables','Coordina caja y administración','Aclara el flujo con tu proveedor','Documenta dónde se resuelven dudas'],
+['Cuenta los días disponibles','Considera fines de semana y turnos','Confirma disponibilidad de soporte','Reserva tiempo para una revisión final'],
+['Atención desde la mesa','Confirma el pedido con el cliente','Registra los cambios solicitados','Revisa la cuenta antes de cerrar'],
+['Consulta tu clasificación','Revisa tu situación en la DGII','Confirma el calendario que te aplica','Consulta las dudas con tu contador'],
+['Qué necesita tu cliente','Pregunta antes de finalizar la venta','Confirma los datos requeridos','Revisa el comprobante con tu asesor'],
+['Pide ayuda con tiempo','Enumera las dudas pendientes','Contacta a tu proveedor y contador','Asigna fecha a cada respuesta'],
+['Un recorrido completo','Practica desde el pedido hasta el cobro','Revisa los puntos donde hay cambios','Anota lo que falta por resolver'],
+['Cada grupo tiene su calendario','No asumas que una fecha aplica a todos','Confirma tu clasificación tributaria','Consulta las fuentes oficiales de DGII'],
+['Revisa las cuentas divididas','Practica el proceso con el equipo','Confirma importes antes de cerrar','Conserva el respaldo de cada operación'],
+['Organiza tus documentos','Define dónde guardar comprobantes','Revisa quién puede consultarlos','Coordina la entrega a contabilidad'],
+['Prueba un turno completo','Repasa atención, cocina y caja','Documenta cualquier duda operativa','Corrige y vuelve a comprobar'],
+['Qué falta para estar listo','Lista tus tareas pendientes','Prioriza las que bloquean el arranque','Confirma avances con tu proveedor'],
+['Si necesitas corregir','Evita borrar el rastro de la operación','Conserva documento y motivo','Consulta el procedimiento aplicable'],
+['Una semana para revisar','Comprueba tus pendientes','Confirma capacitación y soporte','Revisa tu situación con el contador'],
+['Revisa tus canales de venta','Incluye salón y pedidos para llevar','Confirma los responsables por turno','Practica los casos más frecuentes'],
+['Confirma tus datos','Revisa tu información en la DGII','Aclara inconsistencias con tu asesor','Conserva tus comprobaciones'],
+['Última revisión del menú','Comprueba precios y productos','Confirma impuestos con contabilidad','Comunica los cambios al personal'],
+['Repasa con caja y meseros','Practica la atención al cliente','Aclara cuándo pedir los datos','Anota dudas y responsables'],
+['Comprueba tus pruebas','Revisa los resultados con soporte','Confirma correcciones pendientes','Conserva evidencia de lo revisado'],
+['Un cierre de prueba','Revisa ventas y cobros registrados','Investiga diferencias con tu equipo','Consulta el resultado con contabilidad'],
+['Mañana: revisa tu situación','Confirma tu clasificación en la DGII','Consulta requisitos y estado con tu asesor','No des por terminado lo no comprobado'],
+['Hoy: confirma tu estado','Consulta tu situación en la DGII','Verifica lo pendiente con tu contador','Mantén el respaldo de tus gestiones']
+];
+export function dgiiContent(day){if(!/^\d{4}-\d{2}-\d{2}$/.test(day))throw Error('Fecha inválida');const n=Math.round((Date.parse(DGII_END+'T12:00:00Z')-Date.parse(day+'T12:00:00Z'))/86400000),i=43-n;if(!Number.isInteger(i)||i<0||i>=topics.length)throw Error('Campaña DGII fuera de vigencia; revisar antes de ampliar');const [title,...points]=topics[i];return {date:day,days_left:n,title,points,group:DGII_GROUP,deadline:DGII_END,source:DGII_SOURCE,reviewed_at:'2026-10-03',source_scope:'Aviso 06-26: contribuyentes pequeños, micros y no clasificados'}}
+export function dgiiScript(day,resource){const p=dgiiContent(day),count=p.days_left===0?'Hoy vence el plazo':`Faltan ${p.days_left} días`,caption=[`${count}: 15 de noviembre de 2026.`,`${p.group}: consulta tu clasificación y los requisitos aplicables con la DGII y tu contador.`,p.title,p.points.map(x=>'• '+x).join('\n'),'ComandPOS: organiza pedidos, mesas y cuentas. Solicita tu demo: +1 849 540 6093.','Contenido informativo de GCODE; no es una comunicación oficial de DGII ni una certificación del producto.','Fuente: '+p.source,'#FacturacionElectronica #DGII #ComandPOS #NegociosRD'].join('\n\n');return {nombre:'dgii-'+day,brand_id:'comandpos',tipo:'carrusel',layout:'brand',titular:p.title,subtitulo:'Preparación operativa para tu negocio.',caption,cta:'Solicita tu demo',resource_id:resource,slides:[{id:'portada',titulo:p.title,texto:count},{id:'pasos',titulo:'Revisa con tu equipo',texto:p.points.join('. ')},{id:'fecha',titulo:'Confirma tu clasificación',texto:p.group}],dgii:p,evidence_claims:[{id:'dgii-aviso-06-26',text:'El plazo de pequeños, micros y no clasificados concluye el 15 de noviembre de 2026.',source:p.source}],claim_ids:['dgii-aviso-06-26']}}

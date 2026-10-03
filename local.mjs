@@ -1,3 +1,4 @@
+import {DgiiAutomation} from './dgii-automation.mjs'
 import {ImageLines} from './image-lines.mjs'
 import {AdsStore} from './ads/store.mjs'
 import {adsRoute} from './ads/routes.mjs'
@@ -79,6 +80,7 @@ const ads=await new AdsStore(root,{brands:()=>marketing.data.brands,capture:asyn
 const imageLines=await new ImageLines(root,{marketing,budget:creative.budget}).init();
 const batches=await new Batches(root,{produce:createPiece,budget:creative.budget,store,linkJob:async(pieceId,jobId,actor)=>{const p=marketing.data.pieces.find(p=>p.id===pieceId);if(!p)throw problem(404,'Pieza no encontrada');await marketing.savePiece({...p,job_id:jobId},actor,store)}}).init();
 const automation=await new Automation(root,{marketing,store,produce:createPiece,editorial:await new EditorialCalendar(root).init()}).init();
+const dgii=await new DgiiAutomation(root,{marketing,store,versions}).init();automation.dgii=dgii;
 const mime={'.gz':'application/gzip','.css':'text/css; charset=utf-8','.html':'text/html; charset=utf-8','.mjs':'text/javascript','.js':'text/javascript','.json':'application/json','.png':'image/png','.webp':'image/webp','.jpg':'image/jpeg','.ttf':'font/ttf','.mp3':'audio/mpeg','.wav':'audio/wav','.mp4':'video/mp4'}
 const digest=x=>createHash('sha256').update(x).digest()
 function authenticated(req){return timingSafeEqual(digest(req.headers.authorization||''),digest('Bearer '+token))}
@@ -192,6 +194,9 @@ const server=createServer(async(req,res)=>{
       if(path==='/api/image-lines/generate'){const d=await body(req);return json(202,await imageLines.create(d,req.headers['idempotency-key'],actor.username))}
       if(path==='/api/image-lines/recompose')return json(200,await imageLines.recompose((await body(req)).id,actor.username));
       if(path==='/api/image-lines/recover')return json(200,await imageLines.recover((await body(req)).id));
+      if(path==='/api/dgii/config'){access.require(req,['admin']);return json(200,await dgii.configure(await body(req),actor.username))}
+      if(path==='/api/dgii/today'){access.require(req,['admin']);const result=await dgii.requestToday(await body(req),actor.username);await dgii.tick(true);return json(202,result)}
+      if(path==='/api/dgii/release'){access.require(req,['admin']);await dgii.releaseToday(actor.username);await dgii.tick(false);return json(200,dgii.snapshot())}
       if(path==='/api/automation/config'){access.require(req,['admin']);return json(200,await automation.configure(await body(req),actor.username))}
       if(path==='/api/automation/resume')return json(202,await automation.resume((await body(req)).id));
       if(path==='/api/automation/recover'){const d=await body(req);return json(202,await automation.recover(d.id,{allowPaid:d.allow_paid===true}))}
@@ -259,5 +264,5 @@ const server=createServer(async(req,res)=>{
   }catch(e){if(!res.headersSent)json(e.status||(e.code==='ENOENT'?404:400),{error:e.message});else res.destroy()}
 })
 server.listen(port,process.env.STUDIO_BIND_HOST||'127.0.0.1',()=>console.log(`Centro multimedia: http://127.0.0.1:${port}/centro.html\nEditor: http://127.0.0.1:${port}\nAPI v1 habilitada; clave guardada en .studio-state/api-token (no se muestra).`))
-async function shutdown(){server.close();await automation.running;await imageLines.serial;await imageLines.running;await ads.serial;await store.stop();process.exit(0)}
+async function shutdown(){server.close();await automation.running;await imageLines.serial;await imageLines.running;await dgii.serial;await ads.serial;await store.stop();process.exit(0)}
 process.once('SIGTERM',shutdown);process.once('SIGINT',shutdown)
