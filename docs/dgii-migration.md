@@ -39,3 +39,20 @@ Confirmación final 2026-10-03 17:55 UTC: slot DGII `published`, exactamente tre
 - TikTok: https://tiktok.com/@g.code.rd/video/7692500762429197588 (17:53:30 UTC; Buffer status sent, schedulingType automatic).
 
 La espera de TikTok se resolvió consultando el mismo recibo; no se volvió a crear el post. Próxima producción DGII: 4 octubre 05:30 RD, publicación 06:00 RD. El video diario independiente conserva 04:00/07:00. Tres redes publicadas no implica ausencia de incidencias ajenas: la historia general de las 13:00 de hoy ya estaba missed_approval y no se intervino en este encargo DGII.
+
+## Mejora de mensaje y composición — 3/oct/2026
+
+La portada publicada destacaba la cuenta regresiva y un consejo operativo, pero omitía el tema fiscal. Se revisó visualmente el archivo publicado y se corrigió el generador para los próximos días:
+
+1. Portada: «FACTURACIÓN ELECTRÓNICA», cuenta regresiva con fecha y alcance explícito para pequeños, micros y no clasificados; fotografía original y representación ilustrativa de un e-CF.
+2. Preparación fiscal: situación/RNC/Oficina Virtual/NCF, certificado digital, solución de emisión y autorización con pruebas/certificación DGII. Se presentan como puntos clave, no como una lista exhaustiva.
+3. Acción operativa diaria y demo de funciones verificadas de ComandPOS. No se atribuye al producto una certificación fiscal no comprobada.
+
+Fuentes oficiales consultadas el 3/oct/2026:
+- https://dgii.gov.do/publicacionesOficiales/avisosInformativos/Documents/2026/06-26.pdf
+- https://dgii.gov.do/servicios/Documents/Facturacion/TRA-Facturacion-Emisor-Electronico.pdf
+- https://dgii.gov.do/cicloContribuyente/facturacion/comprobantesFiscalesElectronicosE-CF/Paginas/TipoyEstructurae-CF.aspx
+
+El pie y el texto de publicación conservan las fuentes. Se mide el ancho real de texto para evitar desbordamientos. Prueba de render para los 44 días de campaña: títulos, plazos y puntos caben, con el tema explícito antes de la cuenta regresiva. Los recursos existentes se reutilizan sin solicitudes nuevas a proveedores.
+
+La nueva composición no cambia las imágenes ya publicadas en redes. La corrección de hoy se guardará como una pieza distinta en Studio, sin borrar ni republicar automáticamente el carrusel anterior. El historial de publicación y su versión original se conservan.
