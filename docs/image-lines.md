@@ -55,3 +55,7 @@ Enlaces privados de producción:
 - PNG C: /api/library/373025df-fc72-473b-8d35-a77a22fb1bd1
 
 Limitación: la configuración admite varias marcas y líneas y se probó su aislamiento; estas tres pruebas pagadas usan únicamente ComandPOS, con hechos existentes en su perfil. No se afirma validación visual de otras marcas ni conciliación de factura. La generación anterior se verificó mediante pruebas de regresión y apertura de su editor; no se pagó una generación adicional del proveedor anterior.
+
+## Selección predeterminada solicitada por el usuario
+
+2026-10-03: configuración persistente `image-lines/settings.json` con `default_line_id: nueva-direccion-visual`, establecida mediante endpoint privado de administrador. La UI utiliza esta selección al abrir `/images.html` sin parámetro de línea; una selección explícita continúa teniendo prioridad. No cambia líneas guardadas, imágenes existentes ni automatizaciones de n8n. Despliegue `67ec2b3`; siete pruebas de imágenes aprobadas. API de producción confirma la selección y conserva tres trabajos.
