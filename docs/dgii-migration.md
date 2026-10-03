@@ -62,3 +62,5 @@ Verificación de la mejora: desplegado `764f8e7`, salud correcta y respaldo `gco
 Proyecto: https://studio.gcoderd.com/feed-editor.html?project=dgii-2026-10-03-v2
 
 Interfaz comprobada en Chrome a 1440 y 390 px, sin excepciones JavaScript. Se verificó en producción que la generación del 4/oct tiene diseño 2, titular «Facturación electrónica» y contador de 42 días. Los tres recibos de la publicación original de hoy permanecen `published`; no se alteraron ni se generaron envíos adicionales. Coste incremental de API de imágenes: US$0.
+
+Prueba adicional en el contenedor real de producción: 6/6 pruebas DGII aprobadas, incluyendo el render de los 44 días con las fuentes de Linux (24.5 s). Se ejecutó el archivo propio por entrada estándar porque `*.test.mjs` está excluido de la imagen Docker; todos los archivos de prueba se crearon y retiraron en directorios temporales, sin modificar piezas ni publicaciones.
