@@ -196,6 +196,7 @@ const server=createServer(async(req,res)=>{
       if(path==='/api/image-lines/recover')return json(200,await imageLines.recover((await body(req)).id));
       if(path==='/api/dgii/config'){access.require(req,['admin']);return json(200,await dgii.configure(await body(req),actor.username))}
       if(path==='/api/dgii/today'){access.require(req,['admin']);const result=await dgii.requestToday(await body(req),actor.username);await dgii.tick(true);return json(202,result)}
+      if(path==='/api/dgii/recover'){access.require(req,['admin']);return json(202,await dgii.recoverToday(actor.username))}
       if(path==='/api/dgii/release'){access.require(req,['admin']);await dgii.releaseToday(actor.username);await dgii.tick(false);return json(200,dgii.snapshot())}
       if(path==='/api/automation/config'){access.require(req,['admin']);return json(200,await automation.configure(await body(req),actor.username))}
       if(path==='/api/automation/resume')return json(202,await automation.resume((await body(req)).id));
