@@ -1,3 +1,4 @@
+import {ImageLines} from './image-lines.mjs'
 import {AdsStore} from './ads/store.mjs'
 import {adsRoute} from './ads/routes.mjs'
 import {adsPrincipal} from './api-scopes.mjs'
@@ -75,6 +76,7 @@ if(token.length<32)throw Error('STUDIO_API_TOKEN debe tener al menos 32 caracter
 let apiClients;try{apiClients=JSON.parse(await readFile(join(state,'api-clients.json'),'utf8'))}catch(e){if(e.code!=='ENOENT')throw e}
 const store=await new JobStore({root,publications:id=>publicationsFor(marketing.data.deliveries,id)}).init()
 const ads=await new AdsStore(root,{brands:()=>marketing.data.brands,capture:async id=>{const p=marketing.releasePreview(id,store);if(p.comments.length)throw problem(409,'Resuelve los comentarios editoriales');return {...p.bundle,campaign_id:marketing.data.pieces.find(x=>x.id===id)?.campaign_id}},artifact:async(id,kind,sha256)=>({path:store.artifactPath(id,kind),sha256})}).init();
+const imageLines=await new ImageLines(root,{marketing,budget:creative.budget}).init();
 const batches=await new Batches(root,{produce:createPiece,budget:creative.budget,store,linkJob:async(pieceId,jobId,actor)=>{const p=marketing.data.pieces.find(p=>p.id===pieceId);if(!p)throw problem(404,'Pieza no encontrada');await marketing.savePiece({...p,job_id:jobId},actor,store)}}).init();
 const automation=await new Automation(root,{marketing,store,produce:createPiece,editorial:await new EditorialCalendar(root).init()}).init();
 const mime={'.gz':'application/gzip','.css':'text/css; charset=utf-8','.html':'text/html; charset=utf-8','.mjs':'text/javascript','.js':'text/javascript','.json':'application/json','.png':'image/png','.webp':'image/webp','.jpg':'image/jpeg','.ttf':'font/ttf','.mp3':'audio/mpeg','.wav':'audio/wav','.mp4':'video/mp4'}
@@ -167,6 +169,8 @@ const server=createServer(async(req,res)=>{
     if(path==='/api/batches'&&req.method==='GET')return json(200,{batches:batches.list(),quote:batchQuote});
     if(path==='/api/proposals'&&req.method==='GET'){const data=marketing.snapshot(),brand=marketing.brand(url.searchParams.get('brand')||'comandpos'),campaign=campaignContext(data,brand.id,url.searchParams.get('campaign'));return json(200,{proposals:proposals(data,brand,await creative.history(),campaign)})}
     if(path==='/api/release-preview'&&req.method==='GET'){const id=url.searchParams.get('piece_id'),p=marketing.data.pieces.find(p=>p.id===id);return json(200,{...marketing.releasePreview(id,store),automatic_schedule:!!p?.automation_slot&&automation.data.config.enabled&&p.campaign_id===automation.data.config.campaign_id})}
+    if(path==='/api/image-lines'&&req.method==='GET')return json(200,imageLines.snapshot());
+    const imageJob=/^\/api\/image-lines\/jobs\/(img_[a-f0-9-]{36})$/.exec(path);if(imageJob&&req.method==='GET')return json(200,imageLines.get(imageJob[1]));
     if(path==='/api/marketing'&&req.method==='GET')return json(200,marketing.snapshot())
     const resource=/^\/api\/library\/([a-f0-9-]{36})$/.exec(path)
     if(resource&&['GET','HEAD'].includes(req.method))return await sendFile(req,res,marketing.asset(resource[1]).path)
@@ -183,6 +187,9 @@ const server=createServer(async(req,res)=>{
     if(path==='/api/version'&&req.method==='GET')return json(200,await versions.get(url.searchParams.get('kind'),url.searchParams.get('name'),url.searchParams.get('id')))
     if(req.method==='POST'){
       access.sameOrigin(req);access.require(req,['admin','editor'])
+      if(path==='/api/image-lines/config'){access.require(req,['admin']);return json(200,await imageLines.saveLine(await body(req),actor.username))}
+      if(path==='/api/image-lines/generate'){const d=await body(req);return json(202,await imageLines.create(d,req.headers['idempotency-key'],actor.username))}
+      if(path==='/api/image-lines/recover')return json(200,await imageLines.recover((await body(req)).id));
       if(path==='/api/automation/config'){access.require(req,['admin']);return json(200,await automation.configure(await body(req),actor.username))}
       if(path==='/api/automation/resume')return json(202,await automation.resume((await body(req)).id));
       if(path==='/api/automation/recover'){const d=await body(req);return json(202,await automation.recover(d.id,{allowPaid:d.allow_paid===true}))}
@@ -244,11 +251,11 @@ const server=createServer(async(req,res)=>{
     if(path==='/api/lista')return json(200,{guiones:(await readdir(join(root,'storyboards'))).filter(f=>!f.startsWith('.')&&f.endsWith('.json')),voces:(await readdir(join(root,'casting'))).filter(f=>/^\d.*\.mp3$/.test(f)),videos:(await readdir(join(root,'salida'))).filter(f=>!f.startsWith('.')&&f.endsWith('.mp4'))})
     const vendor=/^\/vendor\/wavesurfer\/([a-z0-9./-]+\.js)$/.exec(path);if(vendor&&!vendor[1].includes('..'))return await sendFile(req,res,join(root,'node_modules/wavesurfer.js/dist',vendor[1]));
     const route=decodeURIComponent(path==='/'?'/centro.html':path)
-    if(!/^\/(ads.html|ads-ui.js|ads.css|ads-dashboard.js|ads-analytics\.mjs|project-drafts\.js|automation-ui\.js|carousel-ui\.js|operations-ui\.js|design\.mjs|captions\.mjs|visual-runtime\.js|version-diff\.mjs|styles\.mjs|create-ui\.js|history\.mjs|marketing.html|marketing-ui.js|editor-tools.js|media-scenes.js|ui\.css|ui\.js|home\.js|account\.html|create\.html|editor\.html|feed-editor\.html|centro\.html|studio\.html|validar\.mjs|n8n-style\.js|formats\.js|feed\/templates\/[^/]+\.json|feed\/photos\/[a-z0-9-]+\.(jpg|png)|assets\/[^/]+|storyboards\/[^/]+\.json|casting\/[^/]+\.mp3|salida\/[^/]+\.(mp4|json))$/.test(route)||basename(route).startsWith('.'))throw problem(404,'No disponible')
+    if(!/^\/(images.html|image-lines-ui.js|image-lines.css|ads.html|ads-ui.js|ads.css|ads-dashboard.js|ads-analytics\.mjs|project-drafts\.js|automation-ui\.js|carousel-ui\.js|operations-ui\.js|design\.mjs|captions\.mjs|visual-runtime\.js|version-diff\.mjs|styles\.mjs|create-ui\.js|history\.mjs|marketing.html|marketing-ui.js|editor-tools.js|media-scenes.js|ui\.css|ui\.js|home\.js|account\.html|create\.html|editor\.html|feed-editor\.html|centro\.html|studio\.html|validar\.mjs|n8n-style\.js|formats\.js|feed\/templates\/[^/]+\.json|feed\/photos\/[a-z0-9-]+\.(jpg|png)|assets\/[^/]+|storyboards\/[^/]+\.json|casting\/[^/]+\.mp3|salida\/[^/]+\.(mp4|json))$/.test(route)||basename(route).startsWith('.'))throw problem(404,'No disponible')
     const file=resolve(root,'.'+route);if(!file.startsWith(root+sep))throw problem(403,'Ruta inválida')
     return await sendFile(req,res,file)
   }catch(e){if(!res.headersSent)json(e.status||(e.code==='ENOENT'?404:400),{error:e.message});else res.destroy()}
 })
 server.listen(port,process.env.STUDIO_BIND_HOST||'127.0.0.1',()=>console.log(`Centro multimedia: http://127.0.0.1:${port}/centro.html\nEditor: http://127.0.0.1:${port}\nAPI v1 habilitada; clave guardada en .studio-state/api-token (no se muestra).`))
-async function shutdown(){server.close();await automation.running;await ads.serial;await store.stop();process.exit(0)}
+async function shutdown(){server.close();await automation.running;await imageLines.serial;await imageLines.running;await ads.serial;await store.stop();process.exit(0)}
 process.once('SIGTERM',shutdown);process.once('SIGINT',shutdown)
