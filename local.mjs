@@ -189,6 +189,7 @@ const server=createServer(async(req,res)=>{
       access.sameOrigin(req);access.require(req,['admin','editor'])
       if(path==='/api/image-lines/config'){access.require(req,['admin']);return json(200,await imageLines.saveLine(await body(req),actor.username))}
       if(path==='/api/image-lines/generate'){const d=await body(req);return json(202,await imageLines.create(d,req.headers['idempotency-key'],actor.username))}
+      if(path==='/api/image-lines/recompose')return json(200,await imageLines.recompose((await body(req)).id,actor.username));
       if(path==='/api/image-lines/recover')return json(200,await imageLines.recover((await body(req)).id));
       if(path==='/api/automation/config'){access.require(req,['admin']);return json(200,await automation.configure(await body(req),actor.username))}
       if(path==='/api/automation/resume')return json(202,await automation.resume((await body(req)).id));

@@ -28,3 +28,17 @@ Pruebas automatizadas: multipart binario, configuración separada, snapshot inmu
 ## Despliegue y reversión
 
 Usar `deploy/update-code.sh` con archivo git archive. Respaldo de código e imagen Docker anterior automático; directorios privados conservados. Revertir imagen Docker registrada por el despliegue para retirar la UI sin borrar trabajos, referencias ni resultados. No hay migración destructiva. Validación y resultados de producción se registran después de ejecutarse.
+
+## Ejecución real y revisión
+
+Primer despliegue `72fbacc`, 2026-10-03; saludable. Modelo ejecutado: snapshot Sunburst 2.5, tres respuestas exitosas con request_id y uso; la respuesta no repite el nombre del modelo, por lo que se conserva el identificador enviado explícitamente a la API. En cada solicitud entraron los tres originales con sus hashes y tamaños, sin redimensionar referencias.
+
+- A: `img_1017b4a6-e621-4982-b2e9-8b667f8357d2`, beneficio «Del pedido a cocina», fuente brand.facts[1], 35.084 s, US$0.08398 estimados.
+- B: `img_fb689f3b-3bea-4f8b-a1a3-df0cd8e3e20b`, uso «Cada pedido, a tu manera», fuente brand.facts[0], 33.179 s, US$0.08399 estimados.
+- C: `img_dc1db7cc-47ca-4a3e-8eaa-52e19518e53b`, problema/solución «¿De qué mesa es la cuenta?», fuente brand.facts[2], 51.838 s, US$0.084075 estimados.
+
+Total estimado US$0.252045, reserva preventiva US$2.25 (no gasto real). Exactamente tres llamadas generativas. PNG 1024×1280. Referencias incorporadas con UUID y origen; logo auténtico `feed/brand/logo.png` incorporado como recurso de ComandPOS, sin cambiar perfiles de otras marcas. Las tres piezas permanecen por revisar, sin publicación.
+
+QA visual encontró superposición del degradado del encabezado sobre las cabezas en B/C. Originales completos: corrección local con escala proporcional y espacio protegido, conservando imagen anterior en previous_outputs y marcando su recurso superseded_by. Sin nueva llamada generativa. Nueva composición predeterminada para futuras generaciones; la primera imagen A conserva su encuadre correcto. Recuperación idempotente adicional comprobada.
+
+Navegador real contra producción: escritorio 1440 px y móvil 390 px; línea seleccionada, tres referencias visibles, sin overflow ni excepciones JS. También abrieron Crear, Recursos y el editor de feed anterior. Suite general 183 pruebas aprobadas; prueba adicional de recomposición comprueba historial, superseded_by y cero llamadas extra. Las pruebas no implican publicación ni gasto adicional.
