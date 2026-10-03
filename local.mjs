@@ -47,6 +47,7 @@ async function createPiece(input,key,actor){
  if(input.produce&&input.kind==='video'&&input.allow_paid_voice!==true)throw problem(422,'Autoriza la generación de voz para producir el video')
  const result=actor==='automation'&&input.editorial&&input.kind!=='video'?{id:createHash('sha256').update(key).digest('hex'),kind:input.kind,campaign_id:input.campaign_id,concept_id:input.editorial.topic,script:editorialScript(input.editorial,input.kind,key),caption:editorialScript(input.editorial,input.kind,key).caption,selection:{topic:input.editorial.title},warnings:['Contenido editorial migrado: revisar hechos, imagen y texto antes de aprobar.']}:await creative.create(input,key,actor)
  if(actor==='automation'&&input.editorial&&input.kind!=='video')result.script=await prepareEditorialPhoto(result.script,root,photos,key)
+ if(actor==='automation'&&result.script.editorial?.story)result.script=await imageLines.prepareStory(result.script)
  await versions.save(result.kind,result.script,actor)
  if(!input.produce)return result
  const request={...(input.budget_group?{budget_group:input.budget_group}:{}),brand_id:input.brand_id||'comandpos',kind:result.kind,script:result.script,creative_id:result.id,concept_id:result.concept_id,caption:result.caption,...(result.campaign_id?{campaign_id:result.campaign_id}:{}),...(result.kind==='video'?{voice:true,subtitles:true,allow_paid_voice:true,aspect:input.aspect||'vertical',max_budget_usd:2}:{})}
@@ -200,6 +201,7 @@ const server=createServer(async(req,res)=>{
       if(path==='/api/dgii/release'){access.require(req,['admin']);await dgii.releaseToday(actor.username);await dgii.tick(false);return json(200,dgii.snapshot())}
       if(path==='/api/automation/config'){access.require(req,['admin']);return json(200,await automation.configure(await body(req),actor.username))}
       if(path==='/api/automation/resume')return json(202,await automation.resume((await body(req)).id));
+      if(path==='/api/automation/story-refresh'){access.require(req,['admin']);return json(200,await automation.refreshStory(await body(req),actor.username))}
       if(path==='/api/automation/recover'){const d=await body(req);return json(202,await automation.recover(d.id,{allowPaid:d.allow_paid===true}))}
       if(path==='/api/automation/tick'){access.require(req,['admin']);return json(202,automation.kick({generate:false}))}
       if(path==='/api/creative/correct'){const d=await body(req);const recovery=await creative.correct(d.id,d.revision,d.content,actor.username);const result=await creative.create(recovery.input,recovery.key,actor.username);await versions.save(result.kind,result.script,actor.username);return json(200,{name:result.script.nombre,kind:result.kind})}
