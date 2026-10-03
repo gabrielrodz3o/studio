@@ -17,3 +17,25 @@ Primera salida tardía solo por solicitud expresa de hoy; generación retenida p
 La imagen de contexto procede del original ya pagado `img_1017b4a6-e621-4982-b2e9-8b667f8357d2`; no compra imágenes o voces. Composición local sin coste de proveedor adicional. Se configuró el logotipo auténtico ya guardado de ComandPOS, preservando los demás campos de la marca.
 
 Validación: calendario 44 fechas/títulos distintos, caducidad, corrección de cuenta regresiva, concurrencia, una producción al día, tres destinos, horario, envío tardío explícito, retención de QA, reconciliación, bloqueo ante modificación y ausencia de reenvíos inciertos. Regresión de calendario original incluida. Evidencias de despliegue y enlaces de hoy se agregan tras confirmación real.
+
+## Validación en producción
+
+Despliegue inicial `c2b8795`; el primer render detectó que faltaban los módulos nuevos dentro de image-source. Se corrigió el manifiesto de runtime en `af8299d` y se añadió una prueba que realmente ejecuta el render congelado y comprueba las tres imágenes. Suite final: 188/188 pruebas aprobadas. Fallo original conservado en `job_429459e0-6af3-4eae-8ae3-5ff6a0b02a1e`; recuperación sin compras en `job_ecdfdf3f-338e-4520-90af-88c9d759330d`, succeeded, control creativo passed. Se revisaron visualmente las tres páginas reales antes de liberar.
+
+Campaña original reutilizada y activada; configuración 05:30/06:00, tres redes, vigencia hasta 15 noviembre. n8n confirma activos el calendario `QDXjXalYBBP0Oaaf` y el publicador `XnDxoyTcnbawgPgY`; el publicador DGII antiguo continúa inactivo. No se compraron imágenes ni voces; no se cambió el límite diario ni publicidad pagada.
+
+UI real: Operación y costes muestra «Campaña DGII · diaria» en 1440 y 390 px; el proyecto abre en feed-editor.html?project=dgii-2026-10-03 sin errores JS. Sus piezas y recibos están vinculados a la campaña dentro de Marketing. La sección detallada del calendario automático está en #operations, no en #calendar.
+
+Hoy se crearon exactamente tres entregas:
+- Instagram: 51ee553d-b582-4c16-a5a7-98f45ab5c878
+- Facebook: 8cf3a822-c7a3-4806-bfa4-d51f451253c9
+- TikTok: dc3a04ce-e3db-437b-b128-f42fa9e6b84d
+
+Las entregas tienen aprobación vinculada al archivo, caption, cuenta y fecha; se liberaron por la solicitud explícita del propietario. No se republicaron los días 1 y 2 octubre ni se reactivaron historias DGII paralelas.
+
+Confirmación final 2026-10-03 17:55 UTC: slot DGII `published`, exactamente tres recibos confirmados y conciliados dentro de Studio:
+- Instagram: https://www.instagram.com/p/DeCozVHFmKb/ (17:52:31 UTC)
+- Facebook: https://facebook.com/1901371183485176_1400797728932425 (17:51:44 UTC)
+- TikTok: https://tiktok.com/@g.code.rd/video/7692500762429197588 (17:53:30 UTC; Buffer status sent, schedulingType automatic).
+
+La espera de TikTok se resolvió consultando el mismo recibo; no se volvió a crear el post. Próxima producción DGII: 4 octubre 05:30 RD, publicación 06:00 RD. El video diario independiente conserva 04:00/07:00. Tres redes publicadas no implica ausencia de incidencias ajenas: la historia general de las 13:00 de hoy ya estaba missed_approval y no se intervino en este encargo DGII.
