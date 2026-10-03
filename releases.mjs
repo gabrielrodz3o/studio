@@ -20,6 +20,7 @@ export function publicationBundle(piece, job, brand, account) {
   return {schema_version:1,piece_id:piece.id,job_id:job.id,brand_id:piece.brand_id,
     ...(piece.automation_slot?{scheduled_at:piece.scheduled_at}:{}),brand_hash:hash(brand),channel:piece.channel,account,kind:piece.kind,caption,caption_supported:captionSupported,
     ...(job.kind==='video'&&Number.isFinite(job.artifact?.cover_time)?{cover_time:job.artifact.cover_time}:{}),
+    ...(piece.music_mode==='recommended'?{music:{mode:'recommended',required:true,preserve_photo:true}}:{}),
     files,resources:job.resources||[],cover_sha256:job.artifact?.cover_sha256 || null,ai_voice:aiVoice}
 }
 export function sameBundle(release, bundle) {return release?.status === 'approved' && release.hash === hash(bundle)}

@@ -475,3 +475,23 @@ Recibos del Reel confirmados (3 octubre): Facebook entrega `9497c11d-c027-4072-a
 Feed completo confirmado: Instagram entrega `6cdbf356-fd60-4b1b-af9c-34af85fb9708`, https://www.instagram.com/p/DeCfWzNls7r/ ; Facebook entrega `648f706b-270d-43e7-8c25-d3c4ed7d5d9e`, Buffer sent 16:34:42.242Z, https://www.facebook.com/1387801790232019/posts/1400741555604709 ; TikTok entrega `71d22b28-8f7a-4ce3-be1b-281a31a2eb8c`, Buffer sent 16:36:26.438Z, https://tiktok.com/@g.code.rd/video/7692480753682156852 . La API devuelve este enlace de video para la publicación de imagen; no se inventa otro permalink. Historias de 13:00 y 18:00 mantienen su horario; esta recuperación no afirma su publicación anticipada.
 
 Cierre de recuperación: el calendario del Reel conservaba las horas del primer envío expedito, distintas de los reintentos posteriores al arreglo CDN, y por eso prepare informaba “No se cambia una entrega existente”. Se conciliaron únicamente sus targets con las piezas ya publicadas, con cola vacía, parada breve y respaldo `automation-before-video-receipts.json`; se preservan todos los recibos y fallos. Tick real posterior confirmó `2026-10-03:video=published`, `feed=published`, ambos sin error; `story-13=scheduled`. Horario diario futuro comprobado: generación 04:00, publicación 07:00 RD.
+
+
+## GST-038 · Imágenes con música nativa por API — 2026-10-03
+
+Estado: **PARCIAL**, no es publicación musical implementada. Solicitud explícita: conservar imágenes/carrusel, sin conversión a video, Studio/API encargado; no navegador ni recordatorios manuales.
+
+Implementado: `music_mode` en `Marketing.savePiece` y formulario del calendario; se conserva cuando una edición omite el campo. La intención exige imagen/carrusel en Instagram/TikTok. `publicationBundle` incluye la música requerida en la huella solo cuando se solicita (bundles antiguos sin música conservan compatibilidad). Cambiar música revoca aprobación. `capabilities.mjs` comunica límites actuales; `schedule` y `validateDelivery` bloquean envíos incompatibles, incluida reclamación por n8n. La UI muestra el requisito y el motivo de bloqueo en calendario/revisión. No se habilita por cookies, sesión Brave o banderas aportadas por el cliente. No se cambió el formato ni se modificaron entregas previas.
+
+Pruebas: `photo-music.test.mjs` verifica ambas plataformas, persistencia/recarga, edición sin pérdida de intención, bloqueo sin crear entrega, revocación/hash, rechazo de formato/modo inválido, compatibilidad histórica y bloqueo al reclamar después de cambios inesperados. Suite Node: 199/199 aprobadas. Publicación real con música: **NO REALIZADA**. No se instaló otro proveedor, compró servicio, extrajo cookie ni creó app TikTok.
+
+Dependencias externas pendientes: TikTok Buffer no expone auto_add_music; candidata Ayrshare `tikTokOptions.autoAddMusic` (solo imágenes), requiere evaluar cuenta/plan, conectar cuenta por OAuth y guardar credencial por mecanismo seguro. No hay integración Ayrshare encontrada en el código revisado. No basta crear app privada TikTok: las reglas oficiales de Direct Post excluyen herramientas limitadas a grupos internos. Instagram API actual no tiene vía verificada para música en fotos; Ayrshare documenta rechazo explícito code515 fuera de Reels. No ofrecer cambio de proveedor como solución a ambas redes.
+
+Fuentes revisadas:
+- https://developers.tiktok.com/docs/en/content-posting-api-reference-photo-post
+- https://developers.tiktok.com/docs/en/content-sharing-guidelines
+- https://developers.buffer.com/reference.html (TikTokPostMetadataInput; InstagramPostMetadataInput)
+- https://www.ayrshare.com/docs/apis/post/social-networks/tiktok (`autoAddMusic`)
+- https://www.ayrshare.com/docs/apis/post/social-networks/instagram (Adding Music to a Reel / Reels Only)
+
+Siguiente paso ejecutable: validar plan/acceso de un proveedor compatible para TikTok antes de integrar su autenticación, envío y conciliación. Criterio de aceptación: fotos originales, música solicitada explícitamente, recibo y URL de cuenta correcta, reconciliación sin duplicados, verificación de audio. Instagram permanece bloqueado mientras no haya soporte API documentado y probado para imágenes/carruseles. No declarar esta capacidad completa por tener selector o pruebas locales.
