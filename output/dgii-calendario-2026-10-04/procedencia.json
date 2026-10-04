@@ -1,0 +1,9 @@
+{
+  "date": "2026-10-04",
+  "method": "built-in image_gen",
+  "model": "not reported",
+  "cost": "not reported",
+  "prompt": "Create a premium photorealistic commercial BACKGROUND asset for ComandPOS electronic invoicing campaign. Vertical 4:5 image. Full-bleed atmospheric Dominican restaurant softly blurred behind warm wooden counter, midnight navy #14233b upper half fading naturally into warm amber/orange #ff6b35 lower half. Upper 48 percent remains dark navy negative space with subtle photographic depth, for typography added later. Hero: a beautiful substantial desk flip-calendar with copper spiral binding and ivory textured paper, occupying the lower half, centered from x18% to x85%, y53% to y90%. Entire calendar visible, realistic paper layers and soft contact shadows, luxurious editorial lighting. Calendar page almost front-facing for legibility. Calendar printed text EXACTLY 'NOVIEMBRE 2026' and a very large bold black '15', beneath it small orange text 'Fecha límite'. These are the ONLY words/numbers in image. No countdown, no brand/logo, no watermark, no UI, no people, no seals, no assertions about further extensions. Keep bottom 8 percent uncluttered dark tabletop for a caption overlay. This is original brand photography, not a copy of another company's advertisement. High-end lens and depth, rich authentic texture, visually striking physical calendar.",
+  "asset": "calendario.png",
+  "purpose": "Reusable DGII calendar background. Countdown and brand logo composed by Studio."
+}

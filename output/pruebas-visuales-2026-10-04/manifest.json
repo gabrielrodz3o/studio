@@ -1,0 +1,93 @@
+{
+  "date": "2026-10-04",
+  "brand": "comandpos",
+  "mode": "local-only",
+  "references": [
+    "content/ads/oct2026/lanzamiento-02oct/comandas-feed.png",
+    "videos/studio/.studio-state/dgii-audit/v2/brand-logo"
+  ],
+  "variants": [
+    {
+      "id": "01-cinematografica",
+      "name": "Fotografía cinematográfica",
+      "prompt": "Use case: ads-marketing. Create ONE finished premium advertising still image for ComandPOS by GCODE restaurant software, vertical 4:5 composition. This is a local creative exploration, not a published advertisement. Reference image 1 is the previous advertising style: preserve brand navy/orange vocabulary but substantially elevate and vary the art direction, do not repeat its generic white bands and icon row. Reference image 2 is the authentic ComandPOS logo: reproduce its geometric G symbol, exact ComandPOS spelling with orange POS and by GCODE accurately; place it on a navy area for contrast, respect its proportions. Brand palette midnight navy #14233b, vivid orange #ff6b35, warm ivory. Communicate only verified features: recording orders and sending kitchen tickets. Main headline EXACT Spanish text: “DEL PEDIDO A COCINA”. Supporting text EXACT: “Gestiona pedidos y envía comandas con ComandPOS.” CTA EXACT: “Solicita tu demo”. Website EXACT: “comandpos.com”. Small but readable bottom footnote EXACT: “Escena ilustrativa · Equipos no incluidos”. Spell all text correctly, clean professional typography, strong mobile legibility, generous edge margins, intentional visual hierarchy, one core idea, no invented prices, statistics, certifications, testimonials, discounts or claims. No QR code, no watermarks, no mock social app frame. Do not invent a detailed product screenshot: any order tile is explicitly a simple illustrative ticket with only “Mesa 4” and “Sin cebolla”. Full finished ad, not a blank photo awaiting text. Distinct sophisticated visual narrative, depth and beautiful craft, not gratuitous decoration.\nArt direction: Immersive editorial food and restaurant photography. Rich dark navy upper third integrates a dramatically large ivory headline, with a restrained orange rule. Dominican restaurant at evening service, candid Dominican waitress holding a tablet in natural three-quarter profile and chef plating mofongo at the pass, focused warm human interaction, subtle motion implied in background only, real skin and stainless-steel texture. Warm tungsten practical lights contrast with cool navy shadows; 50mm commercial photography, selective focus. Bold asymmetric magazine-quality art direction. A single restrained orange flow line visually connects the tablet to a small illustrative kitchen ticket, no floating holograms. Subject fills composition, no giant empty white zones. Brand footer restrained, orange CTA high contrast.",
+      "output": "01-cinematografica.png",
+      "status": "generated_and_visually_reviewed",
+      "method": "built-in image_gen",
+      "source_generated_file": "/Users/gabrielrodriguez/.codex/generated_images/01a0f394-f816-7b42-8a2a-0df7e93d82f4/exec-d8b02779-98c7-4e61-a26e-d313d37e7aff.png",
+      "references": [
+        "content/ads/oct2026/lanzamiento-02oct/comandas-feed.png",
+        "videos/studio/.studio-state/dgii-audit/v2/brand-logo"
+      ],
+      "attempts": 1,
+      "sha256": "f693ccf0a9f3f17a4dfeb7ac8726b2c06fec860d64c7849b1977403bc43d8c9b",
+      "note": "Luz cálida, profundidad y una escena de servicio más envolvente."
+    },
+    {
+      "id": "02-papel-editorial",
+      "name": "Papel recortado",
+      "prompt": "Use case: ads-marketing. Create ONE finished premium advertising still image for ComandPOS by GCODE restaurant software, vertical 4:5 composition. This is a local creative exploration, not a published advertisement. Reference image 1 is the previous advertising style: preserve brand navy/orange vocabulary but substantially elevate and vary the art direction, do not repeat its generic white bands and icon row. Reference image 2 is the authentic ComandPOS logo: reproduce its geometric G symbol, exact ComandPOS spelling with orange POS and by GCODE accurately; place it on a navy area for contrast, respect its proportions. Brand palette midnight navy #14233b, vivid orange #ff6b35, warm ivory. Communicate only verified features: recording orders and sending kitchen tickets. Main headline EXACT Spanish text: “DEL PEDIDO A COCINA”. Supporting text EXACT: “Gestiona pedidos y envía comandas con ComandPOS.” CTA EXACT: “Solicita tu demo”. Website EXACT: “comandpos.com”. Small but readable bottom footnote EXACT: “Escena ilustrativa · Equipos no incluidos”. Spell all text correctly, clean professional typography, strong mobile legibility, generous edge margins, intentional visual hierarchy, one core idea, no invented prices, statistics, certifications, testimonials, discounts or claims. No QR code, no watermarks, no mock social app frame. Do not invent a detailed product screenshot: any order tile is explicitly a simple illustrative ticket with only “Mesa 4” and “Sin cebolla”. Full finished ad, not a blank photo awaiting text. Distinct sophisticated visual narrative, depth and beautiful craft, not gratuitous decoration.\nArt direction: Sophisticated tactile cut-paper and photographic collage. Crafted warm ivory paper, layered navy and orange torn paper, crisp cutout portrait of a Dominican waitress holding a tablet at left and kitchen chef/plated dish at right connected by one folded orange paper ribbon. Large handmade illustrative order ticket Mesa 4 / Sin cebolla sits diagonally between them. Hard light produces real contact shadows and reveals paper fibres. Headline set in oversized condensed navy uppercase across irregular paper planes, completely legible. Editorial collage commissioned by a top design studio, playful but grown-up, tightly curated, no emoji, no clipart. Strong typography balance with interesting dimensional construction. Navy brand block, clean orange CTA.",
+      "output": "02-papel-editorial.png",
+      "status": "generated_and_visually_reviewed",
+      "method": "built-in image_gen",
+      "source_generated_file": "/Users/gabrielrodriguez/.codex/generated_images/01a0f394-f816-7b42-8a2a-0df7e93d82f4/exec-8895ebd5-4f7d-41f4-b54a-5ccb2901f2c7.png",
+      "references": [
+        "content/ads/oct2026/lanzamiento-02oct/comandas-feed.png",
+        "videos/studio/.studio-state/dgii-audit/v2/brand-logo"
+      ],
+      "attempts": 1,
+      "sha256": "1b3f851d515c039c8bc167bbca7368728e1787c38fda1c22564980c899b36707",
+      "note": "Texturas, recortes y capas: la alternativa más cercana al espíritu de Paper Studio."
+    },
+    {
+      "id": "03-tecnologica",
+      "name": "Tecnología y producto",
+      "prompt": "Use case: ads-marketing. Create ONE finished premium advertising still image for ComandPOS by GCODE restaurant software, vertical 4:5 composition. This is a local creative exploration, not a published advertisement. Reference image 1 is the previous advertising style: preserve brand navy/orange vocabulary but substantially elevate and vary the art direction, do not repeat its generic white bands and icon row. Reference image 2 is the authentic ComandPOS logo: reproduce its geometric G symbol, exact ComandPOS spelling with orange POS and by GCODE accurately; place it on a navy area for contrast, respect its proportions. Brand palette midnight navy #14233b, vivid orange #ff6b35, warm ivory. Communicate only verified features: recording orders and sending kitchen tickets. Main headline EXACT Spanish text: “DEL PEDIDO A COCINA”. Supporting text EXACT: “Gestiona pedidos y envía comandas con ComandPOS.” CTA EXACT: “Solicita tu demo”. Website EXACT: “comandpos.com”. Small but readable bottom footnote EXACT: “Escena ilustrativa · Equipos no incluidos”. Spell all text correctly, clean professional typography, strong mobile legibility, generous edge margins, intentional visual hierarchy, one core idea, no invented prices, statistics, certifications, testimonials, discounts or claims. No QR code, no watermarks, no mock social app frame. Do not invent a detailed product screenshot: any order tile is explicitly a simple illustrative ticket with only “Mesa 4” and “Sin cebolla”. Full finished ad, not a blank photo awaiting text. Distinct sophisticated visual narrative, depth and beautiful craft, not gratuitous decoration.\nArt direction: Premium software campaign photomontage with navy-to-cobalt dark backdrop, dramatic orange side lighting, disciplined typography and spacious premium look. A large tablet in three-quarter view held by anatomically correct Dominican restaurant worker hands anchors lower center; its glass screen shows only a minimalist illustrative order ticket Mesa 4 / Sin cebolla, not a fake software UI. Behind it through an architectural orange oval opening is an authentic warm restaurant kitchen with chef preparing food. Physical depth from overlapping photo planes and controlled shadows; a few subtle precise orange routing lines connect order to kitchen. Oversized white headline occupies upper left, orange emphatic A COCINA, exact logo clear at top, CTA and domain in bottom safe zone. Not sci-fi, not crypto, no overwhelming neon or decorative dashboards.",
+      "output": "03-tecnologica.png",
+      "status": "generated_and_visually_reviewed",
+      "method": "built-in image_gen",
+      "source_generated_file": "/Users/gabrielrodriguez/.codex/generated_images/01a0f394-f816-7b42-8a2a-0df7e93d82f4/exec-394c4716-b013-42f3-8f4e-ab06c49813f7.png",
+      "references": [
+        "content/ads/oct2026/lanzamiento-02oct/comandas-feed.png",
+        "videos/studio/.studio-state/dgii-audit/v2/brand-logo"
+      ],
+      "attempts": 1,
+      "sha256": "780e0585fa3f69ea3e7ac7f10a0fd3ed5c0e4ae2c0631f0b306f6a4c22da0791",
+      "note": "Producto protagonista, contraste azul/naranja y recorrido visual del pedido."
+    },
+    {
+      "id": "04-restaurante-3d",
+      "name": "Restaurante en 3D",
+      "prompt": "Create a premium advertising POSTER as a completely STYLIZED 3D ISOMETRIC DIORAMA. Vertical 4:5. The attached image is ONLY the authentic brand logo. Do NOT use photographs or realistic humans. Main visual: an entire miniature restaurant architectural model seen from above at 35 degrees, like a beautiful collectible sculpted clay model or sophisticated miniature set. Visible exposed floor platform floats on ivory studio background, walls cut away, small dining tables on left and open kitchen on right. Matte navy walls, orange pendant lights, textured wood, ceramic dishes. Two small stylized sculpted staff characters with simplified friendly faces and dark Dominican skin: server holding tablet in dining area, chef at kitchen pass. Orange sculptural ribbon connects one table to kitchen, with an illustrative tiny card 'Mesa 4'. Render high-end 3D materials and gorgeous soft occlusion shadows. NO PHOTOGRAPHY, NO CLOSE-UP HUMAN PORTRAITS, NO REAL RESTAURANT PHOTO BACKGROUND. A large miniature world is the visual hero. Editorial graphic composition with ample ivory breathing room and extremely clear navy typography. Exact headline at top: 'DEL PEDIDO A COCINA'. Exact supporting line: 'Gestiona pedidos y envía comandas con ComandPOS.' Authentic attached ComandPOS by GCODE logo in lower navy footer, reproduce faithfully. Orange CTA: 'Solicita tu demo'. Below: 'comandpos.com'. Readable small footnote 'Escena ilustrativa · Equipos no incluidos'. No invented metrics, prices, certifications or features. Strict branding navy #14233b orange #ff6b35. This must visibly be a stylized miniature 3D illustration, NOT a photograph, and clearly different from conventional restaurant stock-photo advertising.",
+      "output": "04-restaurante-3d.png",
+      "status": "generated_and_visually_reviewed",
+      "method": "built-in image_gen",
+      "source_generated_file": "/Users/gabrielrodriguez/.codex/generated_images/01a0f394-f816-7b42-8a2a-0df7e93d82f4/exec-8afb438d-648f-4516-ae57-bdf98d5c4577.png",
+      "references": [
+        "videos/studio/.studio-state/dgii-audit/v2/brand-logo"
+      ],
+      "initial_prompt": "Use case: ads-marketing. Create ONE finished premium advertising still image for ComandPOS by GCODE restaurant software, vertical 4:5 composition. This is a local creative exploration, not a published advertisement. Reference image 1 is the previous advertising style: preserve brand navy/orange vocabulary but substantially elevate and vary the art direction, do not repeat its generic white bands and icon row. Reference image 2 is the authentic ComandPOS logo: reproduce its geometric G symbol, exact ComandPOS spelling with orange POS and by GCODE accurately; place it on a navy area for contrast, respect its proportions. Brand palette midnight navy #14233b, vivid orange #ff6b35, warm ivory. Communicate only verified features: recording orders and sending kitchen tickets. Main headline EXACT Spanish text: “DEL PEDIDO A COCINA”. Supporting text EXACT: “Gestiona pedidos y envía comandas con ComandPOS.” CTA EXACT: “Solicita tu demo”. Website EXACT: “comandpos.com”. Small but readable bottom footnote EXACT: “Escena ilustrativa · Equipos no incluidos”. Spell all text correctly, clean professional typography, strong mobile legibility, generous edge margins, intentional visual hierarchy, one core idea, no invented prices, statistics, certifications, testimonials, discounts or claims. No QR code, no watermarks, no mock social app frame. Do not invent a detailed product screenshot: any order tile is explicitly a simple illustrative ticket with only “Mesa 4” and “Sin cebolla”. Full finished ad, not a blank photo awaiting text. Distinct sophisticated visual narrative, depth and beautiful craft, not gratuitous decoration.\nArt direction: High-end art-directed isometric miniature restaurant, rich tactile 3D materials rather than generic stock illustration. A connected dining room and open kitchen in a single beautifully crafted architectural diorama, warm wood tables, navy cabinetry, orange pendant lights, porcelain plates and stainless pass. Two elegant small stylized Dominican restaurant staff figures, waitress with tablet and chef at kitchen pass, no unnecessary characters. A single orange path travels from table to pass, with one small physical order card Mesa 4 / Sin cebolla. Warm ivory background, soft realistic ambient shadows, tangible clay and architectural-model quality, orange/navy structural details. Diorama is large and hero-worthy, with meticulous materials and excellent spatial composition. Large navy headline upper third, navy logo panel, editorial supporting line and orange CTA below. Clear typography never overlaps model. Distinctive intelligent branded world, not childish toy ad.",
+      "attempts": 2,
+      "sha256": "8d40590d2b8ab5c17a240aafbf95367811e2205e42c67334a0a3d56520915208",
+      "note": "Un restaurante en miniatura: una dirección ilustrada claramente diferente."
+    },
+    {
+      "id": "05-editorial-impacto",
+      "name": "Editorial de alto impacto",
+      "prompt": "Use case: ads-marketing. Create ONE finished premium advertising still image for ComandPOS by GCODE restaurant software, vertical 4:5 composition. This is a local creative exploration, not a published advertisement. Reference image 1 is the previous advertising style: preserve brand navy/orange vocabulary but substantially elevate and vary the art direction, do not repeat its generic white bands and icon row. Reference image 2 is the authentic ComandPOS logo: reproduce its geometric G symbol, exact ComandPOS spelling with orange POS and by GCODE accurately; place it on a navy area for contrast, respect its proportions. Brand palette midnight navy #14233b, vivid orange #ff6b35, warm ivory. Communicate only verified features: recording orders and sending kitchen tickets. Main headline EXACT Spanish text: “DEL PEDIDO A COCINA”. Supporting text EXACT: “Gestiona pedidos y envía comandas con ComandPOS.” CTA EXACT: “Solicita tu demo”. Website EXACT: “comandpos.com”. Small but readable bottom footnote EXACT: “Escena ilustrativa · Equipos no incluidos”. Spell all text correctly, clean professional typography, strong mobile legibility, generous edge margins, intentional visual hierarchy, one core idea, no invented prices, statistics, certifications, testimonials, discounts or claims. No QR code, no watermarks, no mock social app frame. Do not invent a detailed product screenshot: any order tile is explicitly a simple illustrative ticket with only “Mesa 4” and “Sin cebolla”. Full finished ad, not a blank photo awaiting text. Distinct sophisticated visual narrative, depth and beautiful craft, not gratuitous decoration.\nArt direction: Bold contemporary Swiss-inspired editorial food campaign, typographic visual punch. Massive tightly kerned navy headline DEL PEDIDO on warm ivory upper field, A COCINA on vivid orange typographic block, dynamic but impeccably aligned grid. Sculptural cutout photography of an authentic Dominican restaurant server holding a tablet and chef’s hands plating beautiful mofongo weave across the edge of those blocks, strong natural shadows and realistic stainless accents. A close-up food image adds appetizing tactile detail without competing with the software story. Innovative asymmetric composition, orange/navy/ivory blocks with 65 percent photographic visual interest, no repetitive three-icon rows, no rounded generic SaaS cards. Precise hierarchy, typography and photography feel designed together as a magazine cover. Logo neatly at top on navy, concise support and restrained CTA at bottom, outstanding small-screen readability.",
+      "output": "05-editorial-impacto.png",
+      "status": "generated_and_visually_reviewed",
+      "method": "built-in image_gen",
+      "source_generated_file": "/Users/gabrielrodriguez/.codex/generated_images/01a0f394-f816-7b42-8a2a-0df7e93d82f4/exec-d24a9ca2-6a45-4250-89d0-b4704abc0727.png",
+      "references": [
+        "content/ads/oct2026/lanzamiento-02oct/comandas-feed.png",
+        "videos/studio/.studio-state/dgii-audit/v2/brand-logo"
+      ],
+      "attempts": 1,
+      "sha256": "452c3ea2e186262f68e686ea4369f15922bf231f45f878b37183bfb52ba55880",
+      "note": "Tipografía grande y composición editorial para que el mensaje destaque."
+    }
+  ],
+  "provider_model": "Built-in image_gen; model identifier and cost not reported",
+  "publication": "local-only; production unchanged"
+}
