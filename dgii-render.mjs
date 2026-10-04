@@ -1,7 +1,7 @@
 import './fontconfig.mjs';
 import sharp from 'sharp';import {readFile,writeFile} from 'node:fs/promises';import{join}from'node:path';import{createHash}from'node:crypto';import{dgiiContent,DGII_CHECKLIST,DGII_REQUIREMENTS}from'./dgii-content.mjs';
 const e=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-export function validateDgii(s){if(!s.dgii)return;const p=dgiiContent(s.dgii.date);if(s.tipo!=='carrusel'||s.brand_id!=='comandpos'||JSON.stringify(p)!==JSON.stringify(s.dgii)||s.slides.length!==3)throw Error('Contenido DGII alterado o fuera de vigencia')}
+export function validateDgii(s){if(!s.dgii)return;const p=dgiiContent(s.dgii.date);if(s.dgii_cover&&(s.dgii_cover.kind!=='calendar'||s.dgii_cover.deadline!==p.deadline||s.dgii_cover.asset_id!==s.resource_id))throw Error('Portada DGII fuera de contexto');if(s.tipo!=='carrusel'||s.brand_id!=='comandpos'||JSON.stringify(p)!==JSON.stringify(s.dgii)||s.slides.length!==3)throw Error('Contenido DGII alterado o fuera de vigencia')}
 // Measure actual font widths; long daily topics must fail visibly, never run off the image.
 export async function dgiiText(value,x,y,{size=32,width=920,color='#14233b',weight=600,maxLines=3}={}){
  const lines=[];for(const word of String(value).split(/\s+/)){const candidate=lines.length?lines.at(-1)+' '+word:word;const m=await sharp({text:{text:e(candidate),font:`Montserrat Bold ${size}`,rgba:true}}).metadata();if(m.width>width&&lines.length)lines.push(word);else if(lines.length)lines[lines.length-1]=candidate;else lines.push(word)}
@@ -16,6 +16,7 @@ export async function executeDgii(s,dir){
  const count=p.days_left===0?'Hoy vence el plazo':p.days_left===1?'Falta 1 día':`Faltan ${p.days_left} días`;
  for(let i=0;i<3;i++){
  let body='';visible.length=0;
+ if(i===0&&s.dgii_cover?.kind==='calendar'){const out=await calendarCover(s,b,await readFile(join(dir,'brand-photo')),logo);const bytes=out.bytes,filename='pagina-1.jpg';await writeFile(join(dir,'artifacts',filename),bytes);images.push({index:1,filename,width:1080,height:1350,bytes:bytes.length,sha256:createHash('sha256').update(bytes).digest('hex'),visible_text:out.visible_text});continue;}
  if(i===0){
  body=await text('FACTURACIÓN',80,242,{size:72,weight:900,maxLines:1})+await text('ELECTRÓNICA',80,325,{size:72,weight:900,color:orange,maxLines:1});
  body+=`<rect x="80" y="370" width="920" height="270" rx="24" fill="${navy}"/>`;
@@ -43,4 +44,18 @@ export async function executeDgii(s,dir){
  const bytes=await sharp(Buffer.from(svg)).jpeg({quality:95}).toBuffer(),filename='pagina-'+(i+1)+'.jpg';await writeFile(join(dir,'artifacts',filename),bytes);images.push({index:i+1,filename,width:1080,height:1350,bytes:bytes.length,sha256:createHash('sha256').update(bytes).digest('hex'),visible_text:[...visible]});
  }
  await writeFile(join(dir,'artifacts/manifest.json'),JSON.stringify({guion:s,caption:s.caption,images,sources:[p.source,DGII_REQUIREMENTS],design_version:s.dgii_design_version||2,visual_style:s.visual_style||null,review:'pending'}));return{manifest_filename:'manifest.json',images,width:1080,height:1350,caption:s.caption,content_type:'image/jpeg'};
+}
+
+export async function calendarCover(s,b,background,logo){
+ const p=s.dgii,navy=b.primary||'#14233b',orange=b.accent||'#ff6b35',visible=[];
+ const photo=await sharp(background).resize(1080,1350,{fit:'cover'}).png().toBuffer();
+ const t=async(value,x,y,size,color='white',weight=700)=>{visible.push(value);return dgiiText(value,x,y,{size,color,weight,width:940,maxLines:1})};
+ const title=await t('FACTURACIÓN ELECTRÓNICA',74,195,37,'white',800);
+ const lead=await t(p.days_left===0?'El plazo vence':p.days_left===1?'Te queda':'Te quedan',74,294,57);
+ const days=await t(p.days_left===0?'HOY':p.days_left+' '+(p.days_left===1?'día':'días'),64,461,p.days_left===0?160:150,orange,900);
+ const support=await t('para preparar tu negocio.',74,529,38,'white',500)+await t('Pequeños, micros y no clasificados.',74,588,27,'white',600);
+ const bottom=await t('Desliza para conocer los pasos →',74,1264,29,'white',800)+await t('DGII · Aviso 06-26 · Verifica tu clasificación.',74,1309,19,'white',500);
+ visible.push('15 NOVIEMBRE 2026','Fecha límite');
+ const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1350"><defs><linearGradient id="shade" x2="0" y2="1"><stop stop-color="${navy}" stop-opacity=".6"/><stop offset=".49" stop-color="${navy}" stop-opacity=".1"/><stop offset=".82" stop-color="${navy}" stop-opacity="0"/><stop offset="1" stop-color="${navy}" stop-opacity=".9"/></linearGradient></defs><image href="data:image/png;base64,${photo.toString('base64')}" width="1080" height="1350"/><rect width="1080" height="1350" fill="url(#shade)"/><image href="data:image/png;base64,${logo.toString('base64')}" x="74" y="45" width="300" height="80"/>${title}${lead}${days}${support}${bottom}</svg>`;
+ return {bytes:await sharp(Buffer.from(svg)).jpeg({quality:96}).toBuffer(),visible_text:visible};
 }

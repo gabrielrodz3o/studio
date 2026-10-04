@@ -191,6 +191,7 @@ const server=createServer(async(req,res)=>{
     if(path==='/api/version'&&req.method==='GET')return json(200,await versions.get(url.searchParams.get('kind'),url.searchParams.get('name'),url.searchParams.get('id')))
     if(req.method==='POST'){
       access.sameOrigin(req);access.require(req,['admin','editor'])
+      if(path==='/api/image-lines/dgii-cover'){access.require(req,['admin']);return json(200,await imageLines.configureDgiiCover(await body(req),actor.username))}
       if(path==='/api/image-lines/rotation'){access.require(req,['admin']);return json(200,await imageLines.configureRotation(await body(req),actor.username))}
       if(path==='/api/image-lines/default'){access.require(req,['admin']);return json(200,await imageLines.setDefault((await body(req)).line_id,actor.username))}
       if(path==='/api/image-lines/config'){access.require(req,['admin']);return json(200,await imageLines.saveLine(await body(req),actor.username))}

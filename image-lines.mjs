@@ -44,6 +44,7 @@ export class ImageLines{
  snapshot(){return structuredClone({lines:this.lines,default_line_id:this.settings.default_line_id,jobs:this.jobs.map(j=>({...j,prompt:undefined})),options:{...imageOptions,visual_styles:visualDirections},rotation:this.rotation,style_references:this.settings.style_references||{},rotation_enabled:!!this.settings.rotation_enabled})}
  get(id){const j=this.jobs.find(j=>j.id===id);if(!j)throw fail(404,'Generación no encontrada');return structuredClone(j)}
  asset(id){const a=this.marketing.asset(id);if(a.meta.type!=='image'||a.meta.expires_at&&Date.parse(a.meta.expires_at)<=Date.now())throw fail(422,'Referencia no disponible');return a}
+ configureDgiiCover(d,actor){return this.tx(async()=>{const a=this.asset(d.asset_id);if(a.meta.brand_id!=='comandpos'||d.deadline!=='2026-11-15')throw fail(422,'Referencia o fecha DGII inválida');const settings={...this.settings,dgii_calendar:{asset_id:a.meta.id,sha256:a.meta.hash,deadline:d.deadline,configured_by:actor,at:now()}};await save(join(this.dir,'settings.json'),settings);this.settings=settings;return this.settings.dgii_calendar})}
  configureRotation(d,actor){return this.tx(async()=>{if(typeof d.enabled!=='boolean')throw fail(422,'Indica enabled');const refs=d.references||this.settings.style_references||{};for(const [id,asset] of Object.entries(refs)){visualDirection(id);this.asset(asset)}const settings={...this.settings,rotation_enabled:d.enabled,style_references:refs,updated_by:actor,updated_at:now()};await save(join(this.dir,'settings.json'),settings);this.settings=settings;return this.snapshot()})}
  async chooseStyle(brand,key,requested='auto'){
  const prior=this.rotation.assignments.find(a=>a.brand_id===brand&&a.key===key);if(prior)return structuredClone(prior);
@@ -55,6 +56,7 @@ export class ImageLines{
  }
  // Creates one reusable background per piece. Reconsulting the same key never buys twice.
  async preparePiece(script,key,actor='automation'){
+ if(script.dgii&&this.settings.dgii_calendar){const c=this.settings.dgii_calendar,a=this.asset(c.asset_id);if(script.brand_id!=='comandpos'||script.dgii.deadline!==c.deadline||a.meta.brand_id!==script.brand_id||a.meta.hash!==c.sha256)throw Error('La portada DGII requiere revisar marca, fecha o recurso');return {...script,resource_id:c.asset_id,dgii_design_version:4,dgii_cover:{...c,kind:'calendar'},visual_style:{id:'cinematografica',name:'Calendario editorial DGII',mode:'campaign',additional_generation_cost_usd:0}};}
  if(!this.settings.rotation_enabled||!this.settings.default_line_id)return script;
  if(!['imagen','carrusel','historia_social'].includes(script.tipo))return script;
  const brand=this.marketing.brand(script.brand_id||'comandpos'),facts=String(brand.facts||'').split(/\.\s*/).map(x=>x.trim()).filter(Boolean),words=String(script.titular+' '+script.subtitulo).toLowerCase().split(/\W+/).filter(x=>x.length>3);
