@@ -521,3 +521,11 @@ Aceptación: cinco estilos distintos por ciclo; no repetición en frontera; reco
 ## GST-041 — Cuenta regresiva DGII comprensible (2026-10-04)
 
 Implementación local verificada: `dgii-content.mjs`, `dgii-render.mjs`. Título «Facturación electrónica», número protagonista, fecha completa y destinatarios pequeños/micros/no clasificados; requisitos en español sin e-CF como título. Caption conserva definición técnica y fuentes. Contador por día, no «43» fijo; expiración bloquea. Se conserva el contenido publicado y la aprobación ligada a versión. 44 días renderizados en pruebas; portada de 42 días revisada visualmente. No se publica una corrección duplicada. Fuente oficial Aviso 06-26 verificada el 4 octubre.
+
+### GST-040 / GST-041 — Verificación de producción
+
+Desplegado en gcoderd2 el 2026-10-04; código `78b5969`. Actualizaciones saludables, respaldo de imagen anterior `gcode-studio:before-20261004T142906Z` y archivos privados conservados. Rotación activa en `nueva-direccion-visual`, cinco referencias importadas a la biblioteca (no enlaces externos); historial por marca visible. Navegador real a 1440 y 390 px: siete opciones (auto, cinco estilos, clásico), cinco referencias, sin errores JS ni desbordamiento. Pruebas: suite completa 207/207; tras el ajuste de referencias/gramática, 19 pruebas específicas aprobadas.
+
+Generación real `img_36a2946c-9141-422a-ae78-9142ded4cb28` terminada: cinematográfica, referencia `d2891d4c-54f2-46a8-a973-17b40acb150a`, SHA256 `f693ccf0a9f3f17a4dfeb7ac8726b2c06fec860d64c7849b1977403bc43d8c9b`, 1,966,794 bytes enviados. Modelo ejecutado configurado `gpt-image-2.5-sunburst-2026-09-08`. Estimación basada en tokens US$0.05947 (no cargo conciliado). Imagen en `/images.html?job=img_36a2946c-9141-422a-ae78-9142ded4cb28`.
+
+Muestra DGII generada en Studio: `job_dced97a9-45a4-4b89-8d2d-1b7ea9099ce5`, tres páginas, cuenta de 42 días y fondo de la prueba real. Revisión visual de las tres páginas realizada. Portada accesible con sesión en `/api/centro/jobs/job_dced97a9-45a4-4b89-8d2d-1b7ea9099ce5/artifacts/image-1`. Sin programar ni publicar la muestra; los trabajos y entregas previas mantienen su versión. Las próximas generaciones automáticas de imágenes/carruseles/historias usan la rotación; no altera estilos de video.
