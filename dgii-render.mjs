@@ -18,14 +18,17 @@ export async function executeDgii(s,dir){
  let body='';visible.length=0;
  if(i===0){
  body=await text('FACTURACIÓN',80,242,{size:72,weight:900,maxLines:1})+await text('ELECTRÓNICA',80,325,{size:72,weight:900,color:orange,maxLines:1});
- body+=`<rect x="80" y="367" width="920" height="91" rx="20" fill="${navy}"/>`+await text(count+' · 15 NOV 2026',110,427,{size:39,color:'white',weight:800,width:860,maxLines:1});
- body+=await text('Plazo para pequeños, micros y no clasificados.',80,504,{size:29,maxLines:1});
- body+=`<image href="data:image/png;base64,${photo.toString('base64')}" x="80" y="551" width="920" height="470"/>`;
- body+=`<rect x="695" y="770" width="270" height="219" rx="20" fill="white" stroke="${orange}" stroke-width="3"/><path d="M740 933H920M740 960H890" stroke="#d8dde5" stroke-width="6"/>`+await text('e-CF',728,843,{size:54,weight:900,width:210,maxLines:1})+await text('Comprobante fiscal electrónico',728,874,{size:17,width:210,maxLines:2});
- body+=await text('Prepara tu negocio para emitir e-CF.',80,1080,{size:35,weight:800,maxLines:1})+await text('Desliza: requisitos clave y una acción para hoy.',80,1140,{size:29,maxLines:1});
+ body+=`<rect x="80" y="370" width="920" height="270" rx="24" fill="${navy}"/>`;
+ body+=await text(p.days_left===0?'HOY VENCE':p.days_left===1?'FALTA':'FALTAN',112,416,{size:28,color:'white',maxLines:1});
+ body+=await text(String(p.days_left),105,602,{size:176,color:'white',weight:900,width:370,maxLines:1});
+ body+=await text(p.days_left===1?'DÍA':'DÍAS',485,510,{size:61,color:'white',weight:900,width:420,maxLines:1});
+ body+=await text('15 NOVIEMBRE 2026',485,567,{size:27,color:'white',width:445,maxLines:1});
+ body+=await text('Plazo para pequeños, micros y no clasificados.',80,692,{size:29,maxLines:1});
+ body+=`<image href="data:image/png;base64,${photo.toString('base64')}" x="80" y="725" width="920" height="300" preserveAspectRatio="xMidYMid meet"/>`;
+ body+=await text('Prepara tu negocio para facturar electrónicamente.',80,1080,{size:30,weight:800,maxLines:1})+await text('Desliza: requisitos clave y una acción para hoy.',80,1140,{size:29,maxLines:1});
  }
  if(i===1){
- body=await text('Tu ruta hacia los e-CF',80,238,{size:51,weight:900,maxLines:1})+await text('Puntos clave para la facturación electrónica',80,295,{size:29,maxLines:1});
+ body=await text('Cómo emitir facturas electrónicas',80,238,{size:43,weight:900,maxLines:1})+await text('Puntos clave para la facturación electrónica',80,295,{size:29,maxLines:1});
  for(const [k,step]of DGII_CHECKLIST.entries()){const y=345+k*177;body+=`<rect x="80" y="${y}" width="920" height="156" rx="20" fill="#f4f6f9"/><circle cx="126" cy="${y+45}" r="23" fill="${orange}"/>`+await text(String(k+1),118,y+53,{size:22,color:'white',width:32,maxLines:1})+await text(step.title,172,y+46,{size:32,weight:800,width:785,maxLines:1})+await text(step.body,172,y+89,{size:25,weight:500,width:775,maxLines:2});}
  body+=await text('Consulta el procedimiento completo en dgii.gov.do',80,1119,{size:28,maxLines:1})+await text('Confirma tu caso con la DGII y tu contador.',80,1164,{size:27,maxLines:1});
  }
@@ -35,8 +38,9 @@ export async function executeDgii(s,dir){
  body+=`<rect x="80" y="810" width="920" height="353" rx="24" fill="${navy}"/>`+await text('Organiza pedidos, mesas y cuentas',112,871,{size:35,color:'white',width:850,weight:800,maxLines:1})+await text('con ComandPOS.',112,920,{size:35,color:'white',maxLines:1})+await text('Solicita una demo de estas funciones.',112,983,{size:28,color:'white',width:850,maxLines:1})+`<rect x="112" y="1020" width="856" height="69" rx="16" fill="${orange}"/>`+await text('+1 849 540 6093 · comandpos.com',145,1065,{size:28,color:'white',width:790,maxLines:1})+await text('La demo no sustituye la autorización fiscal de la DGII.',112,1131,{size:22,color:'white',width:850,maxLines:1});
  }
  const footer=await text(i===0?'DGII · Aviso 06-26 · Verifica tu clasificación.':i===1?'Fuente: DGII · Autorización para ser Emisor Electrónico.':'Guía informativa · Revisa tu proceso fiscal con tu contador.',80,1244,{size:21,width:920,maxLines:1})+await text('GCODE · Contenido informativo; no es una comunicación oficial de DGII.',80,1282,{size:19,width:920,maxLines:1});
- const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1350"><rect width="1080" height="1350" fill="white"/><rect x="70" y="40" width="360" height="100" rx="18" fill="${navy}"/><image href="data:image/png;base64,${logo.toString('base64')}" x="100" y="50" width="300" height="80"/><text x="1000" y="99" text-anchor="end" font-family="Montserrat" font-size="22" font-weight="700" fill="${navy}">GUÍA PARA TU NEGOCIO · RD</text>${body}<rect x="80" y="1203" width="920" height="3" fill="${orange}"/>${footer}<text x="1000" y="1320" text-anchor="end" font-family="Montserrat" font-size="20" fill="${navy}">${i+1}/3</text></svg>`;
+ const decor=s.visual_style?.id==='papel-editorial'?`<path d="M20 180L52 230L25 300L52 380L22 460L50 600L25 780L50 940L25 1110L50 1280" stroke="${orange}" stroke-width="16" fill="none"/>`:s.visual_style?.id==='tecnologica'?`<path d="M1035 170V1190H1010" stroke="${orange}" stroke-width="8" fill="none"/>`:s.visual_style?.id==='editorial-impacto'?`<rect x="0" y="170" width="28" height="1010" fill="${orange}"/>`:'';
+ const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1350"><rect width="1080" height="1350" fill="${s.visual_style?.id==='papel-editorial'||s.visual_style?.id==='restaurante-3d'?'#f8f3e9':'white'}"/>${decor}<rect x="70" y="40" width="360" height="100" rx="18" fill="${navy}"/><image href="data:image/png;base64,${logo.toString('base64')}" x="100" y="50" width="300" height="80"/><text x="1000" y="99" text-anchor="end" font-family="Montserrat" font-size="22" font-weight="700" fill="${navy}">GUÍA PARA TU NEGOCIO · RD</text>${body}<rect x="80" y="1203" width="920" height="3" fill="${orange}"/>${footer}<text x="1000" y="1320" text-anchor="end" font-family="Montserrat" font-size="20" fill="${navy}">${i+1}/3</text></svg>`;
  const bytes=await sharp(Buffer.from(svg)).jpeg({quality:95}).toBuffer(),filename='pagina-'+(i+1)+'.jpg';await writeFile(join(dir,'artifacts',filename),bytes);images.push({index:i+1,filename,width:1080,height:1350,bytes:bytes.length,sha256:createHash('sha256').update(bytes).digest('hex'),visible_text:[...visible]});
  }
- await writeFile(join(dir,'artifacts/manifest.json'),JSON.stringify({guion:s,caption:s.caption,images,sources:[p.source,DGII_REQUIREMENTS],design_version:2,review:'pending'}));return{manifest_filename:'manifest.json',images,width:1080,height:1350,caption:s.caption,content_type:'image/jpeg'};
+ await writeFile(join(dir,'artifacts/manifest.json'),JSON.stringify({guion:s,caption:s.caption,images,sources:[p.source,DGII_REQUIREMENTS],design_version:s.dgii_design_version||2,visual_style:s.visual_style||null,review:'pending'}));return{manifest_filename:'manifest.json',images,width:1080,height:1350,caption:s.caption,content_type:'image/jpeg'};
 }

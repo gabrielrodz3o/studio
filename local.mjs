@@ -46,8 +46,9 @@ async function createPiece(input,key,actor){
  if(input.aspect!=null&&!['vertical','horizontal','square','portrait'].includes(input.aspect))throw problem(422,'Formato de salida inválido')
  if(input.produce&&input.kind==='video'&&input.allow_paid_voice!==true)throw problem(422,'Autoriza la generación de voz para producir el video')
  const result=actor==='automation'&&input.editorial&&input.kind!=='video'?{id:createHash('sha256').update(key).digest('hex'),kind:input.kind,campaign_id:input.campaign_id,concept_id:input.editorial.topic,script:editorialScript(input.editorial,input.kind,key),caption:editorialScript(input.editorial,input.kind,key).caption,selection:{topic:input.editorial.title},warnings:['Contenido editorial migrado: revisar hechos, imagen y texto antes de aprobar.']}:await creative.create(input,key,actor)
- if(actor==='automation'&&input.editorial&&input.kind!=='video')result.script=await prepareEditorialPhoto(result.script,root,photos,key)
- if(actor==='automation'&&result.script.editorial?.story)result.script=await imageLines.prepareStory(result.script)
+ if(!imageLines.settings.rotation_enabled&&actor==='automation'&&input.editorial&&input.kind!=='video')result.script=await prepareEditorialPhoto(result.script,root,photos,key)
+ if(!imageLines.settings.rotation_enabled&&actor==='automation'&&result.script.editorial?.story)result.script=await imageLines.prepareStory(result.script)
+ if(input.kind!=='video'&&input.produce){try{result.script=await imageLines.preparePiece(result.script,key,actor)}catch(e){if(actor==='automation'||e.code!=='WAITING_RESOURCE')throw e;await imageLines.running;result.script=await imageLines.preparePiece(result.script,key,actor)}result.caption=result.script.caption;}
  await versions.save(result.kind,result.script,actor)
  if(!input.produce)return result
  const request={...(input.budget_group?{budget_group:input.budget_group}:{}),brand_id:input.brand_id||'comandpos',kind:result.kind,script:result.script,creative_id:result.id,concept_id:result.concept_id,caption:result.caption,...(result.campaign_id?{campaign_id:result.campaign_id}:{}),...(result.kind==='video'?{voice:true,subtitles:true,allow_paid_voice:true,aspect:input.aspect||'vertical',max_budget_usd:2}:{})}
@@ -81,7 +82,7 @@ const ads=await new AdsStore(root,{brands:()=>marketing.data.brands,capture:asyn
 const imageLines=await new ImageLines(root,{marketing,budget:creative.budget}).init();
 const batches=await new Batches(root,{produce:createPiece,budget:creative.budget,store,linkJob:async(pieceId,jobId,actor)=>{const p=marketing.data.pieces.find(p=>p.id===pieceId);if(!p)throw problem(404,'Pieza no encontrada');await marketing.savePiece({...p,job_id:jobId},actor,store)}}).init();
 const automation=await new Automation(root,{marketing,store,produce:createPiece,editorial:await new EditorialCalendar(root).init()}).init();
-const dgii=await new DgiiAutomation(root,{marketing,store,versions}).init();automation.dgii=dgii;
+const dgii=await new DgiiAutomation(root,{marketing,store,versions,prepareVisual:(s,key)=>imageLines.preparePiece(s,key,'dgii-automation')}).init();automation.dgii=dgii;
 const mime={'.gz':'application/gzip','.css':'text/css; charset=utf-8','.html':'text/html; charset=utf-8','.mjs':'text/javascript','.js':'text/javascript','.json':'application/json','.png':'image/png','.webp':'image/webp','.jpg':'image/jpeg','.ttf':'font/ttf','.mp3':'audio/mpeg','.wav':'audio/wav','.mp4':'video/mp4'}
 const digest=x=>createHash('sha256').update(x).digest()
 function authenticated(req){return timingSafeEqual(digest(req.headers.authorization||''),digest('Bearer '+token))}
@@ -190,6 +191,7 @@ const server=createServer(async(req,res)=>{
     if(path==='/api/version'&&req.method==='GET')return json(200,await versions.get(url.searchParams.get('kind'),url.searchParams.get('name'),url.searchParams.get('id')))
     if(req.method==='POST'){
       access.sameOrigin(req);access.require(req,['admin','editor'])
+      if(path==='/api/image-lines/rotation'){access.require(req,['admin']);return json(200,await imageLines.configureRotation(await body(req),actor.username))}
       if(path==='/api/image-lines/default'){access.require(req,['admin']);return json(200,await imageLines.setDefault((await body(req)).line_id,actor.username))}
       if(path==='/api/image-lines/config'){access.require(req,['admin']);return json(200,await imageLines.saveLine(await body(req),actor.username))}
       if(path==='/api/image-lines/generate'){const d=await body(req);return json(202,await imageLines.create(d,req.headers['idempotency-key'],actor.username))}

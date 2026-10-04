@@ -59,3 +59,17 @@ Limitación: la configuración admite varias marcas y líneas y se probó su ais
 ## Selección predeterminada solicitada por el usuario
 
 2026-10-03: configuración persistente `image-lines/settings.json` con `default_line_id: nueva-direccion-visual`, establecida mediante endpoint privado de administrador. La UI utiliza esta selección al abrir `/images.html` sin parámetro de línea; una selección explícita continúa teniendo prioridad. No cambia líneas guardadas, imágenes existentes ni automatizaciones de n8n. Despliegue `67ec2b3`; siete pruebas de imágenes aprobadas. API de producción confirma la selección y conserva tres trabajos.
+
+## 4 octubre 2026: cinco direcciones y rotación controlada
+
+`visual-directions.mjs` define cinematográfica, papel editorial, tecnología/producto, mundo de marca 3D y editorial de impacto. La rotación está activada por configuración (`POST /api/image-lines/rotation`), no por una migración destructiva de las líneas. `style_references` relaciona cada dirección con un recurso real de la biblioteca, enviado como imagen al proveedor. El modelo sigue siendo el configurado en la línea.
+
+`ImageLines.chooseStyle` mantiene una bolsa aleatoria por marca en `rotation.json`. Cada ciclo consume los cinco estilos antes de repetir y evita repetir el último al comenzar el siguiente. Las claves de solicitud conservan la elección después de reintentos/reinicio. Los trabajos guardan estilo, ciclo, referencia, prompt y proveedor; las imágenes previas conservan su composición. La UI muestra selección automática/manual y el historial. Se puede desactivar la rotación desde la configuración.
+
+`preparePiece` produce un fondo por pieza (reutilizado entre páginas del carrusel) y las automatizaciones esperan su finalización con `WAITING_RESOURCE`. Errores inciertos no se compran de nuevo. No se ejecuta también el generador fotográfico anterior. Reserva conservadora existente: US$0.75 por fondo, sin alterar el límite diario. Antes las historias reutilizaban fotos: la diversidad ahora puede implicar una generación adicional por historia. No cambia el flujo de publicación ni autoriza nuevos destinos.
+
+`visual-compose.mjs` aplica tipografía y logotipo auténtico fuera del modelo, geometrías/colores según dirección y márgenes de historias. Fotografía vs. 3D depende del fondo generado, no de un filtro cosmético. Los modelos generativos no garantizan una réplica exacta de los bocetos aprobados; revisar los primeros resultados. Video conserva su motor y estilos existentes: esta mejora corresponde a imágenes, carruseles e historias estáticas.
+
+La campaña DGII mantiene tres páginas, fuentes, límites de vigencia y grupo aplicable. Diseño v3 elimina siglas de titulares y portada, explica el término en el caption y destaca el contador calculado por fecha. Hoy 2026-10-04: 42 días hasta 2026-11-15. Aviso oficial comprobado: https://dgii.gov.do/publicacionesOficiales/avisosInformativos/Documents/2026/06-26.pdf . No se editan entregas previas ni se afirma certificación de ComandPOS.
+
+Validación local: 207 pruebas aprobadas; incluye 44 días de DGII, 15 combinaciones de estilo/formato, persistencia y separación de marcas, idempotencia, referencias binarias, recuperación y espera del recurso DGII. La prueba del proveedor usa doble controlado; la generación real y despliegue se registran por separado.
