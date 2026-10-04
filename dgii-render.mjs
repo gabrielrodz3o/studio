@@ -13,7 +13,7 @@ export async function executeDgii(s,dir){
  validateDgii(s);const b=JSON.parse(await readFile(join(dir,'brand-profile.json'))),p=s.dgii,images=[],navy=b.primary,orange=b.accent,visible=[];
  const photo=await sharp(await readFile(join(dir,'brand-photo'))).resize(920,470,{fit:'cover',position:'centre'}).png().toBuffer(),logo=await sharp(await readFile(join(dir,'brand-logo'))).resize(300,80,{fit:'inside'}).png().toBuffer();
  const text=async(value,x,y,opts={})=>{visible.push(value);return dgiiText(value,x,y,{color:navy,...opts})};
- const count=p.days_left===0?'Hoy vence el plazo':`Faltan ${p.days_left} días`;
+ const count=p.days_left===0?'Hoy vence el plazo':p.days_left===1?'Falta 1 día':`Faltan ${p.days_left} días`;
  for(let i=0;i<3;i++){
  let body='';visible.length=0;
  if(i===0){
