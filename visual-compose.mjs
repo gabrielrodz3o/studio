@@ -1,9 +1,11 @@
+import {composeStory} from './story-compose.mjs';
 import './fontconfig.mjs';
 import sharp from 'sharp';
 import {visualDirection} from './visual-directions.mjs';
 const e=s=>String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 async function wrap(value,size,width,max){const out=[];for(const word of String(value||'').split(/\s+/)){const next=out.length?out.at(-1)+' '+word:word;const m=await sharp({text:{text:e(next),font:'Montserrat Bold '+size,rgba:true}}).metadata();if(m.width>width&&out.length)out.push(word);else if(out.length)out[out.length-1]=next;else out.push(word)}if(out.length>max)throw Error('Acorta el texto para esta composición');for(const t of out){const m=await sharp({text:{text:e(t),font:'Montserrat Bold '+size,rgba:true}}).metadata();if(m.width>width)throw Error('Texto demasiado ancho')}return out}
-export async function composeVisual({bytes,logo,brand,style,headline,subline,cta,width=1080,height=1350,points=[],page=''}){
+export async function composeVisual({bytes,logo,brand,style,headline,subline,cta,width=1080,height=1350,points=[],page='',storyHour}){
+ if(height/width>1.65)return composeStory({bytes,logo,brand,style,headline,subline,cta,width,height,points,storyHour});
  const d=visualDirection(style),navy=/^#[a-f\d]{6}$/i.test(brand.primary)?brand.primary:'#14233b',accent=/^#[a-f\d]{6}$/i.test(brand.accent)?brand.accent:'#ff6b35',fg=d.dark?'#ffffff':navy,bg=d.dark?navy:'#f8f3e9',story=height/width>1.65,top=story?180:48,foot=story?height-410:height-240;
  const scale=width/1080; // Layout in 1080-wide coordinates; resize only the final vector.
  const H=height/scale,T=top/scale,F=foot/scale;
